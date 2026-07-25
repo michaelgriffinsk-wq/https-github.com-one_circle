@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Circle | Season 5 Gallery</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #0a0a0a; 
+            color: #fff; 
+            margin: 0; 
+            line-height: 1.6;
+        }
+        /* Navigation */
+        nav {
+            background-color: #111;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #cc0000;
+        }
+        nav a { color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em; transition: color 0.2s;}
+        nav a:hover { color: #cc0000; }
+        nav span { font-weight: bold; letter-spacing: 1px; }
+        
+        /* Header */
+        header { 
+            text-align: center; 
+            padding: 60px 20px; 
+            background: linear-gradient(180deg, #3a0000 0%, #0a0a0a 100%);
+        }
+        header h1 { margin: 0; font-size: 2.2em; text-transform: uppercase; letter-spacing: 2px; }
+        header p { color: #aaa; font-size: 1em; margin: 10px 0 0 0; }
+
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        
+        /* Grid Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #222; 
+        }
+        .gallery-img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(204, 0, 0, 0.4);
+        }
+
+        footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; border-top: 1px solid #222; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">← Back to Home</a>
+        <span>ONE CIRCLE</span>
+    </nav>
+
+    <header>
+        <h1>Season 5 Gallery</h1>
+        <p>The Father's Love • 24/7/2026</p>
+    </header>
+
+    <div class="container">
+        <!-- The JavaScript will inject the images into this empty div -->
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
+    </footer>
+
+    <script>
+        // --- GALLERY CONFIGURATION ---
+        
+        // 1. How many photos are in the folder? Update this number!
+        const totalImages = 15; 
+        
+        // 2. What is the folder name?
+        const folderName = "gallery_season_5";
+        
+        // ------------------------------
+
+        const galleryGrid = document.getElementById('galleryGrid');
+
+        // Loop through the numbers 1 to totalImages
+        for (let i = 1; i <= totalImages; i++) {
+            // Create an image element
+            const img = document.createElement('img');
+            
+            // Build the source path (e.g., images_season_5/1.jpg)
+            img.src = `${folderName}/${i}.jpg`;
+            img.alt = `Season 5 Moment ${i}`;
+            img.className = 'gallery-img';
+            
+            // Add it to the webpage
+            galleryGrid.appendChild(img);
+        }
+    </script>
+
+</body>
+</html>
