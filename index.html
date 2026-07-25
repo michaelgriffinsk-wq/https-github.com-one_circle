@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Circle | Official Website</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #0a0a0a; 
+            color: #fff; 
+            margin: 0; 
+            line-height: 1.6;
+        }
+        /* Navigation */
+        nav {
+            background-color: #111;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #cc0000;
+        }
+        nav h2 { margin: 0; color: #fff; letter-spacing: 1px; font-size: 1.2em; }
+        
+        /* Hero Section */
+        header { 
+            text-align: center; 
+            padding: 80px 20px; 
+            background: linear-gradient(180deg, #3a0000 0%, #0a0a0a 100%);
+        }
+        header h1 { margin: 0; font-size: 2.8em; text-transform: uppercase; letter-spacing: 3px; }
+        header p { color: #aaa; font-size: 1.1em; max-width: 600px; margin: 20px auto 0; }
+
+        /* Main Content Container */
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .section-title { font-size: 1.8em; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 30px; }
+
+        /* =========================================
+           NEW: Upcoming Event Banner
+           ========================================= */
+        .upcoming-card {
+            background: linear-gradient(45deg, #1a0000 0%, #111 100%);
+            border-left: 4px solid #cc0000;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.15);
+        }
+        .upcoming-info h3 { margin: 0 0 5px 0; font-size: 1.6em; color: #fff; }
+        .upcoming-info .event-details { color: #cc0000; font-weight: bold; margin: 0 0 10px 0; font-size: 1.1em; }
+        .upcoming-info p { margin: 0; color: #aaa; font-size: 0.95em; max-width: 500px; }
+        
+        /* Mobile responsiveness for the upcoming banner */
+        @media (max-width: 650px) {
+            .upcoming-card { flex-direction: column; text-align: center; gap: 20px; }
+            .upcoming-card .btn { width: 100%; box-sizing: border-box; text-align: center; }
+        }
+
+        /* Event Grid for Past Seasons */
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Event Cards */
+        .card {
+            background-color: #151515;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-img { width: 100%; height: 200px; background-color: #222; object-fit: cover; }
+        .card-content { padding: 20px; }
+        .card-title { margin: 0 0 10px 0; font-size: 1.3em; color: #cc0000; }
+        
+        /* Lists inside cards */
+        .card-list { padding-left: 20px; color: #ccc; font-size: 0.9em; margin-bottom: 20px;}
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            background-color: #cc0000;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #ff1a1a; }
+        .btn.disabled { background-color: #444; color: #888; cursor: not-allowed; }
+
+        footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; border-top: 1px solid #222; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2>ONE CIRCLE</h2>
+    </nav>
+
+    <header>
+        <h1>Welcome to One Circle</h1>
+        <p>A community of worship, music, and fellowship. Explore our past seasons and listen to our live recordings.</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- UPCOMING EVENT SECTION -->
+        <h2 class="section-title">Next Event</h2>
+        <div class="upcoming-card">
+            <div class="upcoming-info">
+                <h3>[Season 6: Title TBA]</h3>
+                <p class="event-details">📅 [Date TBD] &nbsp;|&nbsp; 📍 [CITAM NGONG]</p>
+                <p>We are currently planning our next gathering. Stay tuned for more details, guest announcements, and registration info!</p>
+            </div>
+            <div class="upcoming-action">
+                <!-- A disabled button that you can activate later -->
+                <a href="#" class="btn disabled">More Info Soon</a>
+            </div>
+        </div>
+
+        <!-- PAST EVENTS SECTION -->
+        <h2 class="section-title">Past Events</h2>
+        <div class="event-grid">
+            
+            <!-- Season 5 Card -->
+            <div class="card">
+                <img src="1000594675.jpg" alt="Season 5 Poster" class="card-img">
+                <div class="card-content">
+                    <h3 class="card-title">Season 5: The Father's Love</h3>
+                    <p style="font-size: 0.85em; color: #888; margin-top: 0;">24/7/2026</p>
+                    <ul class="card-list">
+                        <li>Live Worship Session</li>
+                        <li>Amapiano & Moyo Wangu Medleys</li>
+                        <li>21 Songs</li>
+                    </ul>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                        <a href="playlist_season_5.html" class="btn">Listen ▶</a>
+                        <a href="gallery_season_5.html" class="btn" style="background-color: #333;">Gallery 📷</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Season 4 Card -->
+            <div class="card">
+                <div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>
+                <div class="card-content">
+                    <h3 class="card-title">Season 4: [Event Name]</h3>
+                    <ul class="card-list">
+                        <li>[Highlight 1]</li>
+                        <li>[Highlight 2]</li>
+                        <li>[Highlight 3]</li>
+                    </ul>
+                    <a href="#" class="btn disabled">Media Coming Soon</a>
+                </div>
+            </div>
+
+            <!-- Season 3 Card -->
+            <div class="card">
+                <div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>
+                <div class="card-content">
+                    <h3 class="card-title">Season 3: [Event Name]</h3>
+                    <ul class="card-list">
+                        <li>[Highlight 1]</li>
+                        <li>[Highlight 2]</li>
+                    </ul>
+                    <a href="#" class="btn disabled">Media Coming Soon</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
+    </footer>
+
+</body>
+</html>
+
