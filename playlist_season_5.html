@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Circle | The Father's Love</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #0a0a0a; 
+            color: #fff; 
+            margin: 0; 
+            padding: 0 0 120px 0; 
+        }
+        header { 
+            text-align: center; 
+            padding: 40px 20px; 
+            background: linear-gradient(180deg, #3a0000 0%, #0a0a0a 100%);
+        }
+        .poster-img {
+            width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(204, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        h1 { margin: 0; font-size: 2em; text-transform: uppercase; letter-spacing: 2px; }
+        p.subtitle { color: #aaa; font-size: 0.9em; letter-spacing: 1px;}
+        
+        .container { max-width: 600px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Master Play Button */
+        .master-controls { display: flex; align-items: center; margin: 20px 0 30px; }
+        .play-all-btn {
+            background-color: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.4);
+            transition: transform 0.2s;
+        }
+        .play-all-btn:active { transform: scale(0.95); }
+
+        /* Tracklist */
+        .track-list { list-style: none; padding: 0; margin: 0; }
+        .track-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 5px;
+        }
+        .track-item:hover { background-color: #1a1a1a; }
+        .track-item.active { background-color: #2a0a0a; border-left: 4px solid #cc0000; }
+        
+        .track-info { flex-grow: 1; margin-left: 15px; }
+        .track-title { margin: 0; font-size: 1.1em; font-weight: bold; color: #fff; }
+        .track-artist { margin: 5px 0 0 0; font-size: 0.85em; color: #888; }
+        .track-item.active .track-title { color: #cc0000; }
+
+        /* Bottom Sticky Player (Mini Player) */
+        .bottom-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #111;
+            border-top: 1px solid #333;
+            padding: 15px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            cursor: pointer; 
+        }
+        .player-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .now-playing-text { display: flex; flex-direction: column; }
+        .now-title { font-weight: bold; font-size: 1em; margin: 0; }
+        .now-artist { color: #aaa; font-size: 0.8em; margin: 0; }
+        
+        .player-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        .progress-container {
+            max-width: 600px;
+            margin: 10px auto 0;
+            width: 100%;
+            background: #333;
+            height: 4px;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .progress-bar { height: 100%; background: #cc0000; width: 0%; border-radius: 2px; }
+
+        /* =========================================
+           FULL SCREEN PLAYER STYLES 
+           ========================================= */
+        .full-player {
+            position: fixed;
+            top: 100vh; 
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(180deg, #2a0000 0%, #0a0a0a 100%);
+            z-index: 2000;
+            transition: top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            display: flex;
+            flex-direction: column;
+            padding: 30px 25px;
+            box-sizing: border-box;
+        }
+        .full-player.active {
+            top: 0; 
+        }
+        
+        .fp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .fp-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; }
+        .fp-playlist-info { text-align: center; font-size: 0.75em; letter-spacing: 1px; color: #ccc; }
+        .fp-playlist-info span { font-weight: bold; font-size: 1.1em; color: white; display: block; margin-top: 3px; }
+        
+        .fp-art-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; margin-bottom: 30px; }
+        .fp-art { width: 100%; max-width: 320px; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        
+        .fp-info { margin-bottom: 20px; }
+        .fp-title { font-size: 1.5em; font-weight: bold; margin: 0 0 5px 0; }
+        .fp-artist { font-size: 1em; color: #aaa; margin: 0; }
+        
+        .fp-progress-wrapper { margin-bottom: 30px; }
+        .fp-progress-container { background: #444; height: 5px; border-radius: 3px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        .fp-time-row { display: flex; justify-content: space-between; font-size: 0.75em; color: #aaa; }
+        
+        .fp-controls { display: flex; justify-content: space-between; align-items: center; }
+        .fp-controls button { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .fp-play-btn {
+            background-color: white !important;
+            color: black !important;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            font-size: 28px !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Highlighted/Encircled state for Shuffle & Repeat */
+        .toggle-btn { 
+            color: #888 !important; 
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .toggle-btn.active { 
+            color: #cc0000 !important; 
+            background-color: rgba(204, 0, 0, 0.15); /* Gives it the circular highlight */
+        }
+
+        footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<body>
+
+    <nav style="background-color: #111; padding: 15px 20px; display: flex; align-items: center; border-bottom: 2px solid #cc0000;">
+        <a href="index.html" style="color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em;">← Back to Home</a>
+    </nav>
+
+    <header>
+        <img src="1000594675.jpg" alt="One Circle Poster" class="poster-img">
+        <h1>The Father's Love</h1>
+        <p class="subtitle">One Circle • 24/7/2026</p>
+    </header>
+
+    <div class="container">
+        <div class="master-controls">
+            <button class="play-all-btn" id="masterPlayBtn">▶</button>
+        </div>
+        <ul class="track-list" id="trackList">
+            <!-- Tracks injected by JS -->
+        </ul>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+
+    <!-- Bottom Sticky Player (Mini Player) -->
+    <div class="bottom-player" id="miniPlayer">
+        <div class="player-info-row">
+            <div class="now-playing-text">
+                <p class="now-title" id="nowTitle">Select a track</p>
+                <p class="now-artist" id="nowArtist">One Circle</p>
+            </div>
+            <div class="player-controls" onclick="event.stopPropagation()">
+                <button id="prevBtn">⏮</button>
+                <button id="playPauseBtn">▶</button>
+                <button id="nextBtn">⏭</button>
+            </div>
+        </div>
+        <div class="progress-container" id="progressContainer" onclick="event.stopPropagation(); seekAudio(event, this)">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- FULL SCREEN PLAYER -->
+    <div class="full-player" id="fullPlayer">
+        <div class="fp-header">
+            <button class="fp-close" id="closeFullPlayer">⯆</button>
+            <div class="fp-playlist-info">
+                PLAYING FROM PLAYLIST
+                <span>The Father's Love</span>
+            </div>
+            <div style="width:24px;"></div>
+        </div>
+        
+        <div class="fp-art-container">
+            <img src="1000594675.jpg" alt="Album Art" class="fp-art">
+        </div>
+        
+        <div class="fp-info">
+            <h2 class="fp-title" id="fpTitle">Select a track</h2>
+            <p class="fp-artist" id="fpArtist">One Circle</p>
+        </div>
+        
+        <div class="fp-progress-wrapper">
+            <div class="fp-progress-container" id="fpProgressContainer" onclick="seekAudio(event, this)">
+                <div class="progress-bar" id="fpProgressBar"></div>
+            </div>
+            <div class="fp-time-row">
+                <span id="currentTimeDisplay">0:00</span>
+                <span id="durationDisplay">0:00</span>
+            </div>
+        </div>
+        
+        <div class="fp-controls">
+            <button id="shuffleBtn" class="toggle-btn">🔀</button>
+            <button id="fpPrevBtn">⏮</button>
+            <button id="fpPlayPauseBtn" class="fp-play-btn">▶</button>
+            <button id="fpNextBtn">⏭</button>
+            <button id="repeatBtn" class="toggle-btn">🔁</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
+    </footer>
+
+    <script>
+        // --- 1. PLAYLIST DATA ---
+        const playlist = [
+            { id: 0, title: "Abba Father", artist: "Trey McLaughlin", file: "audio/Track1.mp3" },
+            { id: 1, title: "Abba", artist: "Dante Bowe", file: "audio/Track2.mp3" },
+            { id: 2, title: "I Belong", artist: "William McDowell", file: "audio/Track3.mp3" },
+            { id: 3, title: "How Deep The Father's Love", artist: "SELAH", file: "audio/Track4.mp3" },
+            { id: 4, title: "Good Good Father", artist: "Housefires", file: "audio/Track5.mp3" },
+            { id: 5, title: "I'm A Friend Of God", artist: "Israel Houghton", file: "audio/Track6.mp3" },
+            { id: 6, title: "Who You Say I Am", artist: "Hillsong", file: "audio/Track7.mp3" },
+            { id: 7, title: "Hallelujah", artist: "Sue Wachira", file: "audio/Track8.mp3" },
+            { id: 8, title: "Kama Si We Baba", artist: "Kanji Mbugua", file: "audio/Track9.mp3" },
+            { id: 9, title: "Amapiano Medley", artist: "One Circle", file: "audio/Track10.mp3" },
+            { id: 10, title: "Moyo Wangu Medley", artist: "Icons ft Mike Manao And Janice", file: "audio/Track11.mp3" },
+            { id: 11, title: "Sifa Zote", artist: "Icons ft Mike Manao And Janice", file: "audio/Track12.mp3" },
+            { id: 12, title: "Nakungoja", artist: "Icons ft Mike Manao And Janice", file: "audio/Track13.mp3" },
+            { id: 13, title: "Juu Yako", artist: "Icons ft Mike Manao And Janice", file: "audio/Track14.mp3" },
+            { id: 14, title: "How Much More", artist: "Jordan G Welch", file: "audio/Track15.mp3" },
+            { id: 15, title: "Wastahili Ewe Bwana", artist: "One Circle", file: "audio/Track16.mp3" },
+            { id: 16, title: "The Father's Love Medley", artist: "God in this music", file: "audio/Track17.mp3" },
+            { id: 17, title: "Father Of Mercy", artist: "David Dam", file: "audio/Track18.mp3" },
+            { id: 18, title: "Adopted", artist: "Casey J", file: "audio/Track19.mp3" },
+            { id: 19, title: "Worthy", artist: "Trey McLaughlin - Maiko", file: "audio/Track20.mp3" },
+            { id: 20, title: "Kaye", artist: "Wanza", file: "audio/Track21.mp3" }
+        ];
+
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+        let isShuffle = false;
+        let isRepeat = false;
+
+        const audio = document.getElementById('audioPlayer');
+        const trackListEl = document.getElementById('trackList');
+        
+        const miniPlayer = document.getElementById('miniPlayer');
+        const masterPlayBtn = document.getElementById('masterPlayBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const nowTitle = document.getElementById('nowTitle');
+        const nowArtist = document.getElementById('nowArtist');
+        const progressBar = document.getElementById('progressBar');
+        
+        const fullPlayer = document.getElementById('fullPlayer');
+        const fpTitle = document.getElementById('fpTitle');
+        const fpArtist = document.getElementById('fpArtist');
+        const fpProgressBar = document.getElementById('fpProgressBar');
+        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+        const durationDisplay = document.getElementById('durationDisplay');
+        const fpPlayPauseBtn = document.getElementById('fpPlayPauseBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+
+        function renderTracklist() {
+            trackListEl.innerHTML = '';
+            playlist.forEach((track, index) => {
+                const li = document.createElement('li');
+                li.className = 'track-item';
+                li.innerHTML = `
+                    <div class="track-info">
+                        <p class="track-title">${index + 1}. ${track.title}</p>
+                        <p class="track-artist">${track.artist}</p>
+                    </div>
+                `;
+                li.onclick = () => loadAndPlayTrack(index);
+                trackListEl.appendChild(li);
+            });
+        }
+
+        function loadAndPlayTrack(index) {
+            currentTrackIndex = index;
+            const track = playlist[index];
+            
+            nowTitle.innerText = track.title;
+            nowArtist.innerText = track.artist;
+            fpTitle.innerText = track.title;
+            fpArtist.innerText = track.artist;
+            
+            document.querySelectorAll('.track-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+
+            audio.src = track.file;
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isPlaying = true;
+                    updatePlayButtons();
+                }).catch(error => {
+                    console.error("Playback failed:", error);
+                    alert("Error playing " + track.title + "!\n\nSystem Error: " + error.name);
+                    isPlaying = false;
+                    updatePlayButtons();
+                });
+            }
+        }
+
+        function togglePlay() {
+            if (!audio.src) { loadAndPlayTrack(0); return; }
+            if (isPlaying) { 
+                audio.pause();
+                isPlaying = false;
+            } else { 
+                audio.play();
+                isPlaying = true;
+            }
+            updatePlayButtons();
+        }
+
+        function updatePlayButtons() {
+            const icon = isPlaying ? "⏸" : "▶";
+            playPauseBtn.innerText = icon;
+            masterPlayBtn.innerText = icon;
+            fpPlayPauseBtn.innerText = icon;
+        }
+
+        function playNext() {
+            if (isShuffle) {
+                // Ensure it does not randomly pick the exact same track again
+                let randomIndex = currentTrackIndex;
+                while (randomIndex === currentTrackIndex && playlist.length > 1) {
+                    randomIndex = Math.floor(Math.random() * playlist.length);
+                }
+                loadAndPlayTrack(randomIndex);
+            } else {
+                let nextIndex = currentTrackIndex + 1;
+                if (nextIndex >= playlist.length) nextIndex = 0;
+                loadAndPlayTrack(nextIndex);
+            }
+        }
+
+        function playPrev() {
+            let prevIndex = currentTrackIndex - 1;
+            if (prevIndex < 0) prevIndex = playlist.length - 1;
+            loadAndPlayTrack(prevIndex);
+        }
+
+        masterPlayBtn.onclick = togglePlay;
+        playPauseBtn.onclick = togglePlay;
+        fpPlayPauseBtn.onclick = togglePlay;
+        
+        document.getElementById('nextBtn').onclick = playNext;
+        document.getElementById('fpNextBtn').onclick = playNext;
+        
+        document.getElementById('prevBtn').onclick = playPrev;
+        document.getElementById('fpPrevBtn').onclick = playPrev;
+
+        shuffleBtn.onclick = () => {
+            isShuffle = !isShuffle;
+            shuffleBtn.classList.toggle('active', isShuffle);
+        };
+        
+        repeatBtn.onclick = () => {
+            isRepeat = !isRepeat;
+            audio.loop = isRepeat;
+            repeatBtn.classList.toggle('active', isRepeat);
+        };
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ":" + (secs < 10 ? "0" : "") + secs;
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            if (audio.duration) {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                progressBar.style.width = percent + '%';
+                fpProgressBar.style.width = percent + '%';
+                
+                currentTimeDisplay.innerText = formatTime(audio.currentTime);
+                durationDisplay.innerText = formatTime(audio.duration);
+            }
+        });
+
+        window.seekAudio = function(e, container) {
+            const width = container.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            if (duration) {
+                audio.currentTime = (clickX / width) * duration;
+            }
+        };
+
+        audio.addEventListener('ended', () => {
+            if (!isRepeat) { playNext(); }
+        });
+
+        miniPlayer.addEventListener('click', () => {
+            fullPlayer.classList.add('active');
+        });
+        
+        document.getElementById('closeFullPlayer').addEventListener('click', () => {
+            fullPlayer.classList.remove('active');
+        });
+
+        renderTracklist();
+
+    </script>
+</body>
+</html>
+
