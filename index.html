@@ -12,6 +12,7 @@
             margin: 0; 
             line-height: 1.6;
         }
+        
         /* Navigation */
         nav {
             background-color: #111;
@@ -36,9 +37,7 @@
         .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
         .section-title { font-size: 1.8em; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 30px; }
 
-        /* =========================================
-           NEW: Upcoming Event Banner
-           ========================================= */
+        /* Upcoming Event Banner */
         .upcoming-card {
             background: linear-gradient(45deg, #1a0000 0%, #111 100%);
             border-left: 4px solid #cc0000;
@@ -54,13 +53,12 @@
         .upcoming-info .event-details { color: #cc0000; font-weight: bold; margin: 0 0 10px 0; font-size: 1.1em; }
         .upcoming-info p { margin: 0; color: #aaa; font-size: 0.95em; max-width: 500px; }
         
-        /* Mobile responsiveness for the upcoming banner */
         @media (max-width: 650px) {
             .upcoming-card { flex-direction: column; text-align: center; gap: 20px; }
             .upcoming-card .btn { width: 100%; box-sizing: border-box; text-align: center; }
         }
 
-        /* Event Grid for Past Seasons */
+        /* Event Grid */
         .event-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -74,14 +72,16 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
         .card:hover { transform: translateY(-5px); }
         .card-img { width: 100%; height: 200px; background-color: #222; object-fit: cover; }
-        .card-content { padding: 20px; }
+        .card-content { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
         .card-title { margin: 0 0 10px 0; font-size: 1.3em; color: #cc0000; }
         
         /* Lists inside cards */
-        .card-list { padding-left: 20px; color: #ccc; font-size: 0.9em; margin-bottom: 20px;}
+        .card-list { padding-left: 20px; color: #ccc; font-size: 0.9em; margin-bottom: 20px; flex-grow: 1;}
         
         /* Buttons */
         .btn {
@@ -96,7 +96,7 @@
             transition: background 0.2s;
         }
         .btn:hover { background-color: #ff1a1a; }
-        .btn.disabled { background-color: #444; color: #888; cursor: not-allowed; }
+        .btn.disabled { background-color: #444; color: #888; cursor: not-allowed; pointer-events: none; }
 
         footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; border-top: 1px solid #222; margin-top: 50px; }
     </style>
@@ -114,75 +114,97 @@
 
     <div class="container">
         
-        <!-- UPCOMING EVENT SECTION -->
-        <h2 class="section-title">Next Event</h2>
-        <div class="upcoming-card">
-            <div class="upcoming-info">
-                <h3>[Season 6: Title TBA]</h3>
-                <p class="event-details">📅 [Date, e.g., Oct 2026] &nbsp;|&nbsp; 📍 [Location Name]</p>
-                <p>We are currently planning our next gathering. Stay tuned for more details, guest announcements, and registration info!</p>
-            </div>
-            <div class="upcoming-action">
-                <!-- A disabled button that you can activate later -->
-                <a href="#" class="btn disabled">More Info Soon</a>
-            </div>
-        </div>
+        <!-- UPCOMING EVENT SECTION (Injected by JS) -->
+        <div id="upcomingContainer"></div>
 
         <!-- PAST EVENTS SECTION -->
         <h2 class="section-title">Past Events</h2>
-        <div class="event-grid">
-            
-            <!-- Season 5 Card -->
-            <div class="card">
-                <img src="1000594675.jpg" alt="Season 5 Poster" class="card-img">
-                <div class="card-content">
-                    <h3 class="card-title">Season 5: The Father's Love</h3>
-                    <p style="font-size: 0.85em; color: #888; margin-top: 0;">24/7/2026</p>
-                    <ul class="card-list">
-                        <li>Live Worship Session</li>
-                        <li>Amapiano & Moyo Wangu Medleys</li>
-                        <li>21 Songs</li>
-                    </ul>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                        <a href="playlist_season_5.html" class="btn">Listen ▶</a>
-                        <a href="gallery_season_5.html" class="btn" style="background-color: #333;">Gallery 📷</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Season 4 Card -->
-            <div class="card">
-                <div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>
-                <div class="card-content">
-                    <h3 class="card-title">Season 4: [Event Name]</h3>
-                    <ul class="card-list">
-                        <li>[Highlight 1]</li>
-                        <li>[Highlight 2]</li>
-                        <li>[Highlight 3]</li>
-                    </ul>
-                    <a href="#" class="btn disabled">Media Coming Soon</a>
-                </div>
-            </div>
-
-            <!-- Season 3 Card -->
-            <div class="card">
-                <div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>
-                <div class="card-content">
-                    <h3 class="card-title">Season 3: [Event Name]</h3>
-                    <ul class="card-list">
-                        <li>[Highlight 1]</li>
-                        <li>[Highlight 2]</li>
-                    </ul>
-                    <a href="#" class="btn disabled">Media Coming Soon</a>
-                </div>
-            </div>
-
+        <div class="event-grid" id="pastGrid">
+            <!-- Cards Injected by JS -->
         </div>
+
     </div>
 
     <footer>
-        <p>&copy; 2026 One Circle.</p>
+        <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
     </footer>
+
+    <!-- Link the central database file -->
+    <script src="database.js"></script>
+    
+    <script>
+        const upcomingContainer = document.getElementById('upcomingContainer');
+        const pastGrid = document.getElementById('pastGrid');
+
+        // Loop through the siteDatabase array and build the HTML for each season
+        siteDatabase.seasons.forEach(season => {
+            
+            // 1. If it is an upcoming event, build the banner
+            if (season.status === 'upcoming') {
+                upcomingContainer.innerHTML = `
+                    <h2 class="section-title">Next Event</h2>
+                    <div class="upcoming-card">
+                        <div class="upcoming-info">
+                            <h3>${season.title}</h3>
+                            <p class="event-details">📅 ${season.date} &nbsp;|&nbsp; 📍 ${season.location}</p>
+                            <p>${season.description}</p>
+                        </div>
+                        <div class="upcoming-action">
+                            <a href="#" class="btn disabled">More Info Soon</a>
+                        </div>
+                    </div>
+                `;
+            } 
+            
+            // 2. If it is a past event, build the card
+            else if (season.status === 'past') {
+                
+                // Convert the highlights array into HTML list items
+                let highlightsHTML = '';
+                season.highlights.forEach(item => {
+                    highlightsHTML += `<li>${item}</li>`;
+                });
+
+                // Decide how to display the image (show poster or placeholder)
+                const imageHTML = season.posterImg 
+                    ? `<img src="${season.posterImg}" alt="${season.title} Poster" class="card-img">`
+                    : `<div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>`;
+
+                // Logic for the buttons: Only show them if media actually exists in database.js
+                let buttonsHTML = '';
+                const hasAudio = season.tracklist.length > 0;
+                const hasGallery = season.gallery.maxImages > 0 || season.gallery.maxVideos > 0;
+
+                if (hasAudio || hasGallery) {
+                    buttonsHTML += `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">`;
+                    if (hasAudio) {
+                        buttonsHTML += `<a href="playlist.html?season=${season.seasonNumber}" class="btn">Listen 🎧</a>`;
+                    }
+                    if (hasGallery) {
+                        buttonsHTML += `<a href="gallery.html?season=${season.seasonNumber}" class="btn" style="background-color: #333;">Gallery 📷</a>`;
+                    }
+                    buttonsHTML += `</div>`;
+                } else {
+                    buttonsHTML = `<div style="margin-top: 10px;"><a href="#" class="btn disabled">Media Coming Soon</a></div>`;
+                }
+
+                // Inject the assembled card into the grid
+                pastGrid.innerHTML += `
+                    <div class="card">
+                        ${imageHTML}
+                        <div class="card-content">
+                            <h3 class="card-title">${season.title}</h3>
+                            <p style="font-size: 0.85em; color: #888; margin-top: 0;">${season.date}</p>
+                            <ul class="card-list">
+                                ${highlightsHTML}
+                            </ul>
+                            ${buttonsHTML}
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
 
 </body>
 </html>
