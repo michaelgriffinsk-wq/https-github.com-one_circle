@@ -53,10 +53,17 @@ const siteDatabase = {
                 { trackId: 20, title: "Worthy", artist: "Trey McLaughlin - Maiko", file: "audio/Track20.mp3" },
                 { trackId: 21, title: "Kaye", artist: "Wanza", file: "audio/Track21.mp3" }
             ],
-             {
+            gallery: {
+                folderName: "gallery_season_5",
+                filePrefix: "1",
+                maxImages: 150,
+                maxVideos: 20
+            }
+        }
+        {
             seasonNumber: 4,
             status: "past", // Triggers the grid cards
-            title: "The Revelation",
+            title: "The Revelation of God the Son",
             date: "24/7/2026",
             location: "One Circle",
             posterImg: "1000594675.jpg",
