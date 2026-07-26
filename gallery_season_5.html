@@ -105,6 +105,23 @@
             
             // Add it to the webpage
             galleryGrid.appendChild(img);
+        // Loop through the video numbers 1 to totalVideos
+        for (let i = 1; i <= totalVideos; i++) {
+            // Create a video element instead of an image
+            const video = document.createElement('video');
+            
+            // Uses your exact naming syntax with a video extension (.mp4)
+            video.src = `${folderName}/1 (${i}).mp4`;
+            video.className = 'gallery-video';
+            
+            // Add essential video controls and behaviors
+            video.controls = true;      // Shows play, pause, and volume buttons
+            video.preload = 'metadata'; // Loads video length fast without wasting data
+            
+            // Add it to your webpage grid
+            galleryGrid.appendChild(video);
+}
+
         }
     </script>
 
