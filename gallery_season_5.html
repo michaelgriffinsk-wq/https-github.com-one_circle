@@ -37,20 +37,19 @@
 
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         
-        /* Masonry Gallery (Fixes the cropping issue) */
+        /* Masonry Gallery */
         .gallery-grid {
             column-count: 3;
             column-gap: 15px;
         }
         
-        /* Responsive adjustments for smaller screens */
         @media (max-width: 900px) { .gallery-grid { column-count: 2; } }
         @media (max-width: 500px) { .gallery-grid { column-count: 1; } }
 
-        /* Media Items (Images & Videos) */
+        /* Media Items */
         .media-item {
             margin-bottom: 15px;
-            break-inside: avoid; /* Prevents items from splitting across columns */
+            break-inside: avoid;
             cursor: pointer;
             border-radius: 8px;
             overflow: hidden;
@@ -64,9 +63,9 @@
         }
         .media-item img, .media-item video {
             width: 100%;
-            height: auto; /* Allows the image to expand naturally without cropping */
+            height: auto;
             display: block;
-            pointer-events: none; /* Passes clicks up to the wrapper */
+            pointer-events: none;
         }
         
         /* Video Icon Overlay */
@@ -87,7 +86,7 @@
             pointer-events: none;
         }
 
-        /* Lightbox (Modal) */
+        /* Lightbox */
         .lightbox {
             display: none; 
             position: fixed; 
@@ -114,7 +113,7 @@
             box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
         
-        /* Lightbox Controls */
+        /* Controls */
         .close-btn {
             position: absolute;
             top: 20px;
@@ -163,11 +162,11 @@
     </header>
 
     <div class="container">
-        <!-- Masonry Grid -->
+        <!-- Grid injects here -->
         <div class="gallery-grid" id="galleryGrid"></div>
     </div>
 
-    <!-- Lightbox Modal -->
+    <!-- Lightbox -->
     <div id="lightbox" class="lightbox">
         <span class="close-btn" onclick="closeLightbox()">&times;</span>
         <button class="nav-btn prev-btn" onclick="changeMedia(-1)">&#10094;</button>
@@ -186,12 +185,11 @@
 
     <script>
         // --- GALLERY CONFIGURATION ---
-        const totalImages = 100; 
-        const totalVideos = 5; // Update this with how many videos you have!
+        // Set these to a number slightly higher than your actual file count.
+        // The script will automatically hide any missing files in between.
+        const maxImagesToCheck = 150; 
+        const maxVideosToCheck = 20; 
         const folderName = "gallery_season_5";
-        
-        // Let's assume your videos are named like "video (1).mp4". 
-        // Adjust the extension or naming convention below if needed.
         // ------------------------------
 
         const galleryGrid = document.getElementById('galleryGrid');
@@ -202,36 +200,54 @@
         let mediaList = [];
         let currentIndex = 0;
 
-        // 1. Build the Media Array (Images first, then Videos)
-        for (let i = 1; i <= totalImages; i++) {
-            mediaList.push({ type: 'image', src: `${folderName}/1 (${i}).jpg` });
+        // 1. Build the target list for Images and Videos
+        for (let i = 1; i <= maxImagesToCheck; i++) {
+            mediaList.push({ type: 'image', src: `${folderName}/1 (${i}).jpg`, valid: true });
         }
-        for (let i = 1; i <= totalVideos; i++) {
-            mediaList.push({ type: 'video', src: `${folderName}/video (${i}).mp4` });
+        for (let i = 1; i <= maxVideosToCheck; i++) {
+            mediaList.push({ type: 'video', src: `${folderName}/1 (${i}).mp4`, valid: true }); // Updated video formatting
         }
 
-        // 2. Render the Grid
+        // 2. Render Grid and Listen for Errors
         mediaList.forEach((media, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'media-item';
-            wrapper.onclick = () => openLightbox(index);
 
             if (media.type === 'image') {
                 const img = document.createElement('img');
                 img.src = media.src;
-                img.loading = "lazy"; // Helps page load faster
+                img.loading = "lazy";
+                
+                // The magic trick: If the image doesn't exist, remove the placeholder and mark it invalid
+                img.onerror = () => {
+                    wrapper.style.display = 'none';
+                    media.valid = false;
+                };
                 wrapper.appendChild(img);
+                
             } else if (media.type === 'video') {
                 const vid = document.createElement('video');
                 vid.src = media.src;
                 vid.preload = "metadata";
-                // Add a play icon overlay to distinguish videos in the grid
+                
+                // If the video doesn't exist, remove the placeholder
+                vid.onerror = () => {
+                    wrapper.style.display = 'none';
+                    media.valid = false;
+                };
+
                 const icon = document.createElement('div');
                 icon.className = 'video-icon';
                 icon.innerHTML = '▶'; 
+                
                 wrapper.appendChild(vid);
                 wrapper.appendChild(icon);
             }
+
+            // Only open lightbox if the file actually loaded successfully
+            wrapper.onclick = () => {
+                if (media.valid) openLightbox(index);
+            };
 
             galleryGrid.appendChild(wrapper);
         });
@@ -241,29 +257,40 @@
             currentIndex = index;
             updateLightbox();
             lightbox.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Stop background scrolling
+            document.body.style.overflow = 'hidden'; 
         }
 
         function closeLightbox() {
             lightbox.style.display = 'none';
             document.body.style.overflow = 'auto';
-            lightboxVideo.pause(); // Stop video if playing
+            lightboxVideo.pause(); 
         }
 
         function changeMedia(direction) {
-            currentIndex += direction;
+            let foundValidMedia = false;
+            let attempts = 0; // Prevents infinite loop if folder is empty
+
+            // Loop sequentially, skipping over any files marked as invalid
+            while (!foundValidMedia && attempts < mediaList.length) {
+                currentIndex += direction;
+                
+                if (currentIndex >= mediaList.length) currentIndex = 0;
+                if (currentIndex < 0) currentIndex = mediaList.length - 1;
+                
+                if (mediaList[currentIndex].valid) {
+                    foundValidMedia = true;
+                }
+                attempts++;
+            }
             
-            // Loop back around if at the end/beginning
-            if (currentIndex >= mediaList.length) currentIndex = 0;
-            if (currentIndex < 0) currentIndex = mediaList.length - 1;
-            
-            updateLightbox();
+            if (foundValidMedia) {
+                updateLightbox();
+            }
         }
 
         function updateLightbox() {
             const media = mediaList[currentIndex];
             
-            // Pause any currently playing video before switching
             lightboxVideo.pause();
             lightboxVideo.currentTime = 0;
 
@@ -278,7 +305,7 @@
             }
         }
 
-        // 4. Swipe Gestures for Mobile
+        // 4. Swipe Gestures
         let touchstartX = 0;
         let touchendX = 0;
 
@@ -292,16 +319,11 @@
         });
 
         function handleSwipe() {
-            const swipeThreshold = 50; // Minimum pixels to count as a swipe
-            if (touchendX < touchstartX - swipeThreshold) {
-                changeMedia(1); // Swiped left -> next
-            }
-            if (touchendX > touchstartX + swipeThreshold) {
-                changeMedia(-1); // Swiped right -> previous
-            }
+            const swipeThreshold = 50; 
+            if (touchendX < touchstartX - swipeThreshold) changeMedia(1); 
+            if (touchendX > touchstartX + swipeThreshold) changeMedia(-1); 
         }
 
-        // Close lightbox if clicking outside the media
         lightbox.addEventListener('click', e => {
             if (e.target === lightbox || e.target.className === 'lightbox-content') {
                 closeLightbox();
