@@ -59,7 +59,7 @@ const siteDatabase = {
                 maxImages: 150,
                 maxVideos: 20
             }
-        }
+        },
         {
             seasonNumber: 4,
             status: "past", // Triggers the grid cards
@@ -102,6 +102,6 @@ const siteDatabase = {
                 maxImages: 150,
                 maxVideos: 20
             }
-        }
+        },
     ]
 };
