@@ -90,8 +90,8 @@ const siteDatabase = {
                 { trackId: 14, title: "Mungu Muumbaji", artist: "Chandelier De Gloire RDC", file: "audio/Track35.mp3" },
             ],
             gallery: {
-                folderName: "gallery_season_5",
-                filePrefix: "1",
+                folderName: "gallery_season_4",
+                filePrefix: "2",
                 maxImages: 150,
                 maxVideos: 20
             }
