@@ -4,7 +4,7 @@ const siteDatabase = {
             seasonNumber: 6,
             status: "upcoming", // Triggers the top banner
             title: "Season 6: Title TBA",
-            date: "Oct 2026",
+            date: "TBD",
             location: "Location Name",
             posterImg: "",
             description: "We are currently planning our next gathering. Stay tuned for more details, guest announcements, and registration info!",
