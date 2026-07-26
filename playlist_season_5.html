@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One Circle | The Father's Love</title>
+    <title>One Circle | Playlist</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -181,23 +181,20 @@
         }
         .toggle-btn.active { 
             color: #cc0000 !important; 
-            background-color: rgba(204, 0, 0, 0.15); /* Gives it the circular highlight */
+            background-color: rgba(204, 0, 0, 0.15); 
         }
 
         footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; margin-top: 20px; }
     </style>
 </head>
 <body>
-<body>
 
     <nav style="background-color: #111; padding: 15px 20px; display: flex; align-items: center; border-bottom: 2px solid #cc0000;">
         <a href="index.html" style="color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em;">← Back to Home</a>
     </nav>
 
-    <header>
-        <img src="1000594675.jpg" alt="One Circle Poster" class="poster-img">
-        <h1>The Father's Love</h1>
-        <p class="subtitle">One Circle • 24/7/2026</p>
+    <header id="dynamicHeader">
+        <!-- Injected by JS -->
     </header>
 
     <div class="container">
@@ -235,13 +232,13 @@
             <button class="fp-close" id="closeFullPlayer">⯆</button>
             <div class="fp-playlist-info">
                 PLAYING FROM PLAYLIST
-                <span>The Father's Love</span>
+                <span id="fpPlaylistTitle">Loading...</span>
             </div>
             <div style="width:24px;"></div>
         </div>
         
         <div class="fp-art-container">
-            <img src="1000594675.jpg" alt="Album Art" class="fp-art">
+            <img src="" alt="Album Art" class="fp-art" id="fpArt">
         </div>
         
         <div class="fp-info">
@@ -272,32 +269,50 @@
         <p>&copy; 2026 One Circle.</p>
     </footer>
 
-    <script>
-        // --- 1. PLAYLIST DATA ---
-        const playlist = [
-            { id: 0, title: "Abba Father", artist: "Trey McLaughlin", file: "audio/Track1.mp3" },
-            { id: 1, title: "Abba", artist: "Dante Bowe", file: "audio/Track2.mp3" },
-            { id: 2, title: "I Belong", artist: "William McDowell", file: "audio/Track3.mp3" },
-            { id: 3, title: "How Deep The Father's Love", artist: "SELAH", file: "audio/Track4.mp3" },
-            { id: 4, title: "Good Good Father", artist: "Housefires", file: "audio/Track5.mp3" },
-            { id: 5, title: "I'm A Friend Of God", artist: "Israel Houghton", file: "audio/Track6.mp3" },
-            { id: 6, title: "Who You Say I Am", artist: "Hillsong", file: "audio/Track7.mp3" },
-            { id: 7, title: "Hallelujah", artist: "Sue Wachira", file: "audio/Track8.mp3" },
-            { id: 8, title: "Kama Si We Baba", artist: "Kanji Mbugua", file: "audio/Track9.mp3" },
-            { id: 9, title: "Amapiano Medley", artist: "One Circle", file: "audio/Track10.mp3" },
-            { id: 10, title: "Moyo Wangu", artist: "Icons ft Mike Manao And Janice", file: "audio/Track11.mp3" },
-            { id: 11, title: "Sifa Zote", artist: "Icons ft Mike Manao And Janice", file: "audio/Track12.mp3" },
-            { id: 12, title: "Nakungoja", artist: "Icons ft Mike Manao And Janice", file: "audio/Track13.mp3" },
-            { id: 13, title: "Juu Yako", artist: "Icons ft Mike Manao And Janice", file: "audio/Track14.mp3" },
-            { id: 14, title: "How Much More", artist: "Jordan G Welch", file: "audio/Track15.mp3" },
-            { id: 15, title: "Wastahili Ewe Bwana", artist: "One Circle", file: "audio/Track16.mp3" },
-            { id: 16, title: "The Father's Love Medley", artist: "God in this music", file: "audio/Track17.mp3" },
-            { id: 17, title: "Father Of Mercy", artist: "David Dam", file: "audio/Track18.mp3" },
-            { id: 18, title: "Adopted", artist: "Casey J", file: "audio/Track19.mp3" },
-            { id: 19, title: "Worthy", artist: "Trey McLaughlin - Maiko", file: "audio/Track20.mp3" },
-            { id: 20, title: "Kaye", artist: "Wanza", file: "audio/Track21.mp3" }
-        ];
+    <!-- Include Database -->
+    <script src="database.js"></script>
 
+    <script>
+        // --- 1. DYNAMIC PLAYLIST DATA FETCHING ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const seasonNumber = parseInt(urlParams.get('season'));
+
+        const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
+
+        if (!seasonData) {
+            document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Playlist not found.</h2>';
+            throw new Error("Season not found in database.");
+        }
+
+        // --- 2. UPDATE METADATA & HEADER ---
+        document.title = `One Circle | ${seasonData.title}`;
+        
+        const dynamicHeader = document.getElementById('dynamicHeader');
+        dynamicHeader.innerHTML = `
+            ${seasonData.posterImg ? `<img src="${seasonData.posterImg}" alt="${seasonData.title} Poster" class="poster-img">` : ''}
+            <h1>${seasonData.title}</h1>
+            <p class="subtitle">One Circle • ${seasonData.date}</p>
+        `;
+
+        document.getElementById('fpPlaylistTitle').innerText = seasonData.title;
+        const fpArt = document.getElementById('fpArt');
+        if (seasonData.posterImg) {
+            fpArt.src = seasonData.posterImg;
+        } else {
+            fpArt.style.display = 'none';
+        }
+
+        // --- 3. FORMAT TRACKLIST ---
+        const playlist = seasonData.tracklist.map((track, index) => {
+            return {
+                id: index,
+                title: track.title,
+                artist: track.artist || "One Circle", 
+                file: track.file
+            };
+        });
+
+        // --- 4. PLAYER LOGIC ---
         let currentTrackIndex = 0;
         let isPlaying = false;
         let isShuffle = false;
@@ -389,7 +404,6 @@
 
         function playNext() {
             if (isShuffle) {
-                // Ensure it does not randomly pick the exact same track again
                 let randomIndex = currentTrackIndex;
                 while (randomIndex === currentTrackIndex && playlist.length > 1) {
                     randomIndex = Math.floor(Math.random() * playlist.length);
