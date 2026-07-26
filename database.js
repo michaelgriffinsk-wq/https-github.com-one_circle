@@ -63,10 +63,10 @@ const siteDatabase = {
         {
             seasonNumber: 4,
             status: "past", // Triggers the grid cards
-            title: "The Revelation of God the Son",
+            title: "YESHUA",
             date: "24/7/2026",
             location: "One Circle",
-            posterImg: "1000594675.jpg",
+            posterImg: "24102025.jpg",
             description: "",
             highlights: [
                 "Live Worship Session",
