@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One Circle | Season 5 Gallery</title>
+    <title>One Circle | Gallery</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -156,9 +156,8 @@
         <span>ONE CIRCLE</span>
     </nav>
 
-    <header>
-        <h1>Season 5 Gallery</h1>
-        <p>The Father's Love • 24/7/2026</p>
+    <header id="dynamicHeader">
+        <!-- Injected by JS -->
     </header>
 
     <div class="container">
@@ -183,11 +182,35 @@
         <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
     </footer>
 
+    <!-- Include Database -->
+    <script src="database.js"></script>
+
     <script>
-        // --- GALLERY CONFIGURATION ---
-        const maxImagesToCheck = 150; 
-        const maxVideosToCheck = 20; 
-        const folderName = "gallery_season_5";
+        // --- 1. DYNAMIC GALLERY DATA FETCHING ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const seasonNumber = parseInt(urlParams.get('season'));
+
+        const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
+
+        if (!seasonData) {
+            document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Gallery not found.</h2>';
+            throw new Error("Season not found in database.");
+        }
+
+        // --- 2. UPDATE METADATA & HEADER ---
+        document.title = `One Circle | Season ${seasonData.seasonNumber} Gallery`;
+        
+        const dynamicHeader = document.getElementById('dynamicHeader');
+        dynamicHeader.innerHTML = `
+            <h1>Season ${seasonData.seasonNumber} Gallery</h1>
+            <p>${seasonData.title} • ${seasonData.date}</p>
+        `;
+
+        // --- 3. GALLERY CONFIGURATION ---
+        // Dynamically pull the limits and folder name from the database
+        const maxImagesToCheck = seasonData.gallery.maxImages || 0; 
+        const maxVideosToCheck = seasonData.gallery.maxVideos || 0; 
+        const folderName = seasonData.gallery.folder || `gallery_season_${seasonData.seasonNumber}`;
         // ------------------------------
 
         const galleryGrid = document.getElementById('galleryGrid');
@@ -198,7 +221,7 @@
         let mediaList = [];
         let currentIndex = 0;
 
-        // 1. Build the target list for Images and Videos
+        // 4. Build the target list for Images and Videos
         for (let i = 1; i <= maxImagesToCheck; i++) {
             mediaList.push({ type: 'image', src: `${folderName}/1 (${i}).jpg`, valid: true });
         }
@@ -206,7 +229,7 @@
             mediaList.push({ type: 'video', src: `${folderName}/1 (${i}).mp4`, valid: true });
         }
 
-        // 2. Render Grid and Listen for Errors
+        // 5. Render Grid and Listen for Errors
         mediaList.forEach((media, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'media-item';
@@ -249,7 +272,7 @@
             galleryGrid.appendChild(wrapper);
         });
 
-        // 3. Lightbox Logic
+        // 6. Lightbox Logic
         function openLightbox(index) {
             currentIndex = index;
             updateLightbox();
@@ -301,7 +324,7 @@
             }
         }
 
-        // 4. Swipe Gestures
+        // 7. Swipe Gestures
         let touchstartX = 0;
         let touchendX = 0;
 
