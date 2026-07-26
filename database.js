@@ -70,8 +70,7 @@ const siteDatabase = {
             description: "",
             highlights: [
                 "Live Worship Session",
-                "Amapiano & Moyo Wangu Medleys",
-                "21 Songs"
+                "14 Songs"
             ],
             tracklist: [
                 { trackId: 1, title: "Raise a Sound", artist: "Folabi Nuel", file: "audio/Track22.mp3" },
@@ -91,7 +90,7 @@ const siteDatabase = {
             ],
             gallery: {
                 folderName: "gallery_season_4",
-                filePrefix: "2",
+                filePrefix: "3",
                 maxImages: 150,
                 maxVideos: 20
             }
