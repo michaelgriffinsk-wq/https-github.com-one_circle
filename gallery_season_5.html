@@ -185,8 +185,6 @@
 
     <script>
         // --- GALLERY CONFIGURATION ---
-        // Set these to a number slightly higher than your actual file count.
-        // The script will automatically hide any missing files in between.
         const maxImagesToCheck = 150; 
         const maxVideosToCheck = 20; 
         const folderName = "gallery_season_5";
@@ -205,7 +203,7 @@
             mediaList.push({ type: 'image', src: `${folderName}/1 (${i}).jpg`, valid: true });
         }
         for (let i = 1; i <= maxVideosToCheck; i++) {
-            mediaList.push({ type: 'video', src: `${folderName}/1 (${i}).mp4`, valid: true }); // Updated video formatting
+            mediaList.push({ type: 'video', src: `${folderName}/1 (${i}).mp4`, valid: true });
         }
 
         // 2. Render Grid and Listen for Errors
@@ -218,7 +216,6 @@
                 img.src = media.src;
                 img.loading = "lazy";
                 
-                // The magic trick: If the image doesn't exist, remove the placeholder and mark it invalid
                 img.onerror = () => {
                     wrapper.style.display = 'none';
                     media.valid = false;
@@ -227,14 +224,14 @@
                 
             } else if (media.type === 'video') {
                 const vid = document.createElement('video');
-                vid.src = media.src;
-                vid.preload = "metadata";
+                vid.preload = "auto";
                 
-                // If the video doesn't exist, remove the placeholder
                 vid.onerror = () => {
                     wrapper.style.display = 'none';
                     media.valid = false;
                 };
+
+                vid.src = media.src;
 
                 const icon = document.createElement('div');
                 icon.className = 'video-icon';
@@ -268,9 +265,8 @@
 
         function changeMedia(direction) {
             let foundValidMedia = false;
-            let attempts = 0; // Prevents infinite loop if folder is empty
+            let attempts = 0;
 
-            // Loop sequentially, skipping over any files marked as invalid
             while (!foundValidMedia && attempts < mediaList.length) {
                 currentIndex += direction;
                 
