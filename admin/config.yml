@@ -1,0 +1,63 @@
+backend:
+  name: github
+  repo: your-github-username/your-repository-name # IMPORTANT: Update this to your actual repo
+  branch: main # Or master, depending on your setup
+
+media_folder: "assets/uploads" # Where images/audio are saved via the UI
+public_folder: "/assets/uploads"
+
+collections:
+  # COMPARTMENT 1: EVENTS
+  - name: "database"
+    label: "Events & Seasons"
+    files:
+      - label: "Manage All Seasons"
+        name: "seasons"
+        file: "database.json"
+        fields:
+          - label: "Seasons List"
+            name: "seasons"
+            widget: "list"
+            fields:
+              - {label: "Season Number", name: "seasonNumber", widget: "number"}
+              - {label: "Status", name: "status", widget: "select", options: ["upcoming", "past"]}
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Date", name: "date", widget: "string"}
+              - {label: "Location", name: "location", widget: "string", default: "One Circle"}
+              - {label: "Poster Image", name: "posterImg", widget: "image", required: false}
+              - {label: "Description", name: "description", widget: "text", required: false}
+              - {label: "YouTube Link", name: "youtubeLink", widget: "string", required: false}
+              - {label: "Highlights", name: "highlights", widget: "list", required: false}
+              - label: "Tracklist"
+                name: "tracklist"
+                widget: "list"
+                required: false
+                fields:
+                  - {label: "Track ID", name: "trackId", widget: "number"}
+                  - {label: "Title", name: "title", widget: "string"}
+                  - {label: "Artist", name: "artist", widget: "string", default: "One Circle"}
+                  - {label: "Audio File", name: "file", widget: "file"}
+              - label: "Gallery Configuration"
+                name: "gallery"
+                widget: "object"
+                fields:
+                  - {label: "Folder Name", name: "folderName", widget: "string"}
+                  - {label: "File Prefix", name: "filePrefix", widget: "string"}
+                  - {label: "Max Images", name: "maxImages", widget: "number"}
+                  - {label: "Max Videos", name: "maxVideos", widget: "number"}
+
+  # COMPARTMENT 2: STATIC PAGES
+  - name: "pages"
+    label: "Static Pages"
+    files:
+      - label: "About Page"
+        name: "about"
+        file: "about.json"
+        fields:
+          - {label: "Our Story", name: "story", widget: "text"}
+          - label: "Team Members"
+            name: "team"
+            widget: "list"
+            fields:
+              - {label: "Name", name: "name", widget: "string"}
+              - {label: "Role", name: "role", widget: "string"}
