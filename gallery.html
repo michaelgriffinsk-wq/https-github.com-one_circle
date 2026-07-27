@@ -184,172 +184,181 @@
         <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
     </footer>
 
-    <!-- Include Database -->
-    <script src="database.js"></script>
-
     <script>
-        // --- 1. DYNAMIC GALLERY DATA FETCHING ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const seasonNumber = parseInt(urlParams.get('season'));
-
-        const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
-
-        if (!seasonData) {
-            document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Gallery not found.</h2>';
-            throw new Error("Season not found in database.");
-        }
-
-        // --- 2. UPDATE METADATA & HEADER ---
-        document.title = `One Circle | Season ${seasonData.seasonNumber} Gallery`;
-        
-        const dynamicHeader = document.getElementById('dynamicHeader');
-        dynamicHeader.innerHTML = `
-            <h1>Season ${seasonData.seasonNumber} Gallery</h1>
-            <p>${seasonData.title} • ${seasonData.date}</p>
-        `;
-
-       // --- 3. GALLERY CONFIGURATION ---
-        // Dynamically pull the limits, folder name, and file prefix from the database
-        const maxImagesToCheck = seasonData.gallery.maxImages || 0; 
-        const maxVideosToCheck = seasonData.gallery.maxVideos || 0; 
-        const folderName = seasonData.gallery.folderName || `gallery_season_${seasonData.seasonNumber}`;
-        const filePrefix = seasonData.gallery.filePrefix || "1";
-        // ------------------------------
-
-        const galleryGrid = document.getElementById('galleryGrid');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-        const lightboxVideo = document.getElementById('lightboxVideo');
-
-        let mediaList = [];
-        let currentIndex = 0;
-
-        // 4. Build the target list for Images and Videos using the dynamic prefix
-        for (let i = 1; i <= maxImagesToCheck; i++) {
-            mediaList.push({ type: 'image', src: `${folderName}/${filePrefix} (${i}).jpg`, valid: true });
-        }
-        for (let i = 1; i <= maxVideosToCheck; i++) {
-            mediaList.push({ type: 'video', src: `${folderName}/${filePrefix} (${i}).mp4`, valid: true });
-        }
-        // 5. Render Grid and Listen for Errors
-        mediaList.forEach((media, index) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'media-item';
-
-            if (media.type === 'image') {
-                const img = document.createElement('img');
-                img.src = media.src;
-                img.loading = "lazy";
-                
-                img.onerror = () => {
-                    wrapper.style.display = 'none';
-                    media.valid = false;
-                };
-                wrapper.appendChild(img);
-                
-            } else if (media.type === 'video') {
-                const vid = document.createElement('video');
-                vid.preload = "auto";
-                
-                vid.onerror = () => {
-                    wrapper.style.display = 'none';
-                    media.valid = false;
-                };
-
-                vid.src = media.src;
-
-                const icon = document.createElement('div');
-                icon.className = 'video-icon';
-                icon.innerHTML = '▶'; 
-                
-                wrapper.appendChild(vid);
-                wrapper.appendChild(icon);
-            }
-
-            // Only open lightbox if the file actually loaded successfully
-            wrapper.onclick = () => {
-                if (media.valid) openLightbox(index);
-            };
-
-            galleryGrid.appendChild(wrapper);
-        });
-
-        // 6. Lightbox Logic
-        function openLightbox(index) {
-            currentIndex = index;
-            updateLightbox();
-            lightbox.style.display = 'block';
-            document.body.style.overflow = 'hidden'; 
-        }
-
-        function closeLightbox() {
-            lightbox.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            lightboxVideo.pause(); 
-        }
-
-        function changeMedia(direction) {
-            let foundValidMedia = false;
-            let attempts = 0;
-
-            while (!foundValidMedia && attempts < mediaList.length) {
-                currentIndex += direction;
-                
-                if (currentIndex >= mediaList.length) currentIndex = 0;
-                if (currentIndex < 0) currentIndex = mediaList.length - 1;
-                
-                if (mediaList[currentIndex].valid) {
-                    foundValidMedia = true;
+        // Fetch the JSON database
+        fetch('database.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
-                attempts++;
-            }
-            
-            if (foundValidMedia) {
-                updateLightbox();
-            }
-        }
+                return response.json();
+            })
+            .then(siteDatabase => {
+                // --- 1. DYNAMIC GALLERY DATA FETCHING ---
+                const urlParams = new URLSearchParams(window.location.search);
+                const seasonNumber = parseInt(urlParams.get('season'));
 
-        function updateLightbox() {
-            const media = mediaList[currentIndex];
-            
-            lightboxVideo.pause();
-            lightboxVideo.currentTime = 0;
+                const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
 
-            if (media.type === 'image') {
-                lightboxImg.src = media.src;
-                lightboxImg.style.display = 'block';
-                lightboxVideo.style.display = 'none';
-            } else if (media.type === 'video') {
-                lightboxVideo.src = media.src;
-                lightboxVideo.style.display = 'block';
-                lightboxImg.style.display = 'none';
-            }
-        }
+                if (!seasonData) {
+                    document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Gallery not found.</h2>';
+                    throw new Error("Season not found in database.");
+                }
 
-        // 7. Swipe Gestures
-        let touchstartX = 0;
-        let touchendX = 0;
+                // --- 2. UPDATE METADATA & HEADER ---
+                document.title = `One Circle | Season ${seasonData.seasonNumber} Gallery`;
+                
+                const dynamicHeader = document.getElementById('dynamicHeader');
+                dynamicHeader.innerHTML = `
+                    <h1>Season ${seasonData.seasonNumber} Gallery</h1>
+                    <p>${seasonData.title} • ${seasonData.date}</p>
+                `;
 
-        lightbox.addEventListener('touchstart', e => {
-            touchstartX = e.changedTouches[0].screenX;
-        });
+                // --- 3. GALLERY CONFIGURATION ---
+                const maxImagesToCheck = seasonData.gallery.maxImages || 0; 
+                const maxVideosToCheck = seasonData.gallery.maxVideos || 0; 
+                const folderName = seasonData.gallery.folderName || `gallery_season_${seasonData.seasonNumber}`;
+                const filePrefix = seasonData.gallery.filePrefix || "1";
+                
+                const galleryGrid = document.getElementById('galleryGrid');
+                const lightbox = document.getElementById('lightbox');
+                const lightboxImg = document.getElementById('lightboxImg');
+                const lightboxVideo = document.getElementById('lightboxVideo');
 
-        lightbox.addEventListener('touchend', e => {
-            touchendX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
+                let mediaList = [];
+                let currentIndex = 0;
 
-        function handleSwipe() {
-            const swipeThreshold = 50; 
-            if (touchendX < touchstartX - swipeThreshold) changeMedia(1); 
-            if (touchendX > touchstartX + swipeThreshold) changeMedia(-1); 
-        }
+                // 4. Build the target list for Images and Videos
+                for (let i = 1; i <= maxImagesToCheck; i++) {
+                    mediaList.push({ type: 'image', src: `${folderName}/${filePrefix} (${i}).jpg`, valid: true });
+                }
+                for (let i = 1; i <= maxVideosToCheck; i++) {
+                    mediaList.push({ type: 'video', src: `${folderName}/${filePrefix} (${i}).mp4`, valid: true });
+                }
 
-        lightbox.addEventListener('click', e => {
-            if (e.target === lightbox || e.target.className === 'lightbox-content') {
-                closeLightbox();
-            }
-        });
+                // 5. Render Grid and Listen for Errors
+                mediaList.forEach((media, index) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'media-item';
+
+                    if (media.type === 'image') {
+                        const img = document.createElement('img');
+                        img.src = media.src;
+                        img.loading = "lazy";
+                        
+                        img.onerror = () => {
+                            wrapper.style.display = 'none';
+                            media.valid = false;
+                        };
+                        wrapper.appendChild(img);
+                        
+                    } else if (media.type === 'video') {
+                        const vid = document.createElement('video');
+                        vid.preload = "auto";
+                        
+                        vid.onerror = () => {
+                            wrapper.style.display = 'none';
+                            media.valid = false;
+                        };
+
+                        vid.src = media.src;
+
+                        const icon = document.createElement('div');
+                        icon.className = 'video-icon';
+                        icon.innerHTML = '▶'; 
+                        
+                        wrapper.appendChild(vid);
+                        wrapper.appendChild(icon);
+                    }
+
+                    wrapper.onclick = () => {
+                        if (media.valid) window.openLightbox(index);
+                    };
+
+                    galleryGrid.appendChild(wrapper);
+                });
+
+                // 6. Lightbox Logic (Attached to window so HTML inline onclicks work)
+                window.openLightbox = function(index) {
+                    currentIndex = index;
+                    updateLightbox();
+                    lightbox.style.display = 'block';
+                    document.body.style.overflow = 'hidden'; 
+                };
+
+                window.closeLightbox = function() {
+                    lightbox.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    lightboxVideo.pause(); 
+                };
+
+                window.changeMedia = function(direction) {
+                    let foundValidMedia = false;
+                    let attempts = 0;
+
+                    while (!foundValidMedia && attempts < mediaList.length) {
+                        currentIndex += direction;
+                        
+                        if (currentIndex >= mediaList.length) currentIndex = 0;
+                        if (currentIndex < 0) currentIndex = mediaList.length - 1;
+                        
+                        if (mediaList[currentIndex].valid) {
+                            foundValidMedia = true;
+                        }
+                        attempts++;
+                    }
+                    
+                    if (foundValidMedia) {
+                        updateLightbox();
+                    }
+                };
+
+                function updateLightbox() {
+                    const media = mediaList[currentIndex];
+                    
+                    lightboxVideo.pause();
+                    lightboxVideo.currentTime = 0;
+
+                    if (media.type === 'image') {
+                        lightboxImg.src = media.src;
+                        lightboxImg.style.display = 'block';
+                        lightboxVideo.style.display = 'none';
+                    } else if (media.type === 'video') {
+                        lightboxVideo.src = media.src;
+                        lightboxVideo.style.display = 'block';
+                        lightboxImg.style.display = 'none';
+                    }
+                }
+
+                // 7. Swipe Gestures
+                let touchstartX = 0;
+                let touchendX = 0;
+
+                lightbox.addEventListener('touchstart', e => {
+                    touchstartX = e.changedTouches[0].screenX;
+                });
+
+                lightbox.addEventListener('touchend', e => {
+                    touchendX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                });
+
+                function handleSwipe() {
+                    const swipeThreshold = 50; 
+                    if (touchendX < touchstartX - swipeThreshold) window.changeMedia(1); 
+                    if (touchendX > touchstartX + swipeThreshold) window.changeMedia(-1); 
+                }
+
+                lightbox.addEventListener('click', e => {
+                    if (e.target === lightbox || e.target.className === 'lightbox-content') {
+                        window.closeLightbox();
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching database:", error);
+                document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Failed to load gallery data.</h2>';
+            });
     </script>
 </body>
 </html>
