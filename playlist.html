@@ -273,221 +273,233 @@
         <p>&copy; 2026 One Circle.</p>
     </footer>
 
-    <!-- Include Database -->
-    <script src="database.js"></script>
-
     <script>
-        // --- 1. DYNAMIC PLAYLIST DATA FETCHING ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const seasonNumber = parseInt(urlParams.get('season'));
-
-        const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
-
-        if (!seasonData) {
-            document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Playlist not found.</h2>';
-            throw new Error("Season not found in database.");
-        }
-
-        // --- 2. UPDATE METADATA & HEADER ---
-        document.title = `One Circle | ${seasonData.title}`;
-        
-        const dynamicHeader = document.getElementById('dynamicHeader');
-        dynamicHeader.innerHTML = `
-            ${seasonData.posterImg ? `<img src="${seasonData.posterImg}" alt="${seasonData.title} Poster" class="poster-img">` : ''}
-            <h1>${seasonData.title}</h1>
-            <p class="subtitle">One Circle • ${seasonData.date}</p>
-        `;
-
-        document.getElementById('fpPlaylistTitle').innerText = seasonData.title;
-        const fpArt = document.getElementById('fpArt');
-        if (seasonData.posterImg) {
-            fpArt.src = seasonData.posterImg;
-        } else {
-            fpArt.style.display = 'none';
-        }
-
-        // --- 3. FORMAT TRACKLIST ---
-        const playlist = seasonData.tracklist.map((track, index) => {
-            return {
-                id: index,
-                title: track.title,
-                artist: track.artist || "One Circle", 
-                file: track.file
-            };
-        });
-
-        // --- 4. PLAYER LOGIC ---
-        let currentTrackIndex = 0;
-        let isPlaying = false;
-        let isShuffle = false;
-        let isRepeat = false;
-
-        const audio = document.getElementById('audioPlayer');
-        const trackListEl = document.getElementById('trackList');
-        
-        const miniPlayer = document.getElementById('miniPlayer');
-        const masterPlayBtn = document.getElementById('masterPlayBtn');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const nowTitle = document.getElementById('nowTitle');
-        const nowArtist = document.getElementById('nowArtist');
-        const progressBar = document.getElementById('progressBar');
-        
-        const fullPlayer = document.getElementById('fullPlayer');
-        const fpTitle = document.getElementById('fpTitle');
-        const fpArtist = document.getElementById('fpArtist');
-        const fpProgressBar = document.getElementById('fpProgressBar');
-        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
-        const durationDisplay = document.getElementById('durationDisplay');
-        const fpPlayPauseBtn = document.getElementById('fpPlayPauseBtn');
-        const shuffleBtn = document.getElementById('shuffleBtn');
-        const repeatBtn = document.getElementById('repeatBtn');
-
-        function renderTracklist() {
-            trackListEl.innerHTML = '';
-            playlist.forEach((track, index) => {
-                const li = document.createElement('li');
-                li.className = 'track-item';
-                li.innerHTML = `
-                    <div class="track-info">
-                        <p class="track-title">${index + 1}. ${track.title}</p>
-                        <p class="track-artist">${track.artist}</p>
-                    </div>
-                `;
-                li.onclick = () => loadAndPlayTrack(index);
-                trackListEl.appendChild(li);
-            });
-        }
-
-        function loadAndPlayTrack(index) {
-            currentTrackIndex = index;
-            const track = playlist[index];
-            
-            nowTitle.innerText = track.title;
-            nowArtist.innerText = track.artist;
-            fpTitle.innerText = track.title;
-            fpArtist.innerText = track.artist;
-            
-            document.querySelectorAll('.track-item').forEach((item, i) => {
-                item.classList.toggle('active', i === index);
-            });
-
-            audio.src = track.file;
-            const playPromise = audio.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    isPlaying = true;
-                    updatePlayButtons();
-                }).catch(error => {
-                    console.error("Playback failed:", error);
-                    alert("Error playing " + track.title + "!\n\nSystem Error: " + error.name);
-                    isPlaying = false;
-                    updatePlayButtons();
-                });
-            }
-        }
-
-        function togglePlay() {
-            if (!audio.src) { loadAndPlayTrack(0); return; }
-            if (isPlaying) { 
-                audio.pause();
-                isPlaying = false;
-            } else { 
-                audio.play();
-                isPlaying = true;
-            }
-            updatePlayButtons();
-        }
-
-        function updatePlayButtons() {
-            const icon = isPlaying ? "⏸" : "▶";
-            playPauseBtn.innerText = icon;
-            masterPlayBtn.innerText = icon;
-            fpPlayPauseBtn.innerText = icon;
-        }
-
-        function playNext() {
-            if (isShuffle) {
-                let randomIndex = currentTrackIndex;
-                while (randomIndex === currentTrackIndex && playlist.length > 1) {
-                    randomIndex = Math.floor(Math.random() * playlist.length);
+        // Fetch the JSON database
+        fetch('database.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
-                loadAndPlayTrack(randomIndex);
-            } else {
-                let nextIndex = currentTrackIndex + 1;
-                if (nextIndex >= playlist.length) nextIndex = 0;
-                loadAndPlayTrack(nextIndex);
-            }
-        }
+                return response.json();
+            })
+            .then(siteDatabase => {
+                // --- 1. DYNAMIC PLAYLIST DATA FETCHING ---
+                const urlParams = new URLSearchParams(window.location.search);
+                const seasonNumber = parseInt(urlParams.get('season'));
 
-        function playPrev() {
-            let prevIndex = currentTrackIndex - 1;
-            if (prevIndex < 0) prevIndex = playlist.length - 1;
-            loadAndPlayTrack(prevIndex);
-        }
+                const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
 
-        masterPlayBtn.onclick = togglePlay;
-        playPauseBtn.onclick = togglePlay;
-        fpPlayPauseBtn.onclick = togglePlay;
-        
-        document.getElementById('nextBtn').onclick = playNext;
-        document.getElementById('fpNextBtn').onclick = playNext;
-        
-        document.getElementById('prevBtn').onclick = playPrev;
-        document.getElementById('fpPrevBtn').onclick = playPrev;
+                if (!seasonData) {
+                    document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Playlist not found.</h2>';
+                    throw new Error("Season not found in database.");
+                }
 
-        shuffleBtn.onclick = () => {
-            isShuffle = !isShuffle;
-            shuffleBtn.classList.toggle('active', isShuffle);
-        };
-        
-        repeatBtn.onclick = () => {
-            isRepeat = !isRepeat;
-            audio.loop = isRepeat;
-            repeatBtn.classList.toggle('active', isRepeat);
-        };
-
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return "0:00";
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return mins + ":" + (secs < 10 ? "0" : "") + secs;
-        }
-
-        audio.addEventListener('timeupdate', () => {
-            if (audio.duration) {
-                const percent = (audio.currentTime / audio.duration) * 100;
-                progressBar.style.width = percent + '%';
-                fpProgressBar.style.width = percent + '%';
+                // --- 2. UPDATE METADATA & HEADER ---
+                document.title = `One Circle | ${seasonData.title}`;
                 
-                currentTimeDisplay.innerText = formatTime(audio.currentTime);
-                durationDisplay.innerText = formatTime(audio.duration);
-            }
-        });
+                const dynamicHeader = document.getElementById('dynamicHeader');
+                dynamicHeader.innerHTML = `
+                    ${seasonData.posterImg ? `<img src="${seasonData.posterImg}" alt="${seasonData.title} Poster" class="poster-img">` : ''}
+                    <h1>${seasonData.title}</h1>
+                    <p class="subtitle">One Circle • ${seasonData.date}</p>
+                `;
 
-        window.seekAudio = function(e, container) {
-            const width = container.clientWidth;
-            const clickX = e.offsetX;
-            const duration = audio.duration;
-            if (duration) {
-                audio.currentTime = (clickX / width) * duration;
-            }
-        };
+                document.getElementById('fpPlaylistTitle').innerText = seasonData.title;
+                const fpArt = document.getElementById('fpArt');
+                if (seasonData.posterImg) {
+                    fpArt.src = seasonData.posterImg;
+                } else {
+                    fpArt.style.display = 'none';
+                }
 
-        audio.addEventListener('ended', () => {
-            if (!isRepeat) { playNext(); }
-        });
+                // --- 3. FORMAT TRACKLIST ---
+                const playlist = seasonData.tracklist.map((track, index) => {
+                    return {
+                        id: index,
+                        title: track.title,
+                        artist: track.artist || "One Circle", 
+                        file: track.file
+                    };
+                });
 
-        miniPlayer.addEventListener('click', () => {
-            fullPlayer.classList.add('active');
-        });
-        
-        document.getElementById('closeFullPlayer').addEventListener('click', () => {
-            fullPlayer.classList.remove('active');
-        });
+                // --- 4. PLAYER LOGIC ---
+                let currentTrackIndex = 0;
+                let isPlaying = false;
+                let isShuffle = false;
+                let isRepeat = false;
 
-        renderTracklist();
+                const audio = document.getElementById('audioPlayer');
+                const trackListEl = document.getElementById('trackList');
+                
+                const miniPlayer = document.getElementById('miniPlayer');
+                const masterPlayBtn = document.getElementById('masterPlayBtn');
+                const playPauseBtn = document.getElementById('playPauseBtn');
+                const nowTitle = document.getElementById('nowTitle');
+                const nowArtist = document.getElementById('nowArtist');
+                const progressBar = document.getElementById('progressBar');
+                
+                const fullPlayer = document.getElementById('fullPlayer');
+                const fpTitle = document.getElementById('fpTitle');
+                const fpArtist = document.getElementById('fpArtist');
+                const fpProgressBar = document.getElementById('fpProgressBar');
+                const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+                const durationDisplay = document.getElementById('durationDisplay');
+                const fpPlayPauseBtn = document.getElementById('fpPlayPauseBtn');
+                const shuffleBtn = document.getElementById('shuffleBtn');
+                const repeatBtn = document.getElementById('repeatBtn');
 
+                function renderTracklist() {
+                    trackListEl.innerHTML = '';
+                    playlist.forEach((track, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'track-item';
+                        li.innerHTML = `
+                            <div class="track-info">
+                                <p class="track-title">${index + 1}. ${track.title}</p>
+                                <p class="track-artist">${track.artist}</p>
+                            </div>
+                        `;
+                        li.onclick = () => loadAndPlayTrack(index);
+                        trackListEl.appendChild(li);
+                    });
+                }
+
+                function loadAndPlayTrack(index) {
+                    currentTrackIndex = index;
+                    const track = playlist[index];
+                    
+                    nowTitle.innerText = track.title;
+                    nowArtist.innerText = track.artist;
+                    fpTitle.innerText = track.title;
+                    fpArtist.innerText = track.artist;
+                    
+                    document.querySelectorAll('.track-item').forEach((item, i) => {
+                        item.classList.toggle('active', i === index);
+                    });
+
+                    audio.src = track.file;
+                    const playPromise = audio.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            isPlaying = true;
+                            updatePlayButtons();
+                        }).catch(error => {
+                            console.error("Playback failed:", error);
+                            alert("Error playing " + track.title + "!\n\nSystem Error: " + error.name);
+                            isPlaying = false;
+                            updatePlayButtons();
+                        });
+                    }
+                }
+
+                function togglePlay() {
+                    if (!audio.src) { loadAndPlayTrack(0); return; }
+                    if (isPlaying) { 
+                        audio.pause();
+                        isPlaying = false;
+                    } else { 
+                        audio.play();
+                        isPlaying = true;
+                    }
+                    updatePlayButtons();
+                }
+
+                function updatePlayButtons() {
+                    const icon = isPlaying ? "⏸" : "▶";
+                    playPauseBtn.innerText = icon;
+                    masterPlayBtn.innerText = icon;
+                    fpPlayPauseBtn.innerText = icon;
+                }
+
+                function playNext() {
+                    if (isShuffle) {
+                        let randomIndex = currentTrackIndex;
+                        while (randomIndex === currentTrackIndex && playlist.length > 1) {
+                            randomIndex = Math.floor(Math.random() * playlist.length);
+                        }
+                        loadAndPlayTrack(randomIndex);
+                    } else {
+                        let nextIndex = currentTrackIndex + 1;
+                        if (nextIndex >= playlist.length) nextIndex = 0;
+                        loadAndPlayTrack(nextIndex);
+                    }
+                }
+
+                function playPrev() {
+                    let prevIndex = currentTrackIndex - 1;
+                    if (prevIndex < 0) prevIndex = playlist.length - 1;
+                    loadAndPlayTrack(prevIndex);
+                }
+
+                masterPlayBtn.onclick = togglePlay;
+                playPauseBtn.onclick = togglePlay;
+                fpPlayPauseBtn.onclick = togglePlay;
+                
+                document.getElementById('nextBtn').onclick = playNext;
+                document.getElementById('fpNextBtn').onclick = playNext;
+                
+                document.getElementById('prevBtn').onclick = playPrev;
+                document.getElementById('fpPrevBtn').onclick = playPrev;
+
+                shuffleBtn.onclick = () => {
+                    isShuffle = !isShuffle;
+                    shuffleBtn.classList.toggle('active', isShuffle);
+                };
+                
+                repeatBtn.onclick = () => {
+                    isRepeat = !isRepeat;
+                    audio.loop = isRepeat;
+                    repeatBtn.classList.toggle('active', isRepeat);
+                };
+
+                function formatTime(seconds) {
+                    if (isNaN(seconds)) return "0:00";
+                    const mins = Math.floor(seconds / 60);
+                    const secs = Math.floor(seconds % 60);
+                    return mins + ":" + (secs < 10 ? "0" : "") + secs;
+                }
+
+                audio.addEventListener('timeupdate', () => {
+                    if (audio.duration) {
+                        const percent = (audio.currentTime / audio.duration) * 100;
+                        progressBar.style.width = percent + '%';
+                        fpProgressBar.style.width = percent + '%';
+                        
+                        currentTimeDisplay.innerText = formatTime(audio.currentTime);
+                        durationDisplay.innerText = formatTime(audio.duration);
+                    }
+                });
+
+                // Attach seekAudio to the window object so it can be called by inline onclick handlers
+                window.seekAudio = function(e, container) {
+                    const width = container.clientWidth;
+                    const clickX = e.offsetX;
+                    const duration = audio.duration;
+                    if (duration) {
+                        audio.currentTime = (clickX / width) * duration;
+                    }
+                };
+
+                audio.addEventListener('ended', () => {
+                    if (!isRepeat) { playNext(); }
+                });
+
+                miniPlayer.addEventListener('click', () => {
+                    fullPlayer.classList.add('active');
+                });
+                
+                document.getElementById('closeFullPlayer').addEventListener('click', () => {
+                    fullPlayer.classList.remove('active');
+                });
+
+                renderTracklist();
+
+            })
+            .catch(error => {
+                console.error("Error fetching database:", error);
+                document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Failed to load playlist data.</h2>';
+            });
     </script>
 </body>
 </html>
