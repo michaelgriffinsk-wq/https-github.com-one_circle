@@ -23,6 +23,8 @@
             border-bottom: 2px solid #cc0000;
         }
         nav h2 { margin: 0; color: #fff; letter-spacing: 1px; font-size: 1.2em; }
+        nav .nav-links a { color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em; margin-left: 20px; transition: color 0.2s;}
+        nav .nav-links a:hover { color: #cc0000; }
         
         /* Hero Section */
         header { 
@@ -105,6 +107,10 @@
 
     <nav>
         <h2>ONE CIRCLE</h2>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+        </div>
     </nav>
 
     <header>
@@ -172,22 +178,28 @@
 
                 // Logic for the buttons: Only show them if media actually exists in database.js
                 let buttonsHTML = '';
-                const hasAudio = season.tracklist.length > 0;
-                const hasGallery = season.gallery.maxImages > 0 || season.gallery.maxVideos > 0;
+                const hasAudio = season.tracklist && season.tracklist.length > 0;
+                const hasGallery = season.gallery && (season.gallery.maxImages > 0 || season.gallery.maxVideos > 0);
+                const hasYouTube = season.youtubeLink && season.youtubeLink !== "";
 
-                if (hasAudio || hasGallery) {
+                if (hasAudio || hasGallery || hasYouTube) {
                     buttonsHTML += `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">`;
+                    
                     if (hasAudio) {
                         buttonsHTML += `<a href="playlist.html?season=${season.seasonNumber}" class="btn">Listen 🎧</a>`;
+                    }
+                    if (hasYouTube) {
+                        buttonsHTML += `<a href="${season.youtubeLink}" target="_blank" class="btn" style="background-color: #cc0000;">Watch 📺</a>`;
                     }
                     if (hasGallery) {
                         buttonsHTML += `<a href="gallery.html?season=${season.seasonNumber}" class="btn" style="background-color: #333;">Gallery 📷</a>`;
                     }
+                    
                     buttonsHTML += `</div>`;
                 } else {
                     buttonsHTML = `<div style="margin-top: 10px;"><a href="#" class="btn disabled">Media Coming Soon</a></div>`;
                 }
-
+                
                 // Inject the assembled card into the grid
                 pastGrid.innerHTML += `
                     <div class="card">
@@ -205,6 +217,5 @@
             }
         });
     </script>
-
 </body>
 </html>
