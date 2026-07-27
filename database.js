@@ -12,7 +12,7 @@ const siteDatabase = {
             tracklist: [],
             gallery: {
                 folderName: "gallery_season_6",
-                filePrefix: "3",
+                filePrefix: "2",
                 maxImages: 0,
                 maxVideos: 0
             }
@@ -90,7 +90,7 @@ const siteDatabase = {
             ],
             gallery: {
                 folderName: "gallery_season_4",
-                filePrefix: "2",
+                filePrefix: "3",
                 maxImages: 150,
                 maxVideos: 20
             }
