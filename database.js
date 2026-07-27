@@ -90,7 +90,7 @@ const siteDatabase = {
             ],
             gallery: {
                 folderName: "gallery_season_4",
-                filePrefix: "3",
+                filePrefix: "1",
                 maxImages: 150,
                 maxVideos: 20
             }
