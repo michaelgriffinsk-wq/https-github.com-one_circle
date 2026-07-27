@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Circle | Official Website</title>
+    
+    <!-- Content Security Policy allowing unsafe-eval and unpkg scripts -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' https://unpkg.com; connect-src 'self' https://api.github.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -36,9 +40,7 @@
         .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
         .section-title { font-size: 1.8em; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 30px; }
 
-        /* =========================================
-           NEW: Upcoming Event Banner
-           ========================================= */
+        /* Upcoming Event Banner */
         .upcoming-card {
             background: linear-gradient(45deg, #1a0000 0%, #111 100%);
             border-left: 4px solid #cc0000;
@@ -123,7 +125,6 @@
                 <p>We are currently planning our next gathering. Stay tuned for more details, guest announcements, and registration info!</p>
             </div>
             <div class="upcoming-action">
-                <!-- A disabled button that you can activate later -->
                 <a href="#" class="btn disabled">More Info Soon</a>
             </div>
         </div>
