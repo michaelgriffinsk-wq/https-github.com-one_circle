@@ -13,8 +13,8 @@ const siteDatabase = {
             gallery: {
                 folderName: "gallery_season_6",
                 filePrefix: "2",
-                maxImages: 0,
-                maxVideos: 0
+                maxImages: 150,
+                maxVideos: 30
             }
         },
         {
