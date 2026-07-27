@@ -2,7 +2,7 @@ backend:
   name: github
   repo: michaelgriffinsk-wq/https-github.com-one_circle
   branch: json-branch 
-  base_url: https://netlify-cms-github-oauth-provider-tau-silk.vercel.app
+  base_url: https://netlify-cms-github-oauth-provider-tau-silk.vercel.app/
 
 # This defines where new uploads (like poster images or audio) are saved
 media_folder: "uploads" 
