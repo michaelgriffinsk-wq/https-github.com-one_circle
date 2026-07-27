@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Circle | About</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #0a0a0a; 
+            color: #fff; 
+            margin: 0; 
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        nav {
+            background-color: #111;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #cc0000;
+        }
+        nav a { color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em; transition: color 0.2s;}
+        nav a:hover { color: #cc0000; }
+        nav span { font-weight: bold; letter-spacing: 1px; }
+        
+        /* Hero Section */
+        header { 
+            text-align: center; 
+            padding: 80px 20px; 
+            background: linear-gradient(180deg, #3a0000 0%, #0a0a0a 100%);
+        }
+        header h1 { margin: 0; font-size: 2.8em; text-transform: uppercase; letter-spacing: 3px; }
+        header p { color: #aaa; font-size: 1.1em; max-width: 600px; margin: 20px auto 0; }
+
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .section-title { font-size: 1.8em; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 30px; color: #cc0000; }
+
+        /* About Section (Text + Image) */
+        .about-content {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+        .about-text { flex: 1; color: #ccc; font-size: 1.05em; }
+        .about-image { 
+            flex: 1; 
+            background-color: #222; 
+            height: 300px; 
+            border-radius: 10px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: #555;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .about-content { flex-direction: column; }
+            .about-image { width: 100%; height: 250px; }
+        }
+
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+        }
+
+        /* Team Cards */
+        .team-card {
+            background-color: #151515;
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
+            padding-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+        .team-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(204, 0, 0, 0.2); }
+        .team-photo { 
+            width: 100%; 
+            height: 250px; 
+            background-color: #222; 
+            object-fit: cover; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #555;
+        }
+        .team-name { margin: 15px 0 5px 0; font-size: 1.3em; color: #fff; }
+        .team-role { margin: 0; color: #cc0000; font-size: 0.9em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+        footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; border-top: 1px solid #222; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">← Back to Home</a>
+        <span>ONE CIRCLE</span>
+    </nav>
+
+    <header>
+        <h1>Our Story</h1>
+        <p>A community built on worship, fellowship, and a shared love for the presence of God.</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- ABOUT SECTION -->
+        <h2 class="section-title">What is One Circle?</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Welcome to One Circle. We are a collective of musicians, creatives, and worshippers dedicated to raising a sound that honors God. What started as a simple gathering has grown into a powerful movement of fellowship through music.</p>
+                <p>Through our live sessions and events, our goal is to create an atmosphere where people can encounter The Father's love, worship freely, and experience community.</p>
+            </div>
+            <div class="about-image">
+                <!-- Replace with an actual group photo -->
+                Group Photo Placeholder
+            </div>
+        </div>
+
+        <!-- TEAM SECTION -->
+        <h2 class="section-title">Meet the Team</h2>
+        <div class="team-grid">
+            
+            <!-- Team Member 1 -->
+            <div class="team-card">
+                <div class="team-photo">Photo</div>
+                <h3 class="team-name">Name Here</h3>
+                <p class="team-role">Worship Leader</p>
+            </div>
+
+            <!-- Team Member 2 -->
+            <div class="team-card">
+                <div class="team-photo">Photo</div>
+                <h3 class="team-name">Name Here</h3>
+                <p class="team-role">Keys / Vocals</p>
+            </div>
+
+            <!-- Team Member 3 -->
+            <div class="team-card">
+                <div class="team-photo">Photo</div>
+                <h3 class="team-name">Kebaso Michael Griffins</h3>
+                <p class="team-role">Bassist</p>
+            </div>
+
+            <!-- Team Member 4 -->
+            <div class="team-card">
+                <div class="team-photo">Photo</div>
+                <h3 class="team-name">Duang</h3>
+                <p class="team-role">Audio & Media</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
+    </footer>
+
+</body>
+</html>
