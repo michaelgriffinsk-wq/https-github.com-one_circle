@@ -206,11 +206,12 @@
             <p>${seasonData.title} • ${seasonData.date}</p>
         `;
 
-        // --- 3. GALLERY CONFIGURATION ---
-        // Dynamically pull the limits and folder name from the database
+       // --- 3. GALLERY CONFIGURATION ---
+        // Dynamically pull the limits, folder name, and file prefix from the database
         const maxImagesToCheck = seasonData.gallery.maxImages || 0; 
         const maxVideosToCheck = seasonData.gallery.maxVideos || 0; 
-        const folderName = seasonData.gallery.folder || `gallery_season_${seasonData.seasonNumber}`;
+        const folderName = seasonData.gallery.folderName || `gallery_season_${seasonData.seasonNumber}`;
+        const filePrefix = seasonData.gallery.filePrefix || "1";
         // ------------------------------
 
         const galleryGrid = document.getElementById('galleryGrid');
@@ -221,14 +222,13 @@
         let mediaList = [];
         let currentIndex = 0;
 
-        // 4. Build the target list for Images and Videos
+        // 4. Build the target list for Images and Videos using the dynamic prefix
         for (let i = 1; i <= maxImagesToCheck; i++) {
-            mediaList.push({ type: 'image', src: `${folderName}/1 (${i}).jpg`, valid: true });
+            mediaList.push({ type: 'image', src: `${folderName}/${filePrefix} (${i}).jpg`, valid: true });
         }
         for (let i = 1; i <= maxVideosToCheck; i++) {
-            mediaList.push({ type: 'video', src: `${folderName}/1 (${i}).mp4`, valid: true });
+            mediaList.push({ type: 'video', src: `${folderName}/${filePrefix} (${i}).mp4`, valid: true });
         }
-
         // 5. Render Grid and Listen for Errors
         mediaList.forEach((media, index) => {
             const wrapper = document.createElement('div');
