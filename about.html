@@ -114,9 +114,8 @@
         <!-- ABOUT SECTION -->
         <h2 class="section-title">What is One Circle?</h2>
         <div class="about-content">
-            <div class="about-text">
-                <p>Welcome to One Circle. We are a collective of musicians, creatives, and worshippers dedicated to raising a sound that honors God. What started as a simple gathering has grown into a powerful movement of fellowship through music.</p>
-                <p>Through our live sessions and events, our goal is to create an atmosphere where people can encounter The Father's love, worship freely, and experience community.</p>
+            <div class="about-text" id="aboutTextContainer">
+                <!-- Text Injected by JS -->
             </div>
             <div class="about-image">
                 <!-- Replace with an actual group photo -->
@@ -126,43 +125,55 @@
 
         <!-- TEAM SECTION -->
         <h2 class="section-title">Meet the Team</h2>
-        <div class="team-grid">
-            
-            <!-- Team Member 1 -->
-            <div class="team-card">
-                <div class="team-photo">Photo</div>
-                <h3 class="team-name">Name Here</h3>
-                <p class="team-role">Worship Leader</p>
-            </div>
-
-            <!-- Team Member 2 -->
-            <div class="team-card">
-                <div class="team-photo">Photo</div>
-                <h3 class="team-name">Name Here</h3>
-                <p class="team-role">Keys / Vocals</p>
-            </div>
-
-            <!-- Team Member 3 -->
-            <div class="team-card">
-                <div class="team-photo">Photo</div>
-                <h3 class="team-name">Michael Griffins</h3>
-                <p class="team-role">Dancer🤡🤡🤡</p>
-            </div>
-
-            <!-- Team Member 4 -->
-            <div class="team-card">
-                <div class="team-photo">Photo</div>
-                <h3 class="team-name">Duang</h3>
-                <p class="team-role">Audio & Media</p>
-            </div>
-
+        <div class="team-grid" id="teamGrid">
+            <!-- Team cards injected by JS -->
         </div>
 
     </div>
 
     <footer>
-        <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
+        <p>&copy; 2026 One Circle.</p>
     </footer>
 
+    <script>
+        // Fetch the JSON database
+        fetch('about.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(aboutData => {
+                
+                // 1. Populate the Story text
+                // We split by double line-breaks to create neat HTML paragraphs
+                const storyParagraphs = aboutData.story.split('\\n\\n');
+                let storyHTML = '';
+                storyParagraphs.forEach(p => {
+                    storyHTML += `<p>${p.replace(/\\n/g, '<br>')}</p>`;
+                });
+                document.getElementById('aboutTextContainer').innerHTML = storyHTML;
+
+                // 2. Populate the Team Grid
+                const teamGrid = document.getElementById('teamGrid');
+                teamGrid.innerHTML = ''; // Clear out any placeholders
+                
+                aboutData.team.forEach(member => {
+                    teamGrid.innerHTML += `
+                        <div class="team-card">
+                            <div class="team-photo">Photo</div>
+                            <h3 class="team-name">${member.name}</h3>
+                            <p class="team-role">${member.role}</p>
+                        </div>
+                    `;
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching about data:", error);
+                document.getElementById('aboutTextContainer').innerHTML = '<p style="color: red;">Failed to load story data.</p>';
+                document.getElementById('teamGrid').innerHTML = '<p style="color: red;">Failed to load team data.</p>';
+            });
+    </script>
 </body>
 </html>
