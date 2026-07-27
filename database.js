@@ -25,6 +25,7 @@ const siteDatabase = {
             location: "One Circle",
             posterImg: "1000594675.jpg",
             description: "",
+            youtubeLink: "https://www.youtube.com/live/W_fzCeqCmUk?si=Clv5Q8_dnle7Wa-b",
             highlights: [
                 "Live Worship Session",
                 "Amapiano & Moyo Wangu Medleys",
