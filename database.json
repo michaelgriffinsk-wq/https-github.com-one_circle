@@ -1,36 +1,23 @@
 {
   "seasons": [
     {
-      "seasonNumber": 6,
-      "status": "upcoming",
-      "title": "Season 6: Title TBA",
-      "date": "TBD",
-      "location": "Location Name",
-      "posterImg": "",
-      "description": "We are currently planning our next gathering. Stay tuned for more details, guest announcements, and registration info!",
-      "highlights": [],
       "tracklist": [],
+      "seasonNumber": 6,
+      "date": "TBD",
       "gallery": {
         "folderName": "gallery_season_6",
         "filePrefix": "2",
         "maxImages": 150,
         "maxVideos": 30
-      }
+      },
+      "status": "upcoming",
+      "location": "TBD",
+      "posterImg": "",
+      "title": "Season 6: Title TBA",
+      "description": "We are currently planning our next gathering. Stay tuned for more details, guest announcements, and registration info!",
+      "highlights": []
     },
     {
-      "seasonNumber": 5,
-      "status": "past",
-      "title": "The Father's Love",
-      "date": "24/7/2026",
-      "location": "One Circle",
-      "posterImg": "1000594675.jpg",
-      "description": "",
-      "youtubeLink": "https://www.youtube.com/live/W_fzCeqCmUk?si=Clv5Q8_dnle7Wa-b",
-      "highlights": [
-        "Live Worship Session",
-        "Amapiano & Moyo Wangu Medleys",
-        "21 Songs"
-      ],
       "tracklist": [
         {
           "trackId": 1,
@@ -159,25 +146,27 @@
           "file": "audio/Track21.mp3"
         }
       ],
+      "seasonNumber": 5,
+      "date": "24/7/2026",
       "gallery": {
         "folderName": "gallery_season_5",
         "filePrefix": "1",
         "maxImages": 150,
         "maxVideos": 20
-      }
-    },
-    {
-      "seasonNumber": 4,
+      },
       "status": "past",
-      "title": "YESHUA",
-      "date": "24/7/2026",
       "location": "One Circle",
-      "posterImg": "24102025.jpg",
+      "posterImg": "1000594675.jpg",
+      "title": "The Father's Love",
       "description": "",
+      "youtubeLink": "https://www.youtube.com/live/W_fzCeqCmUk?si=Clv5Q8_dnle7Wa-b",
       "highlights": [
         "Live Worship Session",
-        "14 Songs"
-      ],
+        "Amapiano & Moyo Wangu Medleys",
+        "21 Songs"
+      ]
+    },
+    {
       "tracklist": [
         {
           "trackId": 1,
@@ -264,12 +253,23 @@
           "file": "audio/Track35.mp3"
         }
       ],
+      "seasonNumber": 4,
+      "date": "24/7/2026",
       "gallery": {
         "folderName": "gallery_season_4",
         "filePrefix": "1",
         "maxImages": 150,
         "maxVideos": 20
-      }
+      },
+      "status": "past",
+      "location": "One Circle",
+      "posterImg": "24102025.jpg",
+      "title": "YESHUA",
+      "description": "",
+      "highlights": [
+        "Live Worship Session",
+        "14 Songs"
+      ]
     }
   ]
 }
