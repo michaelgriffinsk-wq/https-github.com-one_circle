@@ -116,7 +116,12 @@
                     <span class="slider"></span>
                 </label>
             </div>
-            <button class="admin-btn admin-btn-secondary" onclick="alert('This will trigger a git push to save database.json')">Publish Changes</button>
+            
+            <!-- UPDATED: Now calls the GitHub API to save changes -->
+            <button class="admin-btn admin-btn-secondary" onclick="publishToGitHub(globalDatabase, 'database.json', 'Update events via custom admin UI')">Publish Changes</button>
+            
+            <!-- NEW: Link to Decap CMS for Image Uploads -->
+            <a href="decap.html" class="admin-btn" style="text-decoration: none; background-color: #0056b3;">Open Advanced CMS</a>
         </div>
     </div>
 
@@ -125,7 +130,7 @@
       <h2>ONE CIRCLE</h2>
       <div class="nav-links">
         <a href="../index.html">Live Home</a>
-        <a href="about.html">Live About</a> <!-- Updated link to point to admin/about.html -->
+        <a href="about.html">Live About</a>
       </div>
     </nav>
     <header>
@@ -186,8 +191,8 @@
                         <input type="text" id="seasonHighlights" placeholder="e.g. Worship, Praise, Fellowship">
                     </div>
                     <div class="form-group">
-                        <label>Poster Image Path</label>
-                        <input type="text" id="seasonPoster" placeholder="e.g. gallery_season_5/poster.jpg">
+                        <label>Poster Image Path (Upload via Advanced CMS)</label>
+                        <input type="text" id="seasonPoster" placeholder="e.g. uploads/poster.jpg">
                     </div>
                     <div class="form-group">
                         <label>YouTube Link</label>
@@ -226,7 +231,7 @@
                     return response.json();
                 })
                 .then(siteDatabase => {
-                    globalDatabase = siteDatabase; // Save it to global variable
+                    globalDatabase = siteDatabase; 
                     renderUI(siteDatabase);
                 })
                 .catch(error => {
@@ -295,7 +300,6 @@
             });
             
             attachEditListeners();
-            // Re-apply edit borders if edit mode is currently on
             if(isEditMode) toggleEditBorders(true);
         }
 
@@ -371,7 +375,6 @@
         saveModalBtn.addEventListener('click', () => {
             const index = document.getElementById('editIndex').value;
             
-            // Build the updated object from form data
             const updatedSeason = {
                 status: document.getElementById('seasonStatus').value,
                 title: document.getElementById('seasonTitleInput').value,
@@ -384,21 +387,83 @@
             };
 
             if (index === 'new') {
-                // Ensure default arrays exist for a brand new season
                 updatedSeason.tracklist = [];
                 updatedSeason.gallery = { maxImages: 0, maxVideos: 0 };
                 updatedSeason.seasonNumber = globalDatabase.seasons.length + 1;
                 globalDatabase.seasons.push(updatedSeason);
             } else {
-                // Merge updates with existing data (so we don't overwrite audio/gallery data)
                 globalDatabase.seasons[index] = { ...globalDatabase.seasons[index], ...updatedSeason };
             }
 
-            renderUI(globalDatabase); // Instantly update the UI!
+            renderUI(globalDatabase); 
             closeModal();
-            
-            alert('Changes saved temporarily in the browser! Click "Publish Changes" in the top right to commit to the repository.');
         });
+
+        // ==========================================
+        // GITHUB API SAVING LOGIC
+        // ==========================================
+        async function publishToGitHub(jsonData, filename, commitMessage) {
+            
+            // 1. Securely prompt for the token without hardcoding it
+            const token = prompt("Enter your GitHub Personal Access Token to publish to the Live Site:");
+            if (!token) {
+                alert("Publishing cancelled. A token is required.");
+                return;
+            }
+
+            // Using values matched exactly to your Decap config.yml
+            const repoOwner = "michaelgriffinsk-wq";
+            const repoName = "https-github.com-one_circle";
+            const branch = "json-branch";
+            const path = filename; 
+
+            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
+
+            try {
+                // 2. Fetch the current file's SHA (GitHub requires this to overwrite a file)
+                const getResponse = await fetch(`${apiUrl}?ref=${branch}`, {
+                    headers: { 
+                        "Authorization": `token ${token}`,
+                        "Accept": "application/vnd.github.v3+json"
+                    }
+                });
+                
+                if (!getResponse.ok) throw new Error("Could not fetch current file SHA.");
+                const fileData = await getResponse.json();
+                const currentSha = fileData.sha;
+
+                // 3. Convert updated JSON to Base64 (Handling special characters correctly)
+                const updatedContent = JSON.stringify(jsonData, null, 2);
+                const base64Content = btoa(unescape(encodeURIComponent(updatedContent)));
+
+                // 4. Send PUT request to GitHub
+                const putResponse = await fetch(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Accept": "application/vnd.github.v3+json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: commitMessage,
+                        content: base64Content,
+                        sha: currentSha,
+                        branch: branch
+                    })
+                });
+
+                if (putResponse.ok) {
+                    alert("Success! Changes have been published to GitHub.");
+                } else {
+                    const errorData = await putResponse.json();
+                    console.error(errorData);
+                    alert("Failed to publish: " + errorData.message);
+                }
+            } catch (error) {
+                console.error("Error publishing:", error);
+                alert("An error occurred. Check the browser console.");
+            }
+        }
 
         // Start
         loadData();
