@@ -11,11 +11,14 @@
     },
     {
       "name": "Kebaso Michael Griffins",
-      "role": "Dancer🤡🤡🤡"
+      "role": "Dancer🤡🤡🤡",
+      "image": "uploads/1000593915.jpg"
     },
     {
       "name": "Duang",
       "role": "Audio & Media"
     }
-  ]
+  ],
+  "page_title": "About us",
+  "hero_subtitle": "Get to know about us and fellowship with us."
 }
