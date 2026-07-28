@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,98 +135,87 @@
         <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
     </footer>
 
+    <!-- Link the central database file -->
+    <script src="database.js"></script>
+    
     <script>
         const upcomingContainer = document.getElementById('upcomingContainer');
         const pastGrid = document.getElementById('pastGrid');
 
-        // Fetch the data from the new JSON file instead of the static JS file
-        fetch('database.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(siteDatabase => {
-                // Loop through the siteDatabase array and build the HTML for each season
-                siteDatabase.seasons.forEach(season => {
-                    
-                    // 1. If it is an upcoming event, build the banner
-                    if (season.status === 'upcoming') {
-                        upcomingContainer.innerHTML = `
-                            <h2 class="section-title">Next Event</h2>
-                            <div class="upcoming-card">
-                                <div class="upcoming-info">
-                                    <h3>${season.title}</h3>
-                                    <p class="event-details">套 ${season.date} &nbsp;|&nbsp; 桃 ${season.location}</p>
-                                    <p>${season.description}</p>
-                                </div>
-                                <div class="upcoming-action">
-                                    <a href="#" class="btn disabled">More Info Soon</a>
-                                </div>
-                            </div>
-                        `;
-                    } 
-                    
-                    // 2. If it is a past event, build the card
-                    else if (season.status === 'past') {
-                        
-                        // Convert the highlights array into HTML list items
-                        let highlightsHTML = '';
-                        season.highlights.forEach(item => {
-                            highlightsHTML += `<li>${item}</li>`;
-                        });
-
-                        // Decide how to display the image (show poster or placeholder)
-                        const imageHTML = season.posterImg 
-                            ? `<img src="${season.posterImg}" alt="${season.title} Poster" class="card-img">`
-                            : `<div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>`;
-
-                        // Logic for the buttons: Only show them if media actually exists in the database
-                        let buttonsHTML = '';
-                        const hasAudio = season.tracklist && season.tracklist.length > 0;
-                        const hasGallery = season.gallery && (season.gallery.maxImages > 0 || season.gallery.maxVideos > 0);
-                        const hasYouTube = season.youtubeLink && season.youtubeLink !== "";
-
-                        if (hasAudio || hasGallery || hasYouTube) {
-                            buttonsHTML += `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">`;
-                            
-                            if (hasAudio) {
-                                buttonsHTML += `<a href="playlist.html?season=${season.seasonNumber}" class="btn">Listen 而</a>`;
-                            }
-                            if (hasYouTube) {
-                                buttonsHTML += `<a href="${season.youtubeLink}" target="_blank" class="btn" style="background-color: #cc0000;">Watch 銅</a>`;
-                            }
-                            if (hasGallery) {
-                                buttonsHTML += `<a href="gallery.html?season=${season.seasonNumber}" class="btn" style="background-color: #333;">Gallery 胴</a>`;
-                            }
-                            
-                            buttonsHTML += `</div>`;
-                        } else {
-                            buttonsHTML = `<div style="margin-top: 10px;"><a href="#" class="btn disabled">Media Coming Soon</a></div>`;
-                        }
-                        
-                        // Inject the assembled card into the grid
-                        pastGrid.innerHTML += `
-                            <div class="card">
-                                ${imageHTML}
-                                <div class="card-content">
-                                    <h3 class="card-title">${season.title}</h3>
-                                    <p style="font-size: 0.85em; color: #888; margin-top: 0;">${season.date}</p>
-                                    <ul class="card-list">
-                                        ${highlightsHTML}
-                                    </ul>
-                                    ${buttonsHTML}
-                                </div>
-                            </div>
-                        `;
-                    }
+        // Loop through the siteDatabase array and build the HTML for each season
+        siteDatabase.seasons.forEach(season => {
+            
+            // 1. If it is an upcoming event, build the banner
+            if (season.status === 'upcoming') {
+                upcomingContainer.innerHTML = `
+                    <h2 class="section-title">Next Event</h2>
+                    <div class="upcoming-card">
+                        <div class="upcoming-info">
+                            <h3>${season.title}</h3>
+                            <p class="event-details">📅 ${season.date} &nbsp;|&nbsp; 📍 ${season.location}</p>
+                            <p>${season.description}</p>
+                        </div>
+                        <div class="upcoming-action">
+                            <a href="#" class="btn disabled">More Info Soon</a>
+                        </div>
+                    </div>
+                `;
+            } 
+            
+            // 2. If it is a past event, build the card
+            else if (season.status === 'past') {
+                
+                // Convert the highlights array into HTML list items
+                let highlightsHTML = '';
+                season.highlights.forEach(item => {
+                    highlightsHTML += `<li>${item}</li>`;
                 });
-            })
-            .catch(error => {
-                console.error("Error loading the database:", error);
-                pastGrid.innerHTML = `<p style="color: red;">Failed to load events. Please ensure database.json exists and is formatted correctly.</p>`;
-            });
+
+                // Decide how to display the image (show poster or placeholder)
+                const imageHTML = season.posterImg 
+                    ? `<img src="${season.posterImg}" alt="${season.title} Poster" class="card-img">`
+                    : `<div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>`;
+
+                // Logic for the buttons: Only show them if media actually exists in database.js
+                let buttonsHTML = '';
+                const hasAudio = season.tracklist && season.tracklist.length > 0;
+                const hasGallery = season.gallery && (season.gallery.maxImages > 0 || season.gallery.maxVideos > 0);
+                const hasYouTube = season.youtubeLink && season.youtubeLink !== "";
+
+                if (hasAudio || hasGallery || hasYouTube) {
+                    buttonsHTML += `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">`;
+                    
+                    if (hasAudio) {
+                        buttonsHTML += `<a href="playlist.html?season=${season.seasonNumber}" class="btn">Listen 🎧</a>`;
+                    }
+                    if (hasYouTube) {
+                        buttonsHTML += `<a href="${season.youtubeLink}" target="_blank" class="btn" style="background-color: #cc0000;">Watch 📺</a>`;
+                    }
+                    if (hasGallery) {
+                        buttonsHTML += `<a href="gallery.html?season=${season.seasonNumber}" class="btn" style="background-color: #333;">Gallery 📷</a>`;
+                    }
+                    
+                    buttonsHTML += `</div>`;
+                } else {
+                    buttonsHTML = `<div style="margin-top: 10px;"><a href="#" class="btn disabled">Media Coming Soon</a></div>`;
+                }
+                
+                // Inject the assembled card into the grid
+                pastGrid.innerHTML += `
+                    <div class="card">
+                        ${imageHTML}
+                        <div class="card-content">
+                            <h3 class="card-title">${season.title}</h3>
+                            <p style="font-size: 0.85em; color: #888; margin-top: 0;">${season.date}</p>
+                            <ul class="card-list">
+                                ${highlightsHTML}
+                            </ul>
+                            ${buttonsHTML}
+                        </div>
+                    </div>
+                `;
+            }
+        });
     </script>
 </body>
 </html>
