@@ -64,7 +64,17 @@ collections:
         file: "about.json"
         format: "json" # Tells the CMS to read/write strict JSON
         fields:
+          - {label: "Page Title", name: "page_title", widget: "string"}
+          - {label: "Hero Subtitle", name: "hero_subtitle", widget: "string"}
           - {label: "Our Story", name: "story", widget: "text"}
+          
+          - label: "Core Values"
+            name: "core_values"
+            widget: "list"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+              - {label: "Icon (Emoji or Text)", name: "icon", widget: "string"}
           
           - label: "Team Members"
             name: "team"
@@ -72,3 +82,11 @@ collections:
             fields:
               - {label: "Name", name: "name", widget: "string"}
               - {label: "Role", name: "role", widget: "string"}
+              - {label: "Team Member Photo", name: "image", widget: "image", required: false}
+              
+          - label: "Footer Links"
+            name: "footer_links"
+            widget: "list"
+            fields:
+              - {label: "Label", name: "label", widget: "string"}
+              - {label: "URL", name: "url", widget: "string"}
