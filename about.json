@@ -1,21 +1,48 @@
 {
-  "story": "Welcome to One Circle. We are a collective of musicians, creatives, and worshippers dedicated to raising a sound that honors God. What started as a simple gathering has grown into a powerful movement of fellowship through music.\n\nThrough our live sessions and events, our goal is to create an atmosphere where people can encounter The Father's love, worship freely, and experience community.",
+  "page_title": "Our Story",
+  "hero_subtitle": "A community built on worship, fellowship, and a shared love for the presence of God.",
+  "story": "Welcome to One Circle. We are a collective of musicians, creatives, and worshippers dedicated to raising a sound that honors God.\n\nWhat started as a simple gathering has grown into a powerful movement of fellowship through music. Through our live sessions and events, our goal is to create an atmosphere where people can encounter The Father's love, worship freely, and experience community.",
+  "core_values": [
+    {
+      "title": "Worship",
+      "description": "Creating an atmosphere for encountering God's presence.",
+      "icon": "🙌"
+    },
+    {
+      "title": "Fellowship",
+      "description": "Building a strong, connected family of believers.",
+      "icon": "🤝"
+    },
+    {
+      "title": "Creativity",
+      "description": "Expressing our faith through music, art, and media.",
+      "icon": "🎨"
+    }
+  ],
   "team": [
     {
       "name": "Shakeela Mutuku",
-      "role": "Vocalist"
+      "role": "Vocalist",
+      "image_placeholder": "Photo"
     },
     {
       "name": "Alex Mutuma",
-      "role": "Keys"
+      "role": "Keys",
+      "image_placeholder": "Photo"
     },
     {
       "name": "Kebaso Michael Griffins",
-      "role": "Dancer🤡🤡🤡"
+      "role": "Bassist",
+      "image_placeholder": "Photo"
     },
     {
       "name": "Duang",
-      "role": "Audio & Media"
+      "role": "Audio & Media",
+      "image_placeholder": "Photo"
     }
+  ],
+  "footer_links": [
+    { "label": "Contact Us", "url": "contact.html" },
+    { "label": "Our Projects", "url": "projects.html" }
   ]
 }
