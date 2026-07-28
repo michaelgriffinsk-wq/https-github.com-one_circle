@@ -1,15 +1,273 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>One Circle Admin Panel</title>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>One Circle | Admin Editor</title>
+    
+    <!-- Link to the shared public stylesheet from the root folder -->
+    <link rel="stylesheet" href="../style.css">
 
-  <!-- Content Security Policy allowing unsafe-eval and unpkg scripts -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' https://unpkg.com; connect-src 'self' https://api.github.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
-</head>
-<body>
-  <!-- Decap CMS Script -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-</body>
+    <style>
+        /* =========================================
+           ADMIN-SPECIFIC STYLES ONLY
+           ========================================= */
+        .admin-toolbar { 
+            background: #111; 
+            padding: 15px 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid #cc0000; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+        
+        .admin-toolbar h1 { margin: 0; font-size: 1.2em; letter-spacing: 1px; }
+        .admin-toolbar .status { font-size: 0.8em; color: #888; margin-left: 10px; font-weight: normal; }
+        
+        .controls { display: flex; gap: 20px; align-items: center; }
+        
+        .admin-btn { 
+            background: #cc0000; color: white; border: none; 
+            padding: 8px 16px; border-radius: 4px; cursor: pointer; 
+            font-weight: bold; transition: background 0.2s;
+        }
+        .admin-btn:hover { background: #ff1a1a; }
+        .admin-btn-secondary { background: #333; }
+        .admin-btn-secondary:hover { background: #444; }
+        
+        .toggle-container { 
+            display: flex; align-items: center; gap: 10px; 
+            font-size: 0.9em; font-weight: bold; 
+            border-right: 1px solid #333; padding-right: 20px;
+        }
+        
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { 
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
+            background-color: #444; transition: .3s; border-radius: 24px; 
+        }
+        .slider:before { 
+            position: absolute; content: ""; height: 16px; width: 16px; 
+            left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; 
+        }
+        input:checked + .slider { background-color: #cc0000; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Edit Mode Visuals */
+        .admin-editable {
+            position: relative;
+            transition: all 0.2s ease-in-out;
+        }
+        .admin-editable.active-edit {
+            outline: 2px dashed #cc0000;
+            outline-offset: 4px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .admin-editable.active-edit:hover {
+            outline: 3px solid #cc0000;
+            background-color: rgba(204, 0, 0, 0.05); /* Slight tint on hover */
+        }
+        .admin-editable.active-edit::after {
+            content: '✎ Edit Season';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #cc0000;
+            color: white;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .admin-editable.active-edit:hover::after {
+            opacity: 1;
+        }
+        /* Disable regular links when editing so the admin doesn't navigate away */
+        body.admin-mode-on .admin-editable a {
+            pointer-events: none;
+        }
+    </style>
+  </head>
+  <body>
+    <!-- ADMIN TOOLBAR -->
+    <div class="admin-toolbar">
+        <h1>One Circle <span class="status">Live Content Editor</span></h1>
+        
+        <div class="controls">
+            <div class="toggle-container">
+                <span>Edit Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="editToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button class="admin-btn admin-btn-secondary" onclick="alert('This will trigger a git push to save database.json')">Publish Changes</button>
+        </div>
+    </div>
+
+    <!-- MAIN WEBSITE MIRROR -->
+    <nav>
+      <h2>ONE CIRCLE</h2>
+      <div class="nav-links">
+        <a href="../index.html">Live Home</a>
+        <a href="../about.html">Live About</a>
+      </div>
+    </nav>
+    <header>
+      <h1>Welcome to One Circle</h1>
+      <p>A community of worship, music, and fellowship. Explore our past seasons and listen to our lists.</p>
+    </header>
+    <div class="container">
+      
+      <div id="upcomingContainer"></div>
+      
+      <div class="section-title">
+          <span style="flex-grow: 1;">Past Events</span>
+          <!-- Inline Add Button (Only visible in Edit Mode) -->
+          <button id="addSeasonBtn" class="admin-btn" style="display: none; margin-left: auto;">+ Add Season</button>
+      </div>
+      <div class="event-grid" id="pastGrid">
+        <!-- Cards Injected by JS -->
+      </div>
+    </div>
+    <footer>
+      <p>© 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
+    </footer>
+
+    <!-- ADMIN LOGIC & DATA FETCHING -->
+    <script>
+        const upcomingContainer = document.getElementById('upcomingContainer');
+        const pastGrid = document.getElementById('pastGrid');
+        const editToggle = document.getElementById('editToggle');
+        const addSeasonBtn = document.getElementById('addSeasonBtn');
+        let isEditMode = false;
+
+        // Path is ../database.json because this file is in the /admin/ folder
+        fetch('../database.json')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(siteDatabase => {
+                siteDatabase.seasons.forEach((season, index) => {
+                    
+                    if (season.status === 'upcoming') {
+                        upcomingContainer.innerHTML = `
+                            <h2 class="section-title">Next Event</h2>
+                            <div class="upcoming-card admin-editable" data-index="${index}">
+                                <div class="upcoming-info">
+                                    <h3>${season.title}</h3>
+                                    <p class="event-details">📅 ${season.date} &nbsp;|&nbsp; 📍 ${season.location}</p>
+                                    <p>${season.description}</p>
+                                </div>
+                                <div class="upcoming-action">
+                                    <a href="#" class="btn disabled">More Info Soon</a>
+                                </div>
+                            </div>
+                        `;
+                    } 
+                    
+                    else if (season.status === 'past') {
+                        let highlightsHTML = '';
+                        season.highlights.forEach(item => {
+                            highlightsHTML += `<li>${item}</li>`;
+                        });
+
+                        // Ensure images point correctly to root
+                        const imageHTML = season.posterImg 
+                            ? `<img src="../${season.posterImg}" alt="${season.title} Poster" class="card-img">`
+                            : `<div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>`;
+
+                        let buttonsHTML = '';
+                        const hasAudio = season.tracklist && season.tracklist.length > 0;
+                        const hasGallery = season.gallery && (season.gallery.maxImages > 0 || season.gallery.maxVideos > 0);
+                        const hasYouTube = season.youtubeLink && season.youtubeLink !== "";
+
+                        if (hasAudio || hasGallery || hasYouTube) {
+                            buttonsHTML += `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">`;
+                            if (hasAudio) buttonsHTML += `<a href="../playlist.html?season=${season.seasonNumber}" class="btn">Listen 🎧</a>`;
+                            if (hasYouTube) buttonsHTML += `<a href="${season.youtubeLink}" target="_blank" class="btn" style="background-color: #cc0000;">Watch 📺</a>`;
+                            if (hasGallery) buttonsHTML += `<a href="../gallery.html?season=${season.seasonNumber}" class="btn" style="background-color: #333;">Gallery 📸</a>`;
+                            buttonsHTML += `</div>`;
+                        } else {
+                            buttonsHTML = `<div style="margin-top: 10px;"><a href="#" class="btn disabled">Media Coming Soon</a></div>`;
+                        }
+                        
+                        pastGrid.innerHTML += `
+                            <div class="card admin-editable" data-index="${index}">
+                                ${imageHTML}
+                                <div class="card-content">
+                                    <h3 class="card-title">${season.title}</h3>
+                                    <p style="font-size: 0.85em; color: #888; margin-top: 0;">${season.date}</p>
+                                    <ul class="card-list">
+                                        ${highlightsHTML}
+                                    </ul>
+                                    ${buttonsHTML}
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                // Attach edit listeners once rendered
+                attachEditListeners();
+            })
+            .catch(error => {
+                console.error("Error loading the database:", error);
+                pastGrid.innerHTML = `<p style="color: red;">Failed to load events. Ensure database.json exists in the root folder.</p>`;
+            });
+
+        // Toggle Edit State
+        editToggle.addEventListener('change', (e) => {
+            isEditMode = e.target.checked;
+            
+            if (isEditMode) {
+                document.body.classList.add('admin-mode-on');
+                addSeasonBtn.style.display = 'block';
+                document.querySelectorAll('.admin-editable').forEach(el => {
+                    el.classList.add('active-edit');
+                });
+            } else {
+                document.body.classList.remove('admin-mode-on');
+                addSeasonBtn.style.display = 'none';
+                document.querySelectorAll('.admin-editable').forEach(el => {
+                    el.classList.remove('active-edit');
+                });
+            }
+        });
+
+        // Add Season Action
+        addSeasonBtn.addEventListener('click', () => {
+            alert('Opening Modal to create a brand new Season to append to database.json!');
+        });
+
+        // Handle clicks on editable cards
+        function attachEditListeners() {
+            document.querySelectorAll('.admin-editable').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (isEditMode) {
+                        e.preventDefault(); 
+                        e.stopPropagation();
+                        
+                        const seasonIndex = card.getAttribute('data-index');
+                        alert(`Opening Edit Modal for Season at database index: ${seasonIndex}`);
+                    }
+                });
+            });
+        }
+    </script>
+  </body>
 </html>
