@@ -102,11 +102,11 @@
             width: 100%; 
             height: 250px; 
             background-color: #222; 
-            object-fit: cover; 
             display: flex;
             justify-content: center;
             align-items: center;
             color: #555;
+            overflow: hidden; /* Ensures image doesn't break card border radius */
         }
         .team-name { margin: 15px 0 5px 0; font-size: 1.3em; color: #fff; }
         .team-role { margin: 0; color: #cc0000; font-size: 0.9em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
@@ -197,14 +197,19 @@
                     `;
                 });
 
-                // 4. Populate the Team Grid
+                // 4. Populate the Team Grid (Updated for Image Support)
                 const teamGrid = document.getElementById('teamGrid');
                 teamGrid.innerHTML = ''; 
                 
                 aboutData.team.forEach(member => {
+                    // Check if an image was uploaded, otherwise use a text placeholder
+                    const imageHTML = member.image 
+                        ? `<img src="${member.image}" alt="${member.name}" style="width: 100%; height: 100%; object-fit: cover;">`
+                        : `Photo`;
+
                     teamGrid.innerHTML += `
                         <div class="team-card">
-                            <div class="team-photo">${member.image_placeholder}</div>
+                            <div class="team-photo">${imageHTML}</div>
                             <h3 class="team-name">${member.name}</h3>
                             <p class="team-role">${member.role}</p>
                         </div>
@@ -229,3 +234,4 @@
     </script>
 </body>
 </html>
+
