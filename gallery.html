@@ -127,165 +127,179 @@
     </footer>
 
     <script>
-        fetch('database.json')
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(siteDatabase => {
-                const urlParams = new URLSearchParams(window.location.search);
-                const seasonNumber = parseInt(urlParams.get('season'));
-                const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
+        function initGalleryPage() {
+            fetch('database.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(siteDatabase => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const seasonNumber = parseInt(urlParams.get('season'));
+                    const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
 
-                if (!seasonData) {
-                    document.getElementById('galleryGrid').innerHTML = '<h2 class="text-center text-[#d4a853] mt-10 text-2xl font-display">Gallery not found.</h2>';
-                    throw new Error("Season not found in database.");
-                }
-
-                // Update Header to match About.html theme
-                document.title = `One Circle | Season ${seasonData.seasonNumber} Gallery`;
-                const dynamicHeader = document.getElementById('dynamicHeader');
-                dynamicHeader.innerHTML = `
-                    <p class="uppercase tracking-[0.3em] text-sm mb-4" style="color: rgb(212, 168, 83); font-weight: 700;">Season ${seasonData.seasonNumber} Gallery</p> 
-                    <h1 class="font-display text-white font-black text-4xl md:text-5xl">${seasonData.title}</h1>
-                    <p class="mt-4 max-w-2xl leading-relaxed text-[#b8c4d6] text-lg">${seasonData.date}</p> 
-                `;
-
-                const maxImagesToCheck = seasonData.gallery.maxImages || 0; 
-                const maxVideosToCheck = seasonData.gallery.maxVideos || 0; 
-                const folderName = seasonData.gallery.folderName || `gallery_season_${seasonData.seasonNumber}`;
-                const filePrefix = seasonData.gallery.filePrefix || "1";
-                
-                const galleryGrid = document.getElementById('galleryGrid');
-                const lightbox = document.getElementById('lightbox');
-                const lightboxImg = document.getElementById('lightboxImg');
-                const lightboxVideo = document.getElementById('lightboxVideo');
-
-                let mediaList = [];
-                let currentIndex = 0;
-
-                for (let i = 1; i <= maxImagesToCheck; i++) {
-                    mediaList.push({ type: 'image', src: `${folderName}/${filePrefix} (${i}).jpg`, valid: true });
-                }
-                for (let i = 1; i <= maxVideosToCheck; i++) {
-                    mediaList.push({ type: 'video', src: `${folderName}/${filePrefix} (${i}).mp4`, valid: true });
-                }
-
-                mediaList.forEach((media, index) => {
-                    const wrapper = document.createElement('div');
-                    // Applying Tailwind classes for beautiful card styling
-                    wrapper.className = 'media-wrapper relative rounded-xl overflow-hidden bg-[#151d2e] cursor-pointer group shadow-lg';
-
-                    if (media.type === 'image') {
-                        const img = document.createElement('img');
-                        img.src = media.src;
-                        img.loading = "lazy";
-                        img.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105";
-                        
-                        img.onerror = () => {
-                            wrapper.style.display = 'none';
-                            media.valid = false;
-                        };
-                        wrapper.appendChild(img);
-                        
-                    } else if (media.type === 'video') {
-                        const vid = document.createElement('video');
-                        vid.preload = "auto";
-                        vid.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105";
-                        
-                        vid.onerror = () => {
-                            wrapper.style.display = 'none';
-                            media.valid = false;
-                        };
-                        vid.src = media.src;
-
-                        const icon = document.createElement('div');
-                        icon.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-black/60 rounded-full flex items-center justify-center text-white pointer-events-none group-hover:bg-[#d4a853] group-hover:text-[#0c1220] transition-colors';
-                        icon.innerHTML = '▶'; 
-                        
-                        wrapper.appendChild(vid);
-                        wrapper.appendChild(icon);
+                    const galleryGrid = document.getElementById('galleryGrid');
+                    if (!seasonData) {
+                        if (galleryGrid) galleryGrid.innerHTML = '<h2 class="text-center text-[#d4a853] mt-10 text-2xl font-display">Gallery not found.</h2>';
+                        throw new Error("Season not found in database.");
                     }
 
-                    // Hover overlay effect matching the elegant theme
-                    const overlay = document.createElement('div');
-                    overlay.className = "absolute inset-0 bg-[#d4a853]/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none";
-                    wrapper.appendChild(overlay);
+                    // Update Header to match About.html theme
+                    document.title = `One Circle | Season ${seasonData.seasonNumber} Gallery`;
+                    const dynamicHeader = document.getElementById('dynamicHeader');
+                    if (dynamicHeader) {
+                        dynamicHeader.innerHTML = `
+                            <p class="uppercase tracking-[0.3em] text-sm mb-4" style="color: rgb(212, 168, 83); font-weight: 700;">Season ${seasonData.seasonNumber} Gallery</p> 
+                            <h1 class="font-display text-white font-black text-4xl md:text-5xl">${seasonData.title}</h1>
+                            <p class="mt-4 max-w-2xl leading-relaxed text-[#b8c4d6] text-lg">${seasonData.date}</p> 
+                        `;
+                    }
 
-                    wrapper.onclick = () => {
-                        if (media.valid) window.openLightbox(index);
+                    const maxImagesToCheck = seasonData.gallery.maxImages || 0; 
+                    const maxVideosToCheck = seasonData.gallery.maxVideos || 0; 
+                    const folderName = seasonData.gallery.folderName || `gallery_season_${seasonData.seasonNumber}`;
+                    const filePrefix = seasonData.gallery.filePrefix || "1";
+                    
+                    const lightbox = document.getElementById('lightbox');
+                    const lightboxImg = document.getElementById('lightboxImg');
+                    const lightboxVideo = document.getElementById('lightboxVideo');
+
+                    let mediaList = [];
+                    let currentIndex = 0;
+
+                    for (let i = 1; i <= maxImagesToCheck; i++) {
+                        mediaList.push({ type: 'image', src: `${folderName}/${filePrefix} (${i}).jpg`, valid: true });
+                    }
+                    for (let i = 1; i <= maxVideosToCheck; i++) {
+                        mediaList.push({ type: 'video', src: `${folderName}/${filePrefix} (${i}).mp4`, valid: true });
+                    }
+
+                    if (galleryGrid) {
+                        galleryGrid.innerHTML = '';
+                        mediaList.forEach((media, index) => {
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'media-wrapper relative rounded-xl overflow-hidden bg-[#151d2e] cursor-pointer group shadow-lg';
+
+                            if (media.type === 'image') {
+                                const img = document.createElement('img');
+                                img.src = media.src;
+                                img.loading = "lazy";
+                                img.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105";
+                                
+                                img.onerror = () => {
+                                    wrapper.style.display = 'none';
+                                    media.valid = false;
+                                };
+                                wrapper.appendChild(img);
+                                
+                            } else if (media.type === 'video') {
+                                const vid = document.createElement('video');
+                                vid.preload = "auto";
+                                vid.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105";
+                                
+                                vid.onerror = () => {
+                                    wrapper.style.display = 'none';
+                                    media.valid = false;
+                                };
+                                vid.src = media.src;
+
+                                const icon = document.createElement('div');
+                                icon.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-black/60 rounded-full flex items-center justify-center text-white pointer-events-none group-hover:bg-[#d4a853] group-hover:text-[#0c1220] transition-colors';
+                                icon.innerHTML = '▶'; 
+                                
+                                wrapper.appendChild(vid);
+                                wrapper.appendChild(icon);
+                            }
+
+                            const overlay = document.createElement('div');
+                            overlay.className = "absolute inset-0 bg-[#d4a853]/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none";
+                            wrapper.appendChild(overlay);
+
+                            wrapper.onclick = () => {
+                                if (media.valid) window.openLightbox(index);
+                            };
+
+                            galleryGrid.appendChild(wrapper);
+                        });
+                    }
+
+                    window.openLightbox = function(index) {
+                        currentIndex = index;
+                        updateLightbox();
+                        if (lightbox) lightbox.style.display = 'block';
+                        document.body.style.overflow = 'hidden'; 
                     };
 
-                    galleryGrid.appendChild(wrapper);
-                });
+                    window.closeLightbox = function() {
+                        if (lightbox) lightbox.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                        if (lightboxVideo) lightboxVideo.pause(); 
+                    };
 
-                window.openLightbox = function(index) {
-                    currentIndex = index;
-                    updateLightbox();
-                    lightbox.style.display = 'block';
-                    document.body.style.overflow = 'hidden'; 
-                };
+                    window.changeMedia = function(direction) {
+                        let foundValidMedia = false;
+                        let attempts = 0;
 
-                window.closeLightbox = function() {
-                    lightbox.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                    lightboxVideo.pause(); 
-                };
+                        while (!foundValidMedia && attempts < mediaList.length) {
+                            currentIndex += direction;
+                            if (currentIndex >= mediaList.length) currentIndex = 0;
+                            if (currentIndex < 0) currentIndex = mediaList.length - 1;
+                            if (mediaList[currentIndex].valid) foundValidMedia = true;
+                            attempts++;
+                        }
+                        if (foundValidMedia) updateLightbox();
+                    };
 
-                window.changeMedia = function(direction) {
-                    let foundValidMedia = false;
-                    let attempts = 0;
+                    function updateLightbox() {
+                        const media = mediaList[currentIndex];
+                        if (lightboxVideo) {
+                            lightboxVideo.pause();
+                            lightboxVideo.currentTime = 0;
+                        }
 
-                    while (!foundValidMedia && attempts < mediaList.length) {
-                        currentIndex += direction;
-                        if (currentIndex >= mediaList.length) currentIndex = 0;
-                        if (currentIndex < 0) currentIndex = mediaList.length - 1;
-                        if (mediaList[currentIndex].valid) foundValidMedia = true;
-                        attempts++;
+                        if (media.type === 'image') {
+                            if (lightboxImg) {
+                                lightboxImg.src = media.src;
+                                lightboxImg.style.display = 'block';
+                            }
+                            if (lightboxVideo) lightboxVideo.style.display = 'none';
+                        } else if (media.type === 'video') {
+                            if (lightboxVideo) {
+                                lightboxVideo.src = media.src;
+                                lightboxVideo.style.display = 'block';
+                            }
+                            if (lightboxImg) lightboxImg.style.display = 'none';
+                        }
                     }
-                    if (foundValidMedia) updateLightbox();
-                };
 
-                function updateLightbox() {
-                    const media = mediaList[currentIndex];
-                    lightboxVideo.pause();
-                    lightboxVideo.currentTime = 0;
+                    let touchstartX = 0;
+                    let touchendX = 0;
 
-                    if (media.type === 'image') {
-                        lightboxImg.src = media.src;
-                        lightboxImg.style.display = 'block';
-                        lightboxVideo.style.display = 'none';
-                    } else if (media.type === 'video') {
-                        lightboxVideo.src = media.src;
-                        lightboxVideo.style.display = 'block';
-                        lightboxImg.style.display = 'none';
+                    if (lightbox) {
+                        lightbox.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
+                        lightbox.addEventListener('touchend', e => {
+                            touchendX = e.changedTouches[0].screenX;
+                            const swipeThreshold = 50; 
+                            if (touchendX < touchstartX - swipeThreshold) window.changeMedia(1); 
+                            if (touchendX > touchstartX + swipeThreshold) window.changeMedia(-1); 
+                        });
+
+                        lightbox.addEventListener('click', e => {
+                            if (e.target === lightbox || e.target.className.includes('lightbox-content')) {
+                                window.closeLightbox();
+                            }
+                        });
                     }
-                }
-
-                let touchstartX = 0;
-                let touchendX = 0;
-
-                lightbox.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
-                lightbox.addEventListener('touchend', e => {
-                    touchendX = e.changedTouches[0].screenX;
-                    const swipeThreshold = 50; 
-                    if (touchendX < touchstartX - swipeThreshold) window.changeMedia(1); 
-                    if (touchendX > touchstartX + swipeThreshold) window.changeMedia(-1); 
+                })
+                .catch(error => {
+                    console.error("Error fetching database:", error);
                 });
+        }
 
-                lightbox.addEventListener('click', e => {
-                    if (e.target === lightbox || e.target.className.includes('lightbox-content')) {
-                        window.closeLightbox();
-                    }
-                });
-            })
-            .catch(error => {
-                console.error("Error fetching database:", error);
-            });
+        window.initPage = initGalleryPage;
+        initGalleryPage();
     </script>
-    <script 
-        src="player.js">   
-    </script>
+    <script src="player.js"></script>
 </body>
 </html>
 
