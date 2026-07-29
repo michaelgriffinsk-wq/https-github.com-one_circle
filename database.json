@@ -283,7 +283,15 @@
         "filePrefix": "1",
         "maxImages": 150,
         "maxVideos": 30
-      }
+      },
+      "tracklist": [
+        {
+          "artist": "David Dam",
+          "trackId": 36,
+          "title": "Shalom",
+          "file": "uploads/david-dam-shalom-daviddamvevo.mp3"
+        }
+      ]
     }
   ]
 }
