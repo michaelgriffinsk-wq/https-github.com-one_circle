@@ -7,7 +7,7 @@
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -20,15 +20,9 @@
     html { scroll-behavior: smooth; }
     body { margin: 0; font-family: "DM Sans", sans-serif; background: var(--ink); color: var(--paper); }
     .serif { font-family: "Fraunces", serif; }
-    .grain {
-      pointer-events: none; position: fixed; inset: 0; z-index: 60; opacity: .05;
-      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-    }
+    .grain { pointer-events: none; position: fixed; inset: 0; z-index: 60; opacity: .05; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
     .top-nav { background: rgba(10,10,11,.82); backdrop-filter: blur(16px); }
-    .hero-image::after {
-      content: ""; position: absolute; inset: 0;
-      background: linear-gradient(90deg, rgba(10,10,11,.94) 0%, rgba(10,10,11,.65) 47%, rgba(10,10,11,.34) 100%);
-    }
+    .hero-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,10,11,.94) 0%, rgba(10,10,11,.65) 47%, rgba(10,10,11,.34) 100%); }
     .section-rule { border-top: 1px solid rgba(245,239,229,.19); }
     .eyebrow { letter-spacing: .18em; text-transform: uppercase; font-size: .7rem; font-weight: 700; }
     .release-card, .video-card, .moment-card { transition: transform .35s ease, box-shadow .35s ease; }
@@ -42,23 +36,35 @@
     .hero-actions { animation: rise .8s .14s ease both; }
     @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
     a:focus-visible, button:focus-visible { outline: 3px solid #f3c976; outline-offset: 3px; }
-    @media (max-width: 640px) {
-      .hero-image::after { background: linear-gradient(0deg, rgba(10,10,11,.96), rgba(10,10,11,.36)); }
-    }
+    @media (max-width: 640px) { .hero-image::after { background: linear-gradient(0deg, rgba(10,10,11,.96), rgba(10,10,11,.36)); } }
   </style>
 </head>
 <body class="w-full overflow-x-hidden">
   <div class="grain" aria-hidden="true"></div>
   
+  <!-- UNIFIED NAVIGATION -->
   <header class="top-nav sticky top-0 z-50 border-b border-white/10">
    <nav class="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-4 md:px-8">
-     <a href="about.html" class="text-sm font-bold tracking-[0.24em] text-[#f5efe5] hover:text-[#d8a64d] transition">← BACK</a>
-    <div class="hidden items-center gap-7 text-xs font-semibold uppercase tracking-[0.16em] text-stone-300 md:flex">
-        <a href="#music" class="transition hover:text-amber-300">Music</a> 
-        <a href="#watch" class="transition hover:text-amber-300">Watch</a> 
-        <a href="#moments" class="transition hover:text-amber-300">Moments</a>
-    </div>
-    <a href="#" id="navListenLink" target="_blank" class="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#f5efe5] transition hover:bg-amber-300 hover:text-black">Listen now</a>
+     <a href="index.html" class="text-sm font-bold tracking-[0.24em] text-[#f5efe5] hover:text-[#d8a64d] transition uppercase">ONE CIRCLE</a>
+     
+     <div class="flex items-center gap-4 md:gap-8">
+        <div class="hidden items-center gap-6 text-xs font-semibold uppercase tracking-[0.16em] text-stone-300 md:flex">
+            <a href="#music" class="transition hover:text-amber-300">Music</a> 
+            <a href="#watch" class="transition hover:text-amber-300">Watch</a> 
+            <a href="#moments" class="transition hover:text-amber-300">Moments</a>
+        </div>
+        
+        <div class="relative group">
+            <button class="flex items-center gap-2 text-[#f5efe5] font-bold tracking-widest uppercase hover:text-[#d8a64d] transition-colors text-xs px-4 py-2 border border-white/20 rounded-full">
+                MENU <i data-lucide="menu" class="w-3 h-3"></i>
+            </button>
+            <div class="absolute right-0 mt-3 w-48 bg-[#0a0a0b]/95 backdrop-blur-md border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right overflow-hidden z-50">
+                <a href="index.html" class="block px-4 py-3 text-xs text-[#f5efe5] hover:bg-[#d8a64d] hover:text-[#17120a] transition-colors font-bold uppercase tracking-wider">Home</a>
+                <a href="about.html" class="block px-4 py-3 text-xs text-[#f5efe5] hover:bg-[#d8a64d] hover:text-[#17120a] transition-colors font-bold uppercase tracking-wider border-t border-white/10">About</a>
+                <a href="projects.html" class="block px-4 py-3 text-xs text-[#17120a] bg-[#d8a64d] transition-colors font-bold uppercase tracking-wider border-t border-white/10">Music</a>
+            </div>
+        </div>
+     </div>
    </nav>
   </header>
 
@@ -114,9 +120,7 @@
       <h2 class="serif text-3xl font-semibold text-[#f5efe5] md:text-4xl">Latest tracks</h2>
       <span class="text-xs uppercase tracking-[.16em] text-[#aaa398] font-bold">Tap to preview</span>
      </div>
-     <div id="tracksContainer" aria-label="Latest tracks">
-        <!-- Tracks injected via JS -->
-     </div>
+     <div id="tracksContainer" aria-label="Latest tracks"></div>
      <p id="preview-status" class="mt-5 min-h-5 text-sm text-amber-300" aria-live="polite"></p>
     </div>
    </section>
@@ -126,10 +130,7 @@
     <div class="mx-auto w-full max-w-7xl px-5 md:px-8">
      <p class="eyebrow mb-3 text-[#d8a64d]">Watch &amp; worship</p>
      <h2 class="serif max-w-2xl text-4xl font-semibold text-[#f5efe5] md:text-5xl">The songs, in the room where they came alive.</h2>
-     
-     <div id="videosContainer" class="mt-10 grid gap-6 md:grid-cols-3">
-        <!-- Videos injected via JS -->
-     </div>
+     <div id="videosContainer" class="mt-10 grid gap-6 md:grid-cols-3"></div>
     </div>
    </section>
 
@@ -142,10 +143,7 @@
      </div>
      <p class="max-w-md leading-relaxed text-[#c4bbb0] md:justify-self-end">Snapshots from studio nights, rehearsals, and the live moments that continue long after the last chord.</p>
     </div>
-    
-    <div id="momentsContainer" class="grid auto-rows-[190px] grid-cols-2 gap-4 md:grid-cols-4">
-        <!-- Moments injected via JS -->
-    </div>
+    <div id="momentsContainer" class="grid auto-rows-[190px] grid-cols-2 gap-4 md:grid-cols-4"></div>
    </section>
 
    <!-- CLOSING -->
@@ -161,27 +159,26 @@
   </footer>
 
   <script>
-    // GitHub Pages Helper
+    lucide.createIcons();
+
     function formatImgPath(path) {
         if (!path) return '';
         return path.startsWith('/') ? path.substring(1) : path;
     }
 
-    // Fetch and populate data
     fetch('projects.json')
         .then(res => res.json())
         .then(data => {
-            // 1. Hero
+            // Hero
             document.getElementById('heroTitle').textContent = data.hero.title;
             document.getElementById('heroDesc').textContent = data.hero.description;
             document.getElementById('heroImg').src = formatImgPath(data.hero.image);
             document.getElementById('heroSpotify').href = data.hero.spotify_url;
             document.getElementById('heroApple').href = data.hero.apple_url;
             document.getElementById('heroYoutube').href = data.hero.youtube_url;
-            document.getElementById('navListenLink').href = data.hero.spotify_url;
             document.getElementById('footerSpotify').href = data.hero.spotify_url;
 
-            // 2. Featured Release
+            // Featured Release
             document.getElementById('featTitle').textContent = data.featured_release.title;
             document.getElementById('featDesc').textContent = data.featured_release.description;
             document.getElementById('featType').textContent = data.featured_release.type;
@@ -189,7 +186,7 @@
             document.getElementById('featSpotify').href = data.featured_release.spotify_url;
             document.getElementById('featApple').href = data.featured_release.apple_url;
 
-            // 3. Tracks
+            // Tracks
             const tracksContainer = document.getElementById('tracksContainer');
             tracksContainer.innerHTML = data.tracks.map(track => `
                 <article class="track-row grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl px-2 py-4 md:grid-cols-[auto_1fr_auto_auto] md:gap-6">
@@ -205,7 +202,7 @@
                 </article>
             `).join('');
 
-            // 4. Videos
+            // Videos
             const videosContainer = document.getElementById('videosContainer');
             videosContainer.innerHTML = data.videos.map(video => `
                 <article class="video-card overflow-hidden rounded-2xl bg-[#211c18]">
@@ -223,9 +220,8 @@
                 </article>
             `).join('');
 
-            // 5. Moments
+            // Moments
             const momentsContainer = document.getElementById('momentsContainer');
-            // Adding specific grid span classes to the first and last moments to create the mosaic look
             momentsContainer.innerHTML = data.moments.map((img, index) => {
                 let spanClass = "";
                 if (index === 0) spanClass = "col-span-2 row-span-2";
@@ -236,23 +232,19 @@
                 </figure>`;
             }).join('');
 
-            // Initialize Icons and Audio after DOM is painted
             lucide.createIcons();
             bindAudioPlayers();
         })
         .catch(err => console.error("Error loading projects data:", err));
 
-    // Audio Preview Logic
+    // Audio Logic
     function bindAudioPlayers() {
         let audioContext;
         let activeOscillator = null;
         let activeButton = null;
 
         function stopPreview() {
-            if (activeOscillator) {
-                try { activeOscillator.stop(); } catch (e) {}
-                activeOscillator = null;
-            }
+            if (activeOscillator) { try { activeOscillator.stop(); } catch (e) {} activeOscillator = null; }
             if (activeButton) activeButton.classList.remove("preview-active");
             activeButton = null;
             document.getElementById("preview-status").textContent = "";
@@ -267,15 +259,12 @@
                 const gain = audioContext.createGain();
                 oscillator.type = "sine";
                 oscillator.frequency.value = Number(button.dataset.tone);
-                
                 gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.08, audioContext.currentTime + 0.04);
                 gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 2.8);
-                
                 oscillator.connect(gain).connect(audioContext.destination);
                 oscillator.start();
                 oscillator.stop(audioContext.currentTime + 2.85);
-                
                 activeOscillator = oscillator;
                 activeButton = button;
                 button.classList.add("preview-active");
