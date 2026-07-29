@@ -133,139 +133,170 @@
 
     <!-- SCRIPT LOGIC -->
     <script>
-        lucide.createIcons();
-        let globalAboutData = null;
-        let isAdmin = sessionStorage.getItem('oneCircleAdmin') === 'true';
+        function initAboutPage() {
+            lucide.createIcons();
+            let globalAboutData = null;
+            let isAdmin = sessionStorage.getItem('oneCircleAdmin') === 'true';
 
-        const observer = new IntersectionObserver((entries) => { 
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }); 
-        }, { threshold: 0.15 }); 
+            const observer = new IntersectionObserver((entries) => { 
+                entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }); 
+            }, { threshold: 0.15 }); 
 
-        fetch('about.json')
-            .then(response => response.json())
-            .then(aboutData => {
-                globalAboutData = aboutData;
-                renderAboutPage(aboutData);
-                
-                if (isAdmin) {
-                    document.getElementById('adminToolbar').style.display = 'flex';
-                    document.getElementById('backLink').href = 'admin/index.html';
-                    document.getElementById('backLink').textContent = '← Back to Admin Panel';
+            fetch('about.json')
+                .then(response => response.json())
+                .then(aboutData => {
+                    globalAboutData = aboutData;
+                    renderAboutPage(aboutData);
                     
-                    const editZones = document.querySelectorAll('.about-editable');
-                    editZones.forEach(zone => {
-                        zone.classList.add('active-edit');
-                        zone.addEventListener('click', openAboutModal);
+                    if (isAdmin) {
+                        const toolbar = document.getElementById('adminToolbar');
+                        if (toolbar) toolbar.style.display = 'flex';
+                        const backLink = document.getElementById('backLink');
+                        if (backLink) {
+                            backLink.href = 'admin/index.html';
+                            backLink.textContent = '← Back to Admin Panel';
+                        }
+                        
+                        const editZones = document.querySelectorAll('.about-editable');
+                        editZones.forEach(zone => {
+                            zone.classList.add('active-edit');
+                            zone.removeEventListener('click', openAboutModal);
+                            zone.addEventListener('click', openAboutModal);
+                        });
+                    }
+                    setTimeout(() => { document.querySelectorAll('.fade-up').forEach(el => observer.observe(el)); }, 100);
+                })
+                .catch(error => console.error("Error fetching about data:", error));
+
+            function renderAboutPage(data) {
+                const titleEl = document.getElementById('pageTitle');
+                const subtitleEl = document.getElementById('pageSubtitle');
+                if (titleEl) titleEl.textContent = data.page_title;
+                if (subtitleEl) subtitleEl.textContent = data.hero_subtitle;
+
+                const storyParagraphs = data.story.split('\n\n');
+                let storyHTML = '';
+                storyParagraphs.forEach(p => { storyHTML += `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`; });
+                const aboutTextContainer = document.getElementById('aboutTextContainer');
+                if (aboutTextContainer) aboutTextContainer.innerHTML = storyHTML;
+
+                const groupPhotoContainer = document.getElementById('groupPhotoContainer');
+                if (groupPhotoContainer && data.group_photo) {
+                    let groupImgPath = data.group_photo;
+                    if (groupImgPath.startsWith('/')) groupImgPath = groupImgPath.substring(1); 
+                    groupPhotoContainer.innerHTML = `<img class="w-full rounded-2xl shadow-2xl object-cover aspect-[4/3]" loading="lazy" src="${groupImgPath}" alt="One Circle Community">`;
+                }
+
+                const valuesGrid = document.getElementById('valuesGrid');
+                if (valuesGrid) {
+                    valuesGrid.innerHTML = '';
+                    data.core_values.forEach((value, index) => {
+                        const delayClass = index === 0 ? '' : `delay-${index}`;
+                        valuesGrid.innerHTML += `
+                            <div class="fade-up ${delayClass} rounded-xl p-8 text-center bg-[#151d2e]">
+                                <div class="text-4xl mb-4">${value.icon}</div>
+                                <h3 class="font-display mb-2 text-white font-bold text-2xl">${value.title}</h3>
+                                <p class="leading-relaxed text-[#94a3b8] text-base">${value.description}</p>
+                            </div>
+                        `;
                     });
                 }
-                setTimeout(() => { document.querySelectorAll('.fade-up').forEach(el => observer.observe(el)); }, 100);
-            })
-            .catch(error => console.error("Error fetching about data:", error));
 
-        function renderAboutPage(data) {
-            document.getElementById('pageTitle').textContent = data.page_title;
-            document.getElementById('pageSubtitle').textContent = data.hero_subtitle;
+                const teamGrid = document.getElementById('teamGrid');
+                if (teamGrid) {
+                    teamGrid.innerHTML = ''; 
+                    data.team.forEach((member, index) => {
+                        let imgPath = member.image;
+                        if (imgPath && imgPath.startsWith('/')) imgPath = imgPath.substring(1); 
+                        const delayClass = index === 0 ? '' : index > 3 ? '' : `delay-${index}`;
+                        
+                        const aspectClasses = ['aspect-[3/4]', 'aspect-[1/1]', 'aspect-[4/5]'];
+                        const randomAspect = aspectClasses[index % aspectClasses.length];
 
-            const storyParagraphs = data.story.split('\n\n');
-            let storyHTML = '';
-            storyParagraphs.forEach(p => { storyHTML += `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`; });
-            document.getElementById('aboutTextContainer').innerHTML = storyHTML;
+                        const imageHTML = imgPath ? `<img class="w-full ${randomAspect} object-cover rounded-xl mb-3 transition-transform duration-500 group-hover:scale-105" loading="lazy" src="${imgPath}" alt="${member.name}">` : `<div class="w-full ${randomAspect} bg-[#151d2e] rounded-xl mb-3 flex items-center justify-center text-gray-500 font-bold">Photo</div>`;
+                        teamGrid.innerHTML += `
+                            <div class="fade-up ${delayClass} mb-6 break-inside-avoid bg-[#151d2e]/40 p-4 rounded-2xl border border-white/5 group shadow-lg">
+                                ${imageHTML}
+                                <h3 class="font-bold text-white text-lg text-center mt-2">${member.name}</h3>
+                                <p class="text-xs uppercase tracking-widest text-center mt-1 text-[#d4a853] font-semibold">${member.role}</p>
+                            </div>
+                        `;
+                    });
+                }
 
-            const groupPhotoContainer = document.getElementById('groupPhotoContainer');
-            if (data.group_photo) {
-                let groupImgPath = data.group_photo;
-                if (groupImgPath.startsWith('/')) groupImgPath = groupImgPath.substring(1); 
-                groupPhotoContainer.innerHTML = `<img class="w-full rounded-2xl shadow-2xl object-cover aspect-[4/3]" loading="lazy" src="${groupImgPath}" alt="One Circle Community">`;
+                const footerLinksContainer = document.getElementById('footerLinksContainer');
+                if (footerLinksContainer) {
+                    footerLinksContainer.innerHTML = data.footer_links.map(link => 
+                        `<a href="${link.url}" class="text-[#d4a853] hover:text-white transition-colors font-bold tracking-wider uppercase text-sm">${link.label}</a>`
+                    ).join('');
+                }
             }
 
-            const valuesGrid = document.getElementById('valuesGrid');
-            valuesGrid.innerHTML = '';
-            data.core_values.forEach((value, index) => {
-                const delayClass = index === 0 ? '' : `delay-${index}`;
-                valuesGrid.innerHTML += `
-                    <div class="fade-up ${delayClass} rounded-xl p-8 text-center bg-[#151d2e]">
-                        <div class="text-4xl mb-4">${value.icon}</div>
-                        <h3 class="font-display mb-2 text-white font-bold text-2xl">${value.title}</h3>
-                        <p class="leading-relaxed text-[#94a3b8] text-base">${value.description}</p>
-                    </div>
-                `;
-            });
+            // Modal Logic
+            window.openAboutModal = function(e) {
+                if (!isAdmin) return;
+                if (e && typeof e.stopPropagation === 'function') { e.stopPropagation(); }
+                const editTitle = document.getElementById('editTitle');
+                const editSubtitle = document.getElementById('editSubtitle');
+                const editStory = document.getElementById('editStory');
+                const aboutModal = document.getElementById('aboutModal');
 
-            const teamGrid = document.getElementById('teamGrid');
-            teamGrid.innerHTML = ''; 
-            data.team.forEach((member, index) => {
-                let imgPath = member.image;
-                if (imgPath && imgPath.startsWith('/')) imgPath = imgPath.substring(1); 
-                const delayClass = index === 0 ? '' : index > 3 ? '' : `delay-${index}`;
-                
-                const aspectClasses = ['aspect-[3/4]', 'aspect-[1/1]', 'aspect-[4/5]'];
-                const randomAspect = aspectClasses[index % aspectClasses.length];
+                if (editTitle) editTitle.value = globalAboutData.page_title;
+                if (editSubtitle) editSubtitle.value = globalAboutData.hero_subtitle;
+                if (editStory) editStory.value = globalAboutData.story;
+                if (aboutModal) aboutModal.style.display = 'flex';
+            }
 
-                const imageHTML = imgPath ? `<img class="w-full ${randomAspect} object-cover rounded-xl mb-3 transition-transform duration-500 group-hover:scale-105" loading="lazy" src="${imgPath}" alt="${member.name}">` : `<div class="w-full ${randomAspect} bg-[#151d2e] rounded-xl mb-3 flex items-center justify-center text-gray-500 font-bold">Photo</div>`;
-                teamGrid.innerHTML += `
-                    <div class="fade-up ${delayClass} mb-6 break-inside-avoid bg-[#151d2e]/40 p-4 rounded-2xl border border-white/5 group shadow-lg">
-                        ${imageHTML}
-                        <h3 class="font-bold text-white text-lg text-center mt-2">${member.name}</h3>
-                        <p class="text-xs uppercase tracking-widest text-center mt-1 text-[#d4a853] font-semibold">${member.role}</p>
-                    </div>
-                `;
-            });
+            window.closeAboutModal = function() { 
+                const aboutModal = document.getElementById('aboutModal');
+                if (aboutModal) aboutModal.style.display = 'none'; 
+            }
 
-            const footerLinksContainer = document.getElementById('footerLinksContainer');
-            footerLinksContainer.innerHTML = data.footer_links.map(link => 
-                `<a href="${link.url}" class="text-[#d4a853] hover:text-white transition-colors font-bold tracking-wider uppercase text-sm">${link.label}</a>`
-            ).join('');
+            window.saveAboutModal = function() {
+                const editTitle = document.getElementById('editTitle');
+                const editSubtitle = document.getElementById('editSubtitle');
+                const editStory = document.getElementById('editStory');
+
+                if (editTitle) globalAboutData.page_title = editTitle.value;
+                if (editSubtitle) globalAboutData.hero_subtitle = editSubtitle.value;
+                if (editStory) globalAboutData.story = editStory.value;
+                renderAboutPage(globalAboutData);
+                closeAboutModal();
+            }
+
+            window.publishAboutToGitHub = async function() {
+                const token = prompt("Enter your GitHub Personal Access Token to publish About page updates:");
+                if (!token) return;
+                const repoOwner = "michaelgriffinsk-wq";
+                const repoName = "https-github.com-one_circle";
+                const branch = "About-json-branch";
+                const path = "about.json"; 
+                const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
+
+                try {
+                    const getResponse = await fetch(`${apiUrl}?ref=${branch}`, { headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" } });
+                    if (!getResponse.ok) throw new Error("Could not fetch current file SHA.");
+                    const currentSha = (await getResponse.json()).sha;
+
+                    const updatedContent = JSON.stringify(globalAboutData, null, 2);
+                    const base64Content = btoa(unescape(encodeURIComponent(updatedContent)));
+
+                    const putResponse = await fetch(apiUrl, {
+                        method: "PUT",
+                        headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: "Update About page content via custom Admin UI", content: base64Content, sha: currentSha, branch: branch })
+                    });
+
+                    if (putResponse.ok) alert("Success! About page changes have been published to GitHub.");
+                    else alert("Failed to publish: " + (await putResponse.json()).message);
+                } catch (error) { console.error("Error publishing:", error); alert("An error occurred."); }
+            }
         }
 
-        // Modal Logic
-        function openAboutModal(e) {
-            if (!isAdmin) return;
-            if (e && typeof e.stopPropagation === 'function') { e.stopPropagation(); }
-            document.getElementById('editTitle').value = globalAboutData.page_title;
-            document.getElementById('editSubtitle').value = globalAboutData.hero_subtitle;
-            document.getElementById('editStory').value = globalAboutData.story;
-            document.getElementById('aboutModal').style.display = 'flex';
-        }
-        function closeAboutModal() { document.getElementById('aboutModal').style.display = 'none'; }
-        function saveAboutModal() {
-            globalAboutData.page_title = document.getElementById('editTitle').value;
-            globalAboutData.hero_subtitle = document.getElementById('editSubtitle').value;
-            globalAboutData.story = document.getElementById('editStory').value;
-            renderAboutPage(globalAboutData);
-            closeAboutModal();
-        }
-
-        async function publishAboutToGitHub() {
-            const token = prompt("Enter your GitHub Personal Access Token to publish About page updates:");
-            if (!token) return;
-            const repoOwner = "michaelgriffinsk-wq";
-            const repoName = "https-github.com-one_circle";
-            const branch = "About-json-branch";
-            const path = "about.json"; 
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
-
-            try {
-                const getResponse = await fetch(`${apiUrl}?ref=${branch}`, { headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" } });
-                if (!getResponse.ok) throw new Error("Could not fetch current file SHA.");
-                const currentSha = (await getResponse.json()).sha;
-
-                const updatedContent = JSON.stringify(globalAboutData, null, 2);
-                const base64Content = btoa(unescape(encodeURIComponent(updatedContent)));
-
-                const putResponse = await fetch(apiUrl, {
-                    method: "PUT",
-                    headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "Update About page content via custom Admin UI", content: base64Content, sha: currentSha, branch: branch })
-                });
-
-                if (putResponse.ok) alert("Success! About page changes have been published to GitHub.");
-                else alert("Failed to publish: " + (await putResponse.json()).message);
-            } catch (error) { console.error("Error publishing:", error); alert("An error occurred."); }
-        }
+        window.initPage = initAboutPage;
+        initAboutPage();
     </script>
-    <script 
-        src="player.js">   
-    </script>
+    <script src="player.js"></script>
 </body>
 </html>
 
