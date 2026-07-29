@@ -98,9 +98,12 @@
             transition: transform 0.3s ease;
         }
         .team-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(204, 0, 0, 0.2); }
+        
+        /* UPDATED: Allows free-form height for team photos */
         .team-photo { 
             width: 100%; 
-            height: 250px; 
+            height: auto; 
+            min-height: 150px;
             background-color: #222; 
             display: flex;
             justify-content: center;
@@ -108,6 +111,7 @@
             color: #555;
             overflow: hidden;
         }
+        
         .team-name { margin: 15px 0 5px 0; font-size: 1.3em; color: #fff; }
         .team-role { margin: 0; color: #cc0000; font-size: 0.9em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -187,8 +191,8 @@
             <div class="about-text" id="aboutTextContainer">
                 <!-- Text Injected by JS -->
             </div>
-            <div class="about-image">
-                <!-- Replace with an actual group photo -->
+            <!-- UPDATED: Added ID to target for group photo -->
+            <div class="about-image" id="groupPhotoContainer">
                 Group Photo Placeholder
             </div>
         </div>
@@ -286,6 +290,17 @@
             });
             document.getElementById('aboutTextContainer').innerHTML = storyHTML;
 
+            // UPDATED: Load the Group Photo dynamically
+            const groupPhotoContainer = document.getElementById('groupPhotoContainer');
+            if (data.group_photo) {
+                let groupImgPath = data.group_photo;
+                if (groupImgPath.startsWith('/')) groupImgPath = groupImgPath.substring(1); 
+                
+                groupPhotoContainer.innerHTML = `<img src="${groupImgPath}" alt="One Circle Community" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">`;
+                groupPhotoContainer.style.backgroundColor = "transparent"; 
+                groupPhotoContainer.style.boxShadow = "none"; 
+            }
+
             const valuesGrid = document.getElementById('valuesGrid');
             valuesGrid.innerHTML = '';
             data.core_values.forEach(value => {
@@ -297,11 +312,19 @@
                 `;
             });
 
+            // UPDATED: Fix for GitHub Pages leading slash and free-form height for team photos
             const teamGrid = document.getElementById('teamGrid');
             teamGrid.innerHTML = ''; 
             data.team.forEach(member => {
-                const imageHTML = member.image 
-                    ? `<img src="${member.image}" alt="${member.name}" style="width: 100%; height: 100%; object-fit: cover;">`
+                let imgPath = member.image;
+                
+                // Remove leading slash if Decap CMS added it
+                if (imgPath && imgPath.startsWith('/')) {
+                    imgPath = imgPath.substring(1); 
+                }
+
+                const imageHTML = imgPath 
+                    ? `<img src="${imgPath}" alt="${member.name}" style="width: 100%; height: auto; display: block;">`
                     : `Photo`;
 
                 teamGrid.innerHTML += `
