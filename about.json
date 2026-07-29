@@ -32,8 +32,9 @@
     },
     {
       "name": "Kebaso Michael Griffins",
-      "role": "Bassist",
-      "image_placeholder": "Photo"
+      "role": "Vocalist ",
+      "image_placeholder": "Photo",
+      "image": "uploads/1000593916.jpg"
     },
     {
       "name": "Duang",
@@ -42,7 +43,13 @@
     }
   ],
   "footer_links": [
-    { "label": "Contact Us", "url": "contact.html" },
-    { "label": "Our Projects", "url": "projects.html" }
+    {
+      "label": "Contact Us",
+      "url": "contact.html"
+    },
+    {
+      "label": "Our Projects",
+      "url": "projects.html"
+    }
   ]
 }
