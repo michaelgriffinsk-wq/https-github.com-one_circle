@@ -62,10 +62,11 @@ collections:
       - label: "About Page"
         name: "about"
         file: "about.json"
-        format: "json" # Tells the CMS to read/write strict JSON
+        format: "json" 
         fields:
           - {label: "Page Title", name: "page_title", widget: "string"}
           - {label: "Hero Subtitle", name: "hero_subtitle", widget: "string"}
+          - {label: "Group Photo", name: "group_photo", widget: "image", required: false}
           - {label: "Our Story", name: "story", widget: "text"}
           
           - label: "Core Values"
