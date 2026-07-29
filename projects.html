@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Circle | Music</title>
+  
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --ink: #0a0a0b;
+      --paper: #f5efe5;
+      --gold: #d8a64d;
+      --muted: #aaa398;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: "DM Sans", sans-serif; background: var(--ink); color: var(--paper); }
+    .serif { font-family: "Fraunces", serif; }
+    .grain {
+      pointer-events: none; position: fixed; inset: 0; z-index: 60; opacity: .05;
+      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+    }
+    .top-nav { background: rgba(10,10,11,.82); backdrop-filter: blur(16px); }
+    .hero-image::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(10,10,11,.94) 0%, rgba(10,10,11,.65) 47%, rgba(10,10,11,.34) 100%);
+    }
+    .section-rule { border-top: 1px solid rgba(245,239,229,.19); }
+    .eyebrow { letter-spacing: .18em; text-transform: uppercase; font-size: .7rem; font-weight: 700; }
+    .release-card, .video-card, .moment-card { transition: transform .35s ease, box-shadow .35s ease; }
+    .release-card:hover, .video-card:hover, .moment-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,.38); }
+    .image-zoom { transition: transform .7s ease; }
+    .video-card:hover .image-zoom, .moment-card:hover .image-zoom { transform: scale(1.06); }
+    .track-row { border-bottom: 1px solid rgba(245,239,229,.15); transition: background .2s ease; }
+    .track-row:hover { background: rgba(245,239,229,.06); }
+    .preview-active { background: var(--gold) !important; color: #17120a !important; border-color: var(--gold) !important; }
+    .hero-copy { animation: rise .8s ease both; }
+    .hero-actions { animation: rise .8s .14s ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    a:focus-visible, button:focus-visible { outline: 3px solid #f3c976; outline-offset: 3px; }
+    @media (max-width: 640px) {
+      .hero-image::after { background: linear-gradient(0deg, rgba(10,10,11,.96), rgba(10,10,11,.36)); }
+    }
+  </style>
+</head>
+<body class="w-full overflow-x-hidden">
+  <div class="grain" aria-hidden="true"></div>
+  
+  <header class="top-nav sticky top-0 z-50 border-b border-white/10">
+   <nav class="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-4 md:px-8">
+     <a href="about.html" class="text-sm font-bold tracking-[0.24em] text-[#f5efe5] hover:text-[#d8a64d] transition">← BACK</a>
+    <div class="hidden items-center gap-7 text-xs font-semibold uppercase tracking-[0.16em] text-stone-300 md:flex">
+        <a href="#music" class="transition hover:text-amber-300">Music</a> 
+        <a href="#watch" class="transition hover:text-amber-300">Watch</a> 
+        <a href="#moments" class="transition hover:text-amber-300">Moments</a>
+    </div>
+    <a href="#" id="navListenLink" target="_blank" class="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#f5efe5] transition hover:bg-amber-300 hover:text-black">Listen now</a>
+   </nav>
+  </header>
+
+  <main id="top">
+   <!-- HERO -->
+   <section class="relative flex min-h-[calc(86*min(var(--vh,1vh),1vh))] items-end overflow-hidden px-5 pb-14 pt-24 md:px-8 md:pb-20">
+    <div class="hero-image absolute inset-0">
+        <img id="heroImg" loading="lazy" class="h-full w-full object-cover" src="" alt="Live Worship">
+    </div>
+    <div class="relative z-10 mx-auto w-full max-w-7xl">
+     <p class="eyebrow mb-5 text-[#d8a64d]">Originals · Covers · Live Sessions</p>
+     <h1 id="heroTitle" class="serif hero-copy max-w-4xl text-5xl font-semibold leading-[.95] text-[#f5efe5] md:text-7xl lg:text-8xl">Loading...</h1>
+     <p id="heroDesc" class="hero-copy mt-7 max-w-xl text-base leading-relaxed text-[#e7e0d6] md:text-lg"></p>
+     <div class="hero-actions mt-9 flex flex-wrap gap-3">
+         <a id="heroSpotify" href="#" target="_blank" class="inline-flex items-center gap-2 rounded-full bg-[#d8a64d] text-[#17120a] px-5 py-3 text-sm font-bold transition hover:-translate-y-0.5">Spotify</a> 
+         <a id="heroApple" href="#" target="_blank" class="inline-flex items-center gap-2 rounded-full border border-white text-[#f5efe5] px-5 py-3 text-sm font-bold transition hover:bg-white hover:text-black">Apple Music</a> 
+         <a id="heroYoutube" href="#" target="_blank" class="inline-flex items-center gap-2 rounded-full border border-white text-[#f5efe5] px-5 py-3 text-sm font-bold transition hover:bg-white hover:text-black">YouTube</a>
+     </div>
+    </div>
+   </section>
+
+   <!-- FEATURED RELEASE -->
+   <section id="music" class="section-rule mx-auto w-full max-w-7xl px-5 py-20 md:px-8">
+    <div class="mb-9 flex flex-wrap items-end justify-between gap-5">
+     <div>
+      <p class="eyebrow mb-3 text-[#d8a64d]">In focus</p>
+      <h2 class="serif text-4xl font-semibold text-[#f5efe5] md:text-5xl">Newest release</h2>
+     </div>
+    </div>
+
+    <article class="release-card grid overflow-hidden rounded-3xl bg-[#211c18] md:grid-cols-[1.08fr_.92fr]">
+     <div class="relative min-h-80 overflow-hidden">
+         <img id="featImg" loading="lazy" class="image-zoom absolute inset-0 h-full w-full object-cover" src="" alt="Album Art">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+      <p id="featType" class="eyebrow absolute bottom-6 left-6 text-[#f5efe5]"></p>
+     </div>
+     <div class="flex flex-col justify-between p-7 md:p-10">
+      <div>
+       <p class="eyebrow mb-4 text-[#d8a64d]">OUT NOW</p>
+       <h3 id="featTitle" class="serif text-4xl font-semibold leading-tight text-[#f5efe5] md:text-5xl"></h3>
+       <p id="featDesc" class="mt-5 max-w-md leading-relaxed text-[#d4cbc0]"></p>
+      </div>
+      <div class="mt-8 flex flex-wrap gap-3">
+          <a id="featSpotify" href="#" target="_blank" class="rounded-full bg-[#d8a64d] text-[#17120a] px-5 py-3 text-sm font-bold transition hover:brightness-110">Listen on Spotify</a> 
+          <a id="featApple" href="#" target="_blank" class="rounded-full border border-white text-[#f5efe5] px-5 py-3 text-sm font-bold transition hover:bg-white hover:text-black">Apple Music</a>
+      </div>
+     </div>
+    </article>
+
+    <!-- TRACKS GRID -->
+    <div class="mt-20">
+     <div class="mb-6 flex items-center justify-between">
+      <h2 class="serif text-3xl font-semibold text-[#f5efe5] md:text-4xl">Latest tracks</h2>
+      <span class="text-xs uppercase tracking-[.16em] text-[#aaa398] font-bold">Tap to preview</span>
+     </div>
+     <div id="tracksContainer" aria-label="Latest tracks">
+        <!-- Tracks injected via JS -->
+     </div>
+     <p id="preview-status" class="mt-5 min-h-5 text-sm text-amber-300" aria-live="polite"></p>
+    </div>
+   </section>
+
+   <!-- WATCH VIDEOS -->
+   <section id="watch" class="section-rule bg-[#151313] py-20">
+    <div class="mx-auto w-full max-w-7xl px-5 md:px-8">
+     <p class="eyebrow mb-3 text-[#d8a64d]">Watch &amp; worship</p>
+     <h2 class="serif max-w-2xl text-4xl font-semibold text-[#f5efe5] md:text-5xl">The songs, in the room where they came alive.</h2>
+     
+     <div id="videosContainer" class="mt-10 grid gap-6 md:grid-cols-3">
+        <!-- Videos injected via JS -->
+     </div>
+    </div>
+   </section>
+
+   <!-- MOMENTS -->
+   <section id="moments" class="section-rule mx-auto w-full max-w-7xl px-5 py-20 md:px-8">
+    <div class="mb-10 grid gap-5 md:grid-cols-2 md:items-end">
+     <div>
+      <p class="eyebrow mb-3 text-[#d8a64d]">From the room</p>
+      <h2 class="serif text-4xl font-semibold text-[#f5efe5] md:text-5xl">Made together, shared wide.</h2>
+     </div>
+     <p class="max-w-md leading-relaxed text-[#c4bbb0] md:justify-self-end">Snapshots from studio nights, rehearsals, and the live moments that continue long after the last chord.</p>
+    </div>
+    
+    <div id="momentsContainer" class="grid auto-rows-[190px] grid-cols-2 gap-4 md:grid-cols-4">
+        <!-- Moments injected via JS -->
+    </div>
+   </section>
+
+   <!-- CLOSING -->
+   <section class="mx-auto mb-12 w-[calc(100%-2.5rem)] max-w-7xl rounded-3xl bg-[#d8a64d] px-6 py-14 text-center md:px-12">
+    <p class="eyebrow mb-4 text-[#4b3515]">Stay in the circle</p>
+    <h2 class="serif mx-auto max-w-3xl text-4xl font-semibold text-[#17120a] md:text-6xl">Find every song, wherever you listen.</h2>
+    <a id="footerSpotify" href="#" target="_blank" class="mt-8 inline-flex items-center gap-2 rounded-full bg-[#17120a] text-[#f5efe5] px-6 py-3 font-bold transition hover:-translate-y-0.5">Follow on Spotify</a>
+   </section>
+  </main>
+
+  <footer class="border-t border-white/10 px-5 py-8 text-center">
+   <p class="text-sm text-[#8e887f]">© 2026 One Circle. Raising a sound that honors God.</p>
+  </footer>
+
+  <script>
+    // GitHub Pages Helper
+    function formatImgPath(path) {
+        if (!path) return '';
+        return path.startsWith('/') ? path.substring(1) : path;
+    }
+
+    // Fetch and populate data
+    fetch('projects.json')
+        .then(res => res.json())
+        .then(data => {
+            // 1. Hero
+            document.getElementById('heroTitle').textContent = data.hero.title;
+            document.getElementById('heroDesc').textContent = data.hero.description;
+            document.getElementById('heroImg').src = formatImgPath(data.hero.image);
+            document.getElementById('heroSpotify').href = data.hero.spotify_url;
+            document.getElementById('heroApple').href = data.hero.apple_url;
+            document.getElementById('heroYoutube').href = data.hero.youtube_url;
+            document.getElementById('navListenLink').href = data.hero.spotify_url;
+            document.getElementById('footerSpotify').href = data.hero.spotify_url;
+
+            // 2. Featured Release
+            document.getElementById('featTitle').textContent = data.featured_release.title;
+            document.getElementById('featDesc').textContent = data.featured_release.description;
+            document.getElementById('featType').textContent = data.featured_release.type;
+            document.getElementById('featImg').src = formatImgPath(data.featured_release.image);
+            document.getElementById('featSpotify').href = data.featured_release.spotify_url;
+            document.getElementById('featApple').href = data.featured_release.apple_url;
+
+            // 3. Tracks
+            const tracksContainer = document.getElementById('tracksContainer');
+            tracksContainer.innerHTML = data.tracks.map(track => `
+                <article class="track-row grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl px-2 py-4 md:grid-cols-[auto_1fr_auto_auto] md:gap-6">
+                    <img loading="lazy" class="h-14 w-14 rounded-lg object-cover" src="${formatImgPath(track.image)}" alt="${track.title}">
+                    <div>
+                        <h3 class="font-bold text-[#f5efe5] text-[17px]">${track.title}</h3>
+                        <p class="mt-1 text-sm text-[#aaa398]">${track.meta}</p>
+                    </div>
+                    <span class="hidden text-sm text-[#aaa398] md:block">${track.duration}</span> 
+                    <button type="button" class="preview-button inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-500 text-stone-100 transition hover:border-amber-300 hover:text-amber-300" data-tone="${track.tone}">
+                        <i data-lucide="play" class="h-4 w-4"></i>
+                    </button>
+                </article>
+            `).join('');
+
+            // 4. Videos
+            const videosContainer = document.getElementById('videosContainer');
+            videosContainer.innerHTML = data.videos.map(video => `
+                <article class="video-card overflow-hidden rounded-2xl bg-[#211c18]">
+                    <div class="relative aspect-video overflow-hidden">
+                        <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(video.image)}" alt="${video.title}">
+                        <span class="absolute bottom-4 left-4 grid h-11 w-11 place-items-center rounded-full bg-amber-300 text-black">
+                            <i data-lucide="play" class="h-4 w-4 fill-current"></i>
+                        </span>
+                    </div>
+                    <div class="p-5">
+                        <p class="eyebrow text-[#d8a64d]">${video.type}</p>
+                        <h3 class="mt-2 text-xl font-bold text-[#f5efe5]">${video.title}</h3>
+                        <a href="${video.url}" target="_blank" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#f5efe5] hover:text-[#d8a64d] transition">Watch on YouTube</a>
+                    </div>
+                </article>
+            `).join('');
+
+            // 5. Moments
+            const momentsContainer = document.getElementById('momentsContainer');
+            // Adding specific grid span classes to the first and last moments to create the mosaic look
+            momentsContainer.innerHTML = data.moments.map((img, index) => {
+                let spanClass = "";
+                if (index === 0) spanClass = "col-span-2 row-span-2";
+                if (index === 3) spanClass = "col-span-2";
+                return `
+                <figure class="moment-card ${spanClass} overflow-hidden rounded-2xl">
+                    <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(img)}" alt="One Circle Moment">
+                </figure>`;
+            }).join('');
+
+            // Initialize Icons and Audio after DOM is painted
+            lucide.createIcons();
+            bindAudioPlayers();
+        })
+        .catch(err => console.error("Error loading projects data:", err));
+
+    // Audio Preview Logic
+    function bindAudioPlayers() {
+        let audioContext;
+        let activeOscillator = null;
+        let activeButton = null;
+
+        function stopPreview() {
+            if (activeOscillator) {
+                try { activeOscillator.stop(); } catch (e) {}
+                activeOscillator = null;
+            }
+            if (activeButton) activeButton.classList.remove("preview-active");
+            activeButton = null;
+            document.getElementById("preview-status").textContent = "";
+        }
+
+        document.querySelectorAll(".preview-button").forEach((button) => {
+            button.addEventListener("click", () => {
+                if (activeButton === button) { stopPreview(); return; }
+                stopPreview();
+                audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                oscillator.type = "sine";
+                oscillator.frequency.value = Number(button.dataset.tone);
+                
+                gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.08, audioContext.currentTime + 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 2.8);
+                
+                oscillator.connect(gain).connect(audioContext.destination);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 2.85);
+                
+                activeOscillator = oscillator;
+                activeButton = button;
+                button.classList.add("preview-active");
+                document.getElementById("preview-status").textContent = "Preview playing — tap again to stop.";
+                oscillator.onended = stopPreview;
+            });
+        });
+    }
+  </script>
+</body>
+</html>
+
