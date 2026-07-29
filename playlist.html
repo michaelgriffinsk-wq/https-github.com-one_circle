@@ -74,96 +74,107 @@
     </main>
 
     <script>
-        lucide.createIcons();
+        function initPlaylistPage() {
+            lucide.createIcons();
 
-        function formatImgPath(path) {
-            if (!path) return '';
-            return path.startsWith('/') ? path.substring(1) : path;
-        }
+            function formatImgPath(path) {
+                if (!path) return '';
+                return path.startsWith('/') ? path.substring(1) : path;
+            }
 
-        fetch('database.json')
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(siteDatabase => {
-                const urlParams = new URLSearchParams(window.location.search);
-                const seasonNumber = parseInt(urlParams.get('season'));
-                const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
+            fetch('database.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(siteDatabase => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const seasonNumber = parseInt(urlParams.get('season'));
+                    const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
 
-                if (!seasonData) {
-                    document.getElementById('trackList').innerHTML = '<h2 class="text-center text-[#d8a64d] mt-10">Playlist not found.</h2>';
-                    throw new Error("Season not found in database.");
-                }
+                    const trackListEl = document.getElementById('trackList');
+                    if (!seasonData) {
+                        if (trackListEl) trackListEl.innerHTML = '<h2 class="text-center text-[#d8a64d] mt-10">Playlist not found.</h2>';
+                        throw new Error("Season not found in database.");
+                    }
 
-                // Header Injection
-                document.title = `One Circle | ${seasonData.title}`;
-                const posterUrl = formatImgPath(seasonData.posterImg);
-                
-                document.getElementById('dynamicHeader').innerHTML = `
-                    ${posterUrl ? `<img src="${posterUrl}" alt="${seasonData.title}" class="w-48 h-48 md:w-64 md:h-64 object-cover rounded-2xl shadow-xl shadow-black/50 mb-6">` : ''}
-                    <h1 class="serif text-4xl md:text-6xl font-semibold text-[#f5efe5] mb-3">${seasonData.title}</h1>
-                    <p class="eyebrow">${seasonData.date}</p>
-                `;
-
-                // Format Tracklist for Global Player
-                const playlist = seasonData.tracklist.map((track, index) => {
-                    return {
-                        id: index,
-                        title: track.title,
-                        artist: track.artist || "One Circle", 
-                        file: formatImgPath(track.file),
-                        image: posterUrl || 'https://images.pexels.com/photos/7708458/pexels-photo-7708458.jpeg'
-                    };
-                });
-
-                const trackListEl = document.getElementById('trackList');
-                const masterPlayBtn = document.getElementById('masterPlayBtn');
-
-                function renderTracklist() {
-                    trackListEl.innerHTML = '';
-                    playlist.forEach((track, index) => {
-                        const div = document.createElement('div');
-                        div.className = 'track-row track-item flex items-center justify-between px-4 py-4 rounded-xl';
-                        div.innerHTML = `
-                            <div class="flex items-center gap-4">
-                                <span class="text-[#aaa398] font-bold text-sm w-4">${index + 1}</span>
-                                <div>
-                                    <h3 class="track-title font-bold text-[#f5efe5] text-[16px]">${track.title}</h3>
-                                    <p class="text-sm text-[#aaa398] mt-1">${track.artist}</p>
-                                </div>
-                            </div>
-                            <i data-lucide="play-circle" class="w-5 h-5 text-[#aaa398]"></i>
+                    // Header Injection
+                    document.title = `One Circle | ${seasonData.title}`;
+                    const posterUrl = formatImgPath(seasonData.posterImg);
+                    
+                    const dynamicHeader = document.getElementById('dynamicHeader');
+                    if (dynamicHeader) {
+                        dynamicHeader.innerHTML = `
+                            ${posterUrl ? `<img src="${posterUrl}" alt="${seasonData.title}" class="w-48 h-48 md:w-64 md:h-64 object-cover rounded-2xl shadow-xl shadow-black/50 mb-6">` : ''}
+                            <h1 class="serif text-4xl md:text-6xl font-semibold text-[#f5efe5] mb-3">${seasonData.title}</h1>
+                            <p class="eyebrow">${seasonData.date}</p>
                         `;
-                        div.onclick = () => {
-                            if (window.globalPlayer) {
-                                window.globalPlayer.playTrack(track, playlist, index);
-                                updateActiveUI(index);
+                    }
+
+                    // Format Tracklist for Global Player
+                    const playlist = seasonData.tracklist.map((track, index) => {
+                        return {
+                            id: index,
+                            title: track.title,
+                            artist: track.artist || "One Circle", 
+                            file: formatImgPath(track.file),
+                            image: posterUrl || 'https://images.pexels.com/photos/7708458/pexels-photo-7708458.jpeg'
+                        };
+                    });
+
+                    const masterPlayBtn = document.getElementById('masterPlayBtn');
+
+                    function renderTracklist() {
+                        if (!trackListEl) return;
+                        trackListEl.innerHTML = '';
+                        playlist.forEach((track, index) => {
+                            const div = document.createElement('div');
+                            div.className = 'track-row track-item flex items-center justify-between px-4 py-4 rounded-xl';
+                            div.innerHTML = `
+                                <div class="flex items-center gap-4">
+                                    <span class="text-[#aaa398] font-bold text-sm w-4">${index + 1}</span>
+                                    <div>
+                                        <h3 class="track-title font-bold text-[#f5efe5] text-[16px]">${track.title}</h3>
+                                        <p class="text-sm text-[#aaa398] mt-1">${track.artist}</p>
+                                    </div>
+                                </div>
+                                <i data-lucide="play-circle" class="w-5 h-5 text-[#aaa398]"></i>
+                            `;
+                            div.onclick = () => {
+                                if (window.globalPlayer) {
+                                    window.globalPlayer.playTrack(track, playlist, index);
+                                    updateActiveUI(index);
+                                }
+                            };
+                            trackListEl.appendChild(div);
+                        });
+                        lucide.createIcons();
+                    }
+
+                    function updateActiveUI(activeIndex) {
+                        document.querySelectorAll('.track-item').forEach((item, i) => {
+                            item.classList.toggle('active', i === activeIndex);
+                        });
+                    }
+
+                    if (masterPlayBtn) {
+                        masterPlayBtn.onclick = () => {
+                            if (playlist.length > 0 && window.globalPlayer) {
+                                window.globalPlayer.playTrack(playlist[0], playlist, 0);
+                                updateActiveUI(0);
                             }
                         };
-                        trackListEl.appendChild(div);
-                    });
-                    lucide.createIcons();
-                }
-
-                function updateActiveUI(activeIndex) {
-                    document.querySelectorAll('.track-item').forEach((item, i) => {
-                        item.classList.toggle('active', i === activeIndex);
-                    });
-                }
-
-                masterPlayBtn.onclick = () => {
-                    if (playlist.length > 0 && window.globalPlayer) {
-                        window.globalPlayer.playTrack(playlist[0], playlist, 0);
-                        updateActiveUI(0);
                     }
-                };
 
-                renderTracklist();
-            })
-            .catch(error => {
-                console.error("Error fetching database:", error);
-            });
+                    renderTracklist();
+                })
+                .catch(error => {
+                    console.error("Error fetching database:", error);
+                });
+        }
+
+        window.initPage = initPlaylistPage;
+        initPlaylistPage();
     </script>
     <script src="player.js"></script>
 </body>
