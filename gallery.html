@@ -4,99 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Circle | Gallery</title>
+    
+    <!-- Tailwind CSS & Fonts matching about.html -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
     <style>
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #0a0a0a; 
-            color: #fff; 
-            margin: 0; 
-            line-height: 1.6;
+            font-family: 'Alegreya Sans', sans-serif; 
+            background: #0c1220; 
+            color: #fff;
         }
+        .font-display { font-family: 'Playfair Display', serif; }
         
-        /* Navigation */
-        nav {
-            background-color: #111;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #cc0000;
-        }
-        nav a { color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em; transition: color 0.2s;}
-        nav a:hover { color: #cc0000; }
-        nav span { font-weight: bold; letter-spacing: 1px; }
-        
-        /* Header */
-        header { 
-            text-align: center; 
-            padding: 60px 20px; 
-            background: linear-gradient(180deg, #3a0000 0%, #0a0a0a 100%);
-        }
-        header h1 { margin: 0; font-size: 2.2em; text-transform: uppercase; letter-spacing: 2px; }
-        header p { color: #aaa; font-size: 1em; margin: 10px 0 0 0; }
-
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        
-        /* Masonry Gallery */
+        /* Masonry Grid */
         .gallery-grid {
             column-count: 3;
-            column-gap: 15px;
+            column-gap: 1.5rem;
         }
-        
         @media (max-width: 900px) { .gallery-grid { column-count: 2; } }
         @media (max-width: 500px) { .gallery-grid { column-count: 1; } }
 
-        /* Media Items */
-        .media-item {
-            margin-bottom: 15px;
+        .media-wrapper {
             break-inside: avoid;
-            cursor: pointer;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-            background-color: #222;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .media-item:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(204, 0, 0, 0.4);
-        }
-        .media-item img, .media-item video {
-            width: 100%;
-            height: auto;
-            display: block;
-            pointer-events: none;
-        }
-        
-        /* Video Icon Overlay */
-        .video-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.6);
-            color: white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            pointer-events: none;
+            margin-bottom: 1.5rem;
         }
 
-        /* Lightbox */
+        /* Lightbox Styles */
         .lightbox {
             display: none; 
             position: fixed; 
             z-index: 1000; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(5px);
+            inset: 0; 
+            background-color: rgba(8, 13, 24, 0.95);
+            backdrop-filter: blur(8px);
         }
         .lightbox-content {
             display: flex;
@@ -104,68 +45,69 @@
             align-items: center;
             height: 100%;
             width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .lightbox-content img, .lightbox-content video {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 95%;
+            max-height: 90vh;
             object-fit: contain;
-            border-radius: 4px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
         
-        /* Controls */
         .close-btn {
             position: absolute;
             top: 20px;
             right: 30px;
             color: #fff;
             font-size: 40px;
-            font-weight: bold;
             cursor: pointer;
             z-index: 1001;
             transition: color 0.2s;
         }
-        .close-btn:hover { color: #cc0000; }
+        .close-btn:hover { color: #d4a853; }
         
         .nav-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
             color: white;
-            font-size: 40px;
-            font-weight: bold;
+            font-size: 30px;
             cursor: pointer;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            padding: 15px;
-            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 1001;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
-        .nav-btn:hover { background: #cc0000; }
+        .nav-btn:hover { background: #d4a853; color: #0c1220; border-color: #d4a853; }
         .prev-btn { left: 20px; }
         .next-btn { right: 20px; }
-
-        footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; border-top: 1px solid #222; margin-top: 50px; }
     </style>
 </head>
-<body>
+<body class="w-full min-h-screen flex flex-col">
 
-   <nav>
-        <a href="index.html" style="color: #fff; text-decoration: none; font-weight: bold; font-size: 1.2em; letter-spacing: 1px;">ONE CIRCLE</a>
-        <div style="display: flex; gap: 20px;">
-            <a href="index.html" style="color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em;">Home</a>
-            <a href="about.html" style="color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em;">About</a>
-        </div>
+    <!-- Navigation -->
+    <nav class="absolute top-0 w-full z-50 p-6 flex justify-between items-center">
+        <a href="index.html" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-sm">← Back to Home</a>
     </nav>
-    <header id="dynamicHeader">
-        <!-- Injected by JS -->
+
+    <!-- Header injected by JS -->
+    <header id="dynamicHeader" class="relative w-full overflow-hidden bg-gradient-to-b from-black/80 to-[#0c1220] flex flex-col items-center justify-center text-center px-6 py-24 min-h-[40vh]">
+        <!-- Content Injected -->
     </header>
 
-    <div class="container">
-        <!-- Grid injects here -->
+    <!-- Main Gallery -->
+    <main class="w-full flex-grow max-w-7xl mx-auto px-6 py-10">
         <div class="gallery-grid" id="galleryGrid"></div>
-    </div>
+    </main>
 
     <!-- Lightbox -->
     <div id="lightbox" class="lightbox">
@@ -180,41 +122,35 @@
         <button class="nav-btn next-btn" onclick="changeMedia(1)">&#10095;</button>
     </div>
 
-    <footer>
-        <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
+    <footer class="w-full text-center py-10 px-6 bg-[#080d18] mt-auto">
+        <p style="color: rgb(75, 85, 99); font-size: 16px;">© 2026 One Circle. Maintained by Kebaso Michael Griffins.</p> 
     </footer>
 
     <script>
-        // Fetch the JSON database
         fetch('database.json')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
             })
             .then(siteDatabase => {
-                // --- 1. DYNAMIC GALLERY DATA FETCHING ---
                 const urlParams = new URLSearchParams(window.location.search);
                 const seasonNumber = parseInt(urlParams.get('season'));
-
                 const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
 
                 if (!seasonData) {
-                    document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Gallery not found.</h2>';
+                    document.getElementById('galleryGrid').innerHTML = '<h2 class="text-center text-[#d4a853] mt-10 text-2xl font-display">Gallery not found.</h2>';
                     throw new Error("Season not found in database.");
                 }
 
-                // --- 2. UPDATE METADATA & HEADER ---
+                // Update Header to match About.html theme
                 document.title = `One Circle | Season ${seasonData.seasonNumber} Gallery`;
-                
                 const dynamicHeader = document.getElementById('dynamicHeader');
                 dynamicHeader.innerHTML = `
-                    <h1>Season ${seasonData.seasonNumber} Gallery</h1>
-                    <p>${seasonData.title} • ${seasonData.date}</p>
+                    <p class="uppercase tracking-[0.3em] text-sm mb-4" style="color: rgb(212, 168, 83); font-weight: 700;">Season ${seasonData.seasonNumber} Gallery</p> 
+                    <h1 class="font-display text-white font-black text-4xl md:text-5xl">${seasonData.title}</h1>
+                    <p class="mt-4 max-w-2xl leading-relaxed text-[#b8c4d6] text-lg">${seasonData.date}</p> 
                 `;
 
-                // --- 3. GALLERY CONFIGURATION ---
                 const maxImagesToCheck = seasonData.gallery.maxImages || 0; 
                 const maxVideosToCheck = seasonData.gallery.maxVideos || 0; 
                 const folderName = seasonData.gallery.folderName || `gallery_season_${seasonData.seasonNumber}`;
@@ -228,7 +164,6 @@
                 let mediaList = [];
                 let currentIndex = 0;
 
-                // 4. Build the target list for Images and Videos
                 for (let i = 1; i <= maxImagesToCheck; i++) {
                     mediaList.push({ type: 'image', src: `${folderName}/${filePrefix} (${i}).jpg`, valid: true });
                 }
@@ -236,15 +171,16 @@
                     mediaList.push({ type: 'video', src: `${folderName}/${filePrefix} (${i}).mp4`, valid: true });
                 }
 
-                // 5. Render Grid and Listen for Errors
                 mediaList.forEach((media, index) => {
                     const wrapper = document.createElement('div');
-                    wrapper.className = 'media-item';
+                    // Applying Tailwind classes for beautiful card styling
+                    wrapper.className = 'media-wrapper relative rounded-xl overflow-hidden bg-[#151d2e] cursor-pointer group shadow-lg';
 
                     if (media.type === 'image') {
                         const img = document.createElement('img');
                         img.src = media.src;
                         img.loading = "lazy";
+                        img.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105";
                         
                         img.onerror = () => {
                             wrapper.style.display = 'none';
@@ -255,21 +191,26 @@
                     } else if (media.type === 'video') {
                         const vid = document.createElement('video');
                         vid.preload = "auto";
+                        vid.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105";
                         
                         vid.onerror = () => {
                             wrapper.style.display = 'none';
                             media.valid = false;
                         };
-
                         vid.src = media.src;
 
                         const icon = document.createElement('div');
-                        icon.className = 'video-icon';
+                        icon.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-black/60 rounded-full flex items-center justify-center text-white pointer-events-none group-hover:bg-[#d4a853] group-hover:text-[#0c1220] transition-colors';
                         icon.innerHTML = '▶'; 
                         
                         wrapper.appendChild(vid);
                         wrapper.appendChild(icon);
                     }
+
+                    // Hover overlay effect matching the elegant theme
+                    const overlay = document.createElement('div');
+                    overlay.className = "absolute inset-0 bg-[#d4a853]/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none";
+                    wrapper.appendChild(overlay);
 
                     wrapper.onclick = () => {
                         if (media.valid) window.openLightbox(index);
@@ -278,7 +219,6 @@
                     galleryGrid.appendChild(wrapper);
                 });
 
-                // 6. Lightbox Logic (Attached to window so HTML inline onclicks work)
                 window.openLightbox = function(index) {
                     currentIndex = index;
                     updateLightbox();
@@ -298,24 +238,16 @@
 
                     while (!foundValidMedia && attempts < mediaList.length) {
                         currentIndex += direction;
-                        
                         if (currentIndex >= mediaList.length) currentIndex = 0;
                         if (currentIndex < 0) currentIndex = mediaList.length - 1;
-                        
-                        if (mediaList[currentIndex].valid) {
-                            foundValidMedia = true;
-                        }
+                        if (mediaList[currentIndex].valid) foundValidMedia = true;
                         attempts++;
                     }
-                    
-                    if (foundValidMedia) {
-                        updateLightbox();
-                    }
+                    if (foundValidMedia) updateLightbox();
                 };
 
                 function updateLightbox() {
                     const media = mediaList[currentIndex];
-                    
                     lightboxVideo.pause();
                     lightboxVideo.currentTime = 0;
 
@@ -330,35 +262,27 @@
                     }
                 }
 
-                // 7. Swipe Gestures
                 let touchstartX = 0;
                 let touchendX = 0;
 
-                lightbox.addEventListener('touchstart', e => {
-                    touchstartX = e.changedTouches[0].screenX;
-                });
-
+                lightbox.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
                 lightbox.addEventListener('touchend', e => {
                     touchendX = e.changedTouches[0].screenX;
-                    handleSwipe();
-                });
-
-                function handleSwipe() {
                     const swipeThreshold = 50; 
                     if (touchendX < touchstartX - swipeThreshold) window.changeMedia(1); 
                     if (touchendX > touchstartX + swipeThreshold) window.changeMedia(-1); 
-                }
+                });
 
                 lightbox.addEventListener('click', e => {
-                    if (e.target === lightbox || e.target.className === 'lightbox-content') {
+                    if (e.target === lightbox || e.target.className.includes('lightbox-content')) {
                         window.closeLightbox();
                     }
                 });
             })
             .catch(error => {
                 console.error("Error fetching database:", error);
-                document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Failed to load gallery data.</h2>';
             });
     </script>
 </body>
 </html>
+
