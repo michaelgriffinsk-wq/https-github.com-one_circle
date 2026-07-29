@@ -1,21 +1,16 @@
-// player.js - Global Persistent Spotify-Style Player Engine
+// player.js - Global Persistent Player & Full-Render SPA Router
 
 (function() {
-    // 1. Inject Player HTML and CSS into the current page automatically
+    // 1. Inject Player HTML and CSS
     const playerContainer = document.createElement('div');
     playerContainer.id = 'globalAudioPlayerRoot';
     playerContainer.innerHTML = `
         <style>
           #persistentPlayer {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            z-index: 99999;
-            background: #121212;
-            color: #fff;
-            font-family: 'DM Sans', sans-serif;
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 99999;
+            background: #121212; color: #fff; font-family: 'DM Sans', sans-serif;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-            user-select: none;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5); user-select: none;
           }
           .player-minimized {
             height: 64px; margin: 8px 12px; border-radius: 8px; background: #1f1f1f;
@@ -114,7 +109,7 @@
     `;
     document.body.appendChild(playerContainer);
 
-    // 2. Player Logic Class
+    // 2. Global Player Class
     class GlobalPersistentPlayer {
         constructor() {
             this.currentTrack = null;
@@ -148,24 +143,6 @@
                 const pos = (e.clientX - rect.left) / rect.width;
                 this.audio.currentTime = pos * this.audio.duration;
             });
-
-            // Swipe Gestures
-            let touchStartY = 0, touchStartX = 0;
-            const swipeArea = document.getElementById('swipeArea');
-
-            swipeArea.addEventListener('touchstart', (e) => {
-                touchStartY = e.touches[0].clientY;
-                touchStartX = e.touches[0].clientX;
-            }, {passive: true});
-
-            swipeArea.addEventListener('touchend', (e) => {
-                const diffY = e.changedTouches[0].clientY - touchStartY;
-                const diffX = e.changedTouches[0].clientX - touchStartX;
-
-                if (diffY > 60 && Math.abs(diffX) < 50) this.setExpanded(false);
-                else if (diffX < -60 && Math.abs(diffY) < 50) this.nextTrack();
-                else if (diffX > 60 && Math.abs(diffY) < 50) this.prevTrack();
-            }, {passive: true});
         }
 
         playTrack(track, playlist = [], index = 0) {
@@ -223,7 +200,6 @@
 
         updateUIState() {
             if (!this.currentTrack) return;
-
             const img = this.currentTrack.image || 'https://images.pexels.com/photos/7708458/pexels-photo-7708458.jpeg';
             const title = this.currentTrack.title || 'Unknown Track';
             const artist = this.currentTrack.artist || 'One Circle';
@@ -231,7 +207,6 @@
             document.getElementById('miniImg').src = img;
             document.getElementById('miniTitle').textContent = title;
             document.getElementById('miniArtist').textContent = artist;
-
             document.getElementById('expandedImg').src = img;
             document.getElementById('expandedTitle').textContent = title;
             document.getElementById('expandedArtist').textContent = artist;
@@ -245,8 +220,8 @@
 
         updateProgress() {
             if (isNaN(this.audio.duration)) return;
-            const progressPercent = (this.audio.currentTime / this.audio.duration) * 100;
-            document.getElementById('progressBarFill').style.width = `${progressPercent}%`;
+            const percent = (this.audio.currentTime / this.audio.duration) * 100;
+            document.getElementById('progressBarFill').style.width = `${percent}%`;
             document.getElementById('currentTime').textContent = this.formatTime(this.audio.currentTime);
             document.getElementById('totalTime').textContent = this.formatTime(this.audio.duration);
         }
@@ -258,14 +233,10 @@
         }
 
         saveState() {
-            const state = {
-                track: this.currentTrack,
-                isPlaying: this.isPlaying,
-                currentTime: this.audio.currentTime,
-                playlist: this.playlist,
-                currentIndex: this.currentIndex
-            };
-            localStorage.setItem('oneCirclePlayerState', JSON.stringify(state));
+            localStorage.setItem('oneCirclePlayerState', JSON.stringify({
+                track: this.currentTrack, isPlaying: this.isPlaying,
+                currentTime: this.audio.currentTime, playlist: this.playlist, currentIndex: this.currentIndex
+            }));
         }
 
         restoreState() {
@@ -279,22 +250,60 @@
                         this.currentIndex = state.currentIndex || 0;
                         this.audio.src = state.track.file || state.track.audioUrl || '';
                         this.audio.currentTime = state.currentTime || 0;
-                        
                         document.getElementById('persistentPlayer').style.display = 'block';
-                        // Auto resume playback on page navigation load
-                        this.audio.play().then(() => {
-                            this.isPlaying = true;
-                            this.updateUIState();
-                        }).catch(e => {
-                            this.isPlaying = false;
-                            this.updateUIState();
-                        });
+                        this.updateUIState();
                     }
-                } catch(e) { console.error("Could not restore player state", e); }
+                } catch(e) {}
             }
         }
     }
 
     window.globalPlayer = new GlobalPersistentPlayer();
+
+    // 3. Seamless SPA Router with Script Execution Fix
+    function initRouter() {
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (!link) return;
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('#') || link.getAttribute('target') === '_blank') return;
+
+            e.preventDefault();
+            loadPage(href);
+        });
+
+        window.addEventListener('popstate', () => loadPage(window.location.pathname, false));
+    }
+
+    async function loadPage(url, pushState = true) {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error();
+            const html = await res.text();
+
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+
+            document.title = newDoc.title;
+            document.body.innerHTML = newDoc.body.innerHTML;
+            document.body.appendChild(playerContainer);
+
+            if (pushState) history.pushState({}, '', url);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Re-evaluate and execute scripts inside the newly injected body
+            document.body.querySelectorAll('script').forEach(oldScript => {
+                if (oldScript.src && oldScript.src.includes('player.js')) return;
+                const newScript = document.createElement('script');
+                if (oldScript.src) newScript.src = oldScript.src;
+                else newScript.textContent = oldScript.textContent;
+                document.body.appendChild(newScript);
+            });
+        } catch (err) {
+            window.location.href = url; // Fallback if fetch fails
+        }
+    }
+
+    initRouter();
 })();
 
