@@ -272,18 +272,6 @@
       ]
     },
     {
-      "location": "CITAM NGONG",
-      "seasonNumber": 3,
-      "status": "past",
-      "title": "I AM",
-      "date": "20/6/2025",
-      "posterImg": "uploads/1000598960.jpg",
-      "gallery": {
-        "folderName": "gallery_season_3",
-        "filePrefix": "1",
-        "maxImages": 150,
-        "maxVideos": 30
-      },
       "tracklist": [
         {
           "artist": "David Dam",
@@ -291,6 +279,23 @@
           "title": "Shalom",
           "file": "audio/Track36.mp3"
         }
+      ],
+      "seasonNumber": 3,
+      "date": "20/6/2025",
+      "gallery": {
+        "folderName": "gallery_season_3",
+        "filePrefix": "1",
+        "maxImages": 150,
+        "maxVideos": 30
+      },
+      "status": "past",
+      "location": "CITAM NGONG",
+      "posterImg": "uploads/1000598960.jpg",
+      "title": "I AM",
+      "description": "-",
+      "youtubeLink": "-",
+      "highlights": [
+        "-"
       ]
     }
   ]
