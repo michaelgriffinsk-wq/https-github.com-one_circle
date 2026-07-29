@@ -57,7 +57,7 @@
             pointer-events: none; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         .admin-editable.active-edit:hover::after { opacity: 1; }
-        body.admin-mode-on .admin-editable a { pointer-events: none; }
+        /* REMOVED the pointer-events: none rule so buttons work! */
 
         /* =========================================
            MODAL UI STYLES
@@ -117,10 +117,7 @@
                 </label>
             </div>
             
-            <!-- UPDATED: Now calls the GitHub API to save changes -->
             <button class="admin-btn admin-btn-secondary" onclick="publishToGitHub(globalDatabase, 'database.json', 'Update events via custom admin UI')">Publish Changes</button>
-            
-            <!-- NEW: Link to Decap CMS for Image Uploads -->
             <a href="decap.html" class="admin-btn" style="text-decoration: none; background-color: #0056b3;">Open Advanced CMS</a>
         </div>
     </div>
@@ -130,7 +127,7 @@
       <h2>ONE CIRCLE</h2>
       <div class="nav-links">
         <a href="../index.html">Live Home</a>
-        <a href="about.html">Live About</a>
+        <a href="../about.html">Live About</a>
       </div>
     </nav>
     <header>
@@ -220,8 +217,14 @@
         const cancelModalBtn = document.getElementById('cancelModalBtn');
         const saveModalBtn = document.getElementById('saveModalBtn');
         
-        let isEditMode = false;
-        let globalDatabase = null; // Store database in memory for editing
+        // UPDATED: Now fetches the state from sessionStorage
+        let isEditMode = sessionStorage.getItem('oneCircleAdmin') === 'true';
+        let globalDatabase = null;
+
+        // Apply UI state on load
+        if(isEditMode) {
+            editToggle.checked = true;
+        }
 
         // Fetch Initial Data
         function loadData() {
@@ -303,9 +306,10 @@
             if(isEditMode) toggleEditBorders(true);
         }
 
-        // Toggle Edit State
+        // Toggle Edit State (UPDATED: Saves to sessionStorage)
         editToggle.addEventListener('change', (e) => {
             isEditMode = e.target.checked;
+            sessionStorage.setItem('oneCircleAdmin', isEditMode);
             toggleEditBorders(isEditMode);
         });
 
@@ -321,12 +325,16 @@
             }
         }
 
-        // Attach clicks to cards
+        // Attach clicks to cards (UPDATED: Allows buttons inside cards to be clicked)
         function attachEditListeners() {
             document.querySelectorAll('.admin-editable').forEach(card => {
                 card.addEventListener('click', (e) => {
                     if (isEditMode) {
-                        e.preventDefault(); e.stopPropagation();
+                        // Let link buttons trigger their normal behavior
+                        if (e.target.closest('a')) return; 
+
+                        e.preventDefault(); 
+                        e.stopPropagation();
                         const index = card.getAttribute('data-index');
                         openModal(index);
                     }
@@ -342,7 +350,6 @@
             editModal.style.display = 'flex';
             
             if (index !== null) {
-                // Edit Existing
                 document.getElementById('modalTitle').innerText = 'Edit Season';
                 document.getElementById('editIndex').value = index;
                 const season = globalDatabase.seasons[index];
@@ -355,9 +362,7 @@
                 document.getElementById('seasonPoster').value = season.posterImg || '';
                 document.getElementById('seasonYoutube').value = season.youtubeLink || '';
                 document.getElementById('seasonHighlights').value = season.highlights ? season.highlights.join(', ') : '';
-                
             } else {
-                // Add New Empty Season
                 document.getElementById('modalTitle').innerText = 'Add New Season';
                 document.getElementById('seasonForm').reset();
                 document.getElementById('editIndex').value = 'new';
@@ -371,7 +376,6 @@
         closeModalBtn.addEventListener('click', closeModal);
         cancelModalBtn.addEventListener('click', closeModal);
 
-        // Handle Save
         saveModalBtn.addEventListener('click', () => {
             const index = document.getElementById('editIndex').value;
             
@@ -403,15 +407,12 @@
         // GITHUB API SAVING LOGIC
         // ==========================================
         async function publishToGitHub(jsonData, filename, commitMessage) {
-            
-            // 1. Securely prompt for the token without hardcoding it
             const token = prompt("Enter your GitHub Personal Access Token to publish to the Live Site:");
             if (!token) {
                 alert("Publishing cancelled. A token is required.");
                 return;
             }
 
-            // Using values matched exactly to your Decap config.yml
             const repoOwner = "michaelgriffinsk-wq";
             const repoName = "https-github.com-one_circle";
             const branch = "json-branch";
@@ -420,7 +421,6 @@
             const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
 
             try {
-                // 2. Fetch the current file's SHA (GitHub requires this to overwrite a file)
                 const getResponse = await fetch(`${apiUrl}?ref=${branch}`, {
                     headers: { 
                         "Authorization": `token ${token}`,
@@ -432,11 +432,9 @@
                 const fileData = await getResponse.json();
                 const currentSha = fileData.sha;
 
-                // 3. Convert updated JSON to Base64 (Handling special characters correctly)
                 const updatedContent = JSON.stringify(jsonData, null, 2);
                 const base64Content = btoa(unescape(encodeURIComponent(updatedContent)));
 
-                // 4. Send PUT request to GitHub
                 const putResponse = await fetch(apiUrl, {
                     method: "PUT",
                     headers: {
