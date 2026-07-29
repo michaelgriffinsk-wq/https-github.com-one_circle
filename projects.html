@@ -214,234 +214,269 @@
   </div>
 
   <script>
-    lucide.createIcons();
-
-    let globalProjectsData = null;
-    let isAdmin = sessionStorage.getItem('oneCircleAdmin') === 'true';
-
-    function formatImgPath(path) {
-        if (!path) return '';
-        return path.startsWith('/') ? path.substring(1) : path;
-    }
-
-    fetch('projects.json')
-        .then(res => res.json())
-        .then(data => {
-            globalProjectsData = data;
-            renderProjectsPage(data);
-
-            if (isAdmin) {
-                document.getElementById('adminToolbar').style.display = 'flex';
-                document.getElementById('backLink').href = 'admin/index.html';
-                document.getElementById('backLink').textContent = '← Back to Admin Panel';
-                
-                const editZones = document.querySelectorAll('.projects-editable');
-                editZones.forEach(zone => {
-                    zone.classList.add('active-edit');
-                    zone.addEventListener('click', openProjectsModal);
-                });
-            }
-        })
-        .catch(err => console.error("Error loading projects data:", err));
-
-    function renderProjectsPage(data) {
-        // Hero
-        document.getElementById('heroTitle').textContent = data.hero.title;
-        document.getElementById('heroDesc').textContent = data.hero.description;
-        document.getElementById('heroImg').src = formatImgPath(data.hero.image);
-        document.getElementById('heroSpotify').href = data.hero.spotify_url;
-        document.getElementById('heroApple').href = data.hero.apple_url;
-        document.getElementById('heroYoutube').href = data.hero.youtube_url;
-        document.getElementById('footerSpotify').href = data.hero.spotify_url;
-
-        // Featured Release
-        document.getElementById('featTitle').textContent = data.featured_release.title;
-        document.getElementById('featDesc').textContent = data.featured_release.description;
-        document.getElementById('featType').textContent = data.featured_release.type;
-        document.getElementById('featImg').src = formatImgPath(data.featured_release.image);
-        document.getElementById('featSpotify').href = data.featured_release.spotify_url;
-        document.getElementById('featApple').href = data.featured_release.apple_url;
-
-        // Tracks
-        const tracksContainer = document.getElementById('tracksContainer');
-        tracksContainer.innerHTML = data.tracks.map(track => `
-            <article class="track-row grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl px-2 py-4 md:grid-cols-[auto_1fr_auto_auto] md:gap-6">
-                <img loading="lazy" class="h-14 w-14 rounded-lg object-cover" src="${formatImgPath(track.image)}" alt="${track.title}">
-                <div>
-                    <h3 class="font-bold text-[#f5efe5] text-[17px]">${track.title}</h3>
-                    <p class="mt-1 text-sm text-[#aaa398]">${track.meta}</p>
-                </div>
-                <span class="hidden text-sm text-[#aaa398] md:block">${track.duration}</span> 
-                <button type="button" class="preview-button inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-500 text-stone-100 transition hover:border-amber-300 hover:text-amber-300" data-tone="${track.tone}">
-                    <i data-lucide="play" class="h-4 w-4"></i>
-                </button>
-            </article>
-        `).join('');
-
-        // Videos
-        const videosContainer = document.getElementById('videosContainer');
-        videosContainer.innerHTML = data.videos.map(video => `
-            <article class="video-card overflow-hidden rounded-2xl bg-[#211c18]">
-                <div class="relative aspect-video overflow-hidden">
-                    <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(video.image)}" alt="${video.title}">
-                    <a href="${video.url}" target="_blank" class="absolute bottom-4 left-4 grid h-11 w-11 place-items-center rounded-full bg-amber-300 text-black hover:scale-110 transition">
-                        <i data-lucide="play" class="h-4 w-4 fill-current"></i>
-                    </a>
-                </div>
-                <div class="p-5">
-                    <p class="eyebrow text-[#d8a64d]">${video.type}</p>
-                    <h3 class="mt-2 text-xl font-bold text-[#f5efe5]">${video.title}</h3>
-                    <a href="${video.url}" target="_blank" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#f5efe5] hover:text-[#d8a64d] transition">Watch on YouTube</a>
-                </div>
-            </article>
-        `).join('');
-
-        // Moments
-        const momentsContainer = document.getElementById('momentsContainer');
-        momentsContainer.innerHTML = data.moments.map((img, index) => {
-            let spanClass = "";
-            if (index === 0) spanClass = "col-span-2 row-span-2";
-            if (index === 3) spanClass = "col-span-2";
-            return `
-            <figure class="moment-card ${spanClass} overflow-hidden rounded-2xl">
-                <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(img)}" alt="One Circle Moment">
-            </figure>`;
-        }).join('');
-
+    function initProjectsPage() {
         lucide.createIcons();
-        bindAudioPlayers();
-    }
 
-    // ==========================================
-    // MODAL & GITHUB SAVING LOGIC
-    // ==========================================
-    function openProjectsModal(e) {
-        if (!isAdmin) return;
-        
-        if (e && typeof e.stopPropagation === 'function') {
-            e.stopPropagation();
+        let globalProjectsData = null;
+        let isAdmin = sessionStorage.getItem('oneCircleAdmin') === 'true';
+
+        function formatImgPath(path) {
+            if (!path) return '';
+            return path.startsWith('/') ? path.substring(1) : path;
         }
 
-        document.getElementById('editHeroTitle').value = globalProjectsData.hero.title;
-        document.getElementById('editHeroDesc').value = globalProjectsData.hero.description;
-        document.getElementById('editFeatTitle').value = globalProjectsData.featured_release.title;
-        document.getElementById('editFeatType').value = globalProjectsData.featured_release.type;
-        document.getElementById('editFeatDesc').value = globalProjectsData.featured_release.description;
-        
-        document.getElementById('projectsModal').style.display = 'flex';
-    }
+        fetch('projects.json')
+            .then(res => res.json())
+            .then(data => {
+                globalProjectsData = data;
+                renderProjectsPage(data);
 
-    function closeProjectsModal() {
-        document.getElementById('projectsModal').style.display = 'none';
-    }
-
-    function saveProjectsModal() {
-        globalProjectsData.hero.title = document.getElementById('editHeroTitle').value;
-        globalProjectsData.hero.description = document.getElementById('editHeroDesc').value;
-        globalProjectsData.featured_release.title = document.getElementById('editFeatTitle').value;
-        globalProjectsData.featured_release.type = document.getElementById('editFeatType').value;
-        globalProjectsData.featured_release.description = document.getElementById('editFeatDesc').value;
-        
-        renderProjectsPage(globalProjectsData);
-        closeProjectsModal();
-    }
-
-    async function publishProjectsToGitHub() {
-        const token = prompt("Enter your GitHub Personal Access Token to publish Music page updates:");
-        if (!token) return;
-
-        const repoOwner = "michaelgriffinsk-wq";
-        const repoName = "https-github.com-one_circle";
-        const branch = "About-json-branch";
-        const path = "projects.json"; 
-        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
-
-        try {
-            const getResponse = await fetch(`${apiUrl}?ref=${branch}`, {
-                headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
-            });
-            if (!getResponse.ok) throw new Error("Could not fetch current file SHA.");
-            const currentSha = (await getResponse.json()).sha;
-
-            const updatedContent = JSON.stringify(globalProjectsData, null, 2);
-            const base64Content = btoa(unescape(encodeURIComponent(updatedContent)));
-
-            const putResponse = await fetch(apiUrl, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: "Update Music page content via custom Admin UI", content: base64Content, sha: currentSha, branch: branch
-                })
-            });
-
-            if (putResponse.ok) alert("Success! Music page changes have been published to GitHub.");
-            else alert("Failed to publish: " + (await putResponse.json()).message);
-        } catch (error) {
-            console.error("Error publishing:", error);
-            alert("An error occurred. Check the browser console.");
-        }
-    }
-
-    // Audio Logic integrated with Global Persistent Player
-    function bindAudioPlayers() {
-        let audioContext;
-        let activeOscillator = null;
-        let activeButton = null;
-
-        function stopPreview() {
-            if (activeOscillator) { try { activeOscillator.stop(); } catch (e) {} activeOscillator = null; }
-            if (activeButton) activeButton.classList.remove("preview-active");
-            activeButton = null;
-            document.getElementById("preview-status").textContent = "";
-        }
-
-        document.querySelectorAll(".preview-button").forEach((button, index) => {
-            const newBtn = button.cloneNode(true);
-            button.parentNode.replaceChild(newBtn, button);
-            
-            newBtn.addEventListener("click", (e) => {
-                e.stopPropagation(); 
-                
-                const trackRow = newBtn.closest('article');
-                const title = trackRow.querySelector('h3').textContent;
-                const meta = trackRow.querySelector('p').textContent;
-                const img = trackRow.querySelector('img').src;
-
-                const trackData = {
-                    title: title,
-                    artist: meta || "One Circle",
-                    image: img,
-                    audioUrl: "" 
-                };
-
-                if (window.globalPlayer) {
-                    window.globalPlayer.playTrack(trackData, globalProjectsData.tracks, index);
+                if (isAdmin) {
+                    const toolbar = document.getElementById('adminToolbar');
+                    if (toolbar) toolbar.style.display = 'flex';
+                    
+                    const backLink = document.getElementById('backLink');
+                    if (backLink) {
+                        backLink.href = 'admin/index.html';
+                        backLink.textContent = '← Back to Admin Panel';
+                    }
+                    
+                    const editZones = document.querySelectorAll('.projects-editable');
+                    editZones.forEach(zone => {
+                        zone.classList.add('active-edit');
+                        zone.removeEventListener('click', openProjectsModal);
+                        zone.addEventListener('click', openProjectsModal);
+                    });
                 }
+            })
+            .catch(err => console.error("Error loading projects data:", err));
 
-                if (activeButton === newBtn) { stopPreview(); return; }
-                stopPreview();
+        function renderProjectsPage(data) {
+            const heroTitle = document.getElementById('heroTitle');
+            const heroDesc = document.getElementById('heroDesc');
+            const heroImg = document.getElementById('heroImg');
+            const heroSpotify = document.getElementById('heroSpotify');
+            const heroApple = document.getElementById('heroApple');
+            const heroYoutube = document.getElementById('heroYoutube');
+            const footerSpotify = document.getElementById('footerSpotify');
+
+            if (heroTitle) heroTitle.textContent = data.hero.title;
+            if (heroDesc) heroDesc.textContent = data.hero.description;
+            if (heroImg) heroImg.src = formatImgPath(data.hero.image);
+            if (heroSpotify) heroSpotify.href = data.hero.spotify_url;
+            if (heroApple) heroApple.href = data.hero.apple_url;
+            if (heroYoutube) heroYoutube.href = data.hero.youtube_url;
+            if (footerSpotify) footerSpotify.href = data.hero.spotify_url;
+
+            const featTitle = document.getElementById('featTitle');
+            const featDesc = document.getElementById('featDesc');
+            const featType = document.getElementById('featType');
+            const featImg = document.getElementById('featImg');
+            const featSpotify = document.getElementById('featSpotify');
+            const featApple = document.getElementById('featApple');
+
+            if (featTitle) featTitle.textContent = data.featured_release.title;
+            if (featDesc) featDesc.textContent = data.featured_release.description;
+            if (featType) featType.textContent = data.featured_release.type;
+            if (featImg) featImg.src = formatImgPath(data.featured_release.image);
+            if (featSpotify) featSpotify.href = data.featured_release.spotify_url;
+            if (featApple) featApple.href = data.featured_release.apple_url;
+
+            const tracksContainer = document.getElementById('tracksContainer');
+            if (tracksContainer) {
+                tracksContainer.innerHTML = data.tracks.map(track => `
+                    <article class="track-row grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl px-2 py-4 md:grid-cols-[auto_1fr_auto_auto] md:gap-6">
+                        <img loading="lazy" class="h-14 w-14 rounded-lg object-cover" src="${formatImgPath(track.image)}" alt="${track.title}">
+                        <div>
+                            <h3 class="font-bold text-[#f5efe5] text-[17px]">${track.title}</h3>
+                            <p class="mt-1 text-sm text-[#aaa398]">${track.meta}</p>
+                        </div>
+                        <span class="hidden text-sm text-[#aaa398] md:block">${track.duration}</span> 
+                        <button type="button" class="preview-button inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-500 text-stone-100 transition hover:border-amber-300 hover:text-amber-300" data-tone="${track.tone}">
+                            <i data-lucide="play" class="h-4 w-4"></i>
+                        </button>
+                    </article>
+                `).join('');
+            }
+
+            const videosContainer = document.getElementById('videosContainer');
+            if (videosContainer) {
+                videosContainer.innerHTML = data.videos.map(video => `
+                    <article class="video-card overflow-hidden rounded-2xl bg-[#211c18]">
+                        <div class="relative aspect-video overflow-hidden">
+                            <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(video.image)}" alt="${video.title}">
+                            <a href="${video.url}" target="_blank" class="absolute bottom-4 left-4 grid h-11 w-11 place-items-center rounded-full bg-amber-300 text-black hover:scale-110 transition">
+                                <i data-lucide="play" class="h-4 w-4 fill-current"></i>
+                            </a>
+                        </div>
+                        <div class="p-5">
+                            <p class="eyebrow text-[#d8a64d]">${video.type}</p>
+                            <h3 class="mt-2 text-xl font-bold text-[#f5efe5]">${video.title}</h3>
+                            <a href="${video.url}" target="_blank" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#f5efe5] hover:text-[#d8a64d] transition">Watch on YouTube</a>
+                        </div>
+                    </article>
+                `).join('');
+            }
+
+            const momentsContainer = document.getElementById('momentsContainer');
+            if (momentsContainer) {
+                momentsContainer.innerHTML = data.moments.map((img, index) => {
+                    let spanClass = "";
+                    if (index === 0) spanClass = "col-span-2 row-span-2";
+                    if (index === 3) spanClass = "col-span-2";
+                    return `
+                    <figure class="moment-card ${spanClass} overflow-hidden rounded-2xl">
+                        <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(img)}" alt="One Circle Moment">
+                    </figure>`;
+                }).join('');
+            }
+
+            lucide.createIcons();
+            bindAudioPlayers();
+        }
+
+        window.openProjectsModal = function(e) {
+            if (!isAdmin) return;
+            if (e && typeof e.stopPropagation === 'function') { e.stopPropagation(); }
+
+            const editHeroTitle = document.getElementById('editHeroTitle');
+            const editHeroDesc = document.getElementById('editHeroDesc');
+            const editFeatTitle = document.getElementById('editFeatTitle');
+            const editFeatType = document.getElementById('editFeatType');
+            const editFeatDesc = document.getElementById('editFeatDesc');
+            const projectsModal = document.getElementById('projectsModal');
+
+            if (editHeroTitle) editHeroTitle.value = globalProjectsData.hero.title;
+            if (editHeroDesc) editHeroDesc.value = globalProjectsData.hero.description;
+            if (editFeatTitle) editFeatTitle.value = globalProjectsData.featured_release.title;
+            if (editFeatType) editFeatType.value = globalProjectsData.featured_release.type;
+            if (editFeatDesc) editFeatDesc.value = globalProjectsData.featured_release.description;
+            if (projectsModal) projectsModal.style.display = 'flex';
+        }
+
+        window.closeProjectsModal = function() {
+            const projectsModal = document.getElementById('projectsModal');
+            if (projectsModal) projectsModal.style.display = 'none';
+        }
+
+        window.saveProjectsModal = function() {
+            const editHeroTitle = document.getElementById('editHeroTitle');
+            const editHeroDesc = document.getElementById('editHeroDesc');
+            const editFeatTitle = document.getElementById('editFeatTitle');
+            const editFeatType = document.getElementById('editFeatType');
+            const editFeatDesc = document.getElementById('editFeatDesc');
+
+            if (editHeroTitle) globalProjectsData.hero.title = editHeroTitle.value;
+            if (editHeroDesc) globalProjectsData.hero.description = editHeroDesc.value;
+            if (editFeatTitle) globalProjectsData.featured_release.title = editFeatTitle.value;
+            if (editFeatType) globalProjectsData.featured_release.type = editFeatType.value;
+            if (editFeatDesc) globalProjectsData.featured_release.description = editFeatDesc.value;
+            
+            renderProjectsPage(globalProjectsData);
+            closeProjectsModal();
+        }
+
+        window.publishProjectsToGitHub = async function() {
+            const token = prompt("Enter your GitHub Personal Access Token to publish Music page updates:");
+            if (!token) return;
+
+            const repoOwner = "michaelgriffinsk-wq";
+            const repoName = "https-github.com-one_circle";
+            const branch = "About-json-branch";
+            const path = "projects.json"; 
+            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
+
+            try {
+                const getResponse = await fetch(`${apiUrl}?ref=${branch}`, {
+                    headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
+                });
+                if (!getResponse.ok) throw new Error("Could not fetch current file SHA.");
+                const currentSha = (await getResponse.json()).sha;
+
+                const updatedContent = JSON.stringify(globalProjectsData, null, 2);
+                const base64Content = btoa(unescape(encodeURIComponent(updatedContent)));
+
+                const putResponse = await fetch(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: "Update Music page content via custom Admin UI", content: base64Content, sha: currentSha, branch: branch
+                    })
+                });
+
+                if (putResponse.ok) alert("Success! Music page changes have been published to GitHub.");
+                else alert("Failed to publish: " + (await putResponse.json()).message);
+            } catch (error) {
+                console.error("Error publishing:", error);
+                alert("An error occurred. Check the browser console.");
+            }
+        }
+
+        function bindAudioPlayers() {
+            let audioContext;
+            let activeOscillator = null;
+            let activeButton = null;
+
+            function stopPreview() {
+                if (activeOscillator) { try { activeOscillator.stop(); } catch (e) {} activeOscillator = null; }
+                if (activeButton) activeButton.classList.remove("preview-active");
+                activeButton = null;
+                const previewStatus = document.getElementById("preview-status");
+                if (previewStatus) previewStatus.textContent = "";
+            }
+
+            document.querySelectorAll(".preview-button").forEach((button, index) => {
+                const newBtn = button.cloneNode(true);
+                button.parentNode.replaceChild(newBtn, button);
                 
-                audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                oscillator.type = "sine";
-                oscillator.frequency.value = Number(newBtn.dataset.tone);
-                gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.08, audioContext.currentTime + 0.04);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 2.8);
-                oscillator.connect(gain).connect(audioContext.destination);
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + 2.85);
-                activeOscillator = oscillator;
-                activeButton = newBtn;
-                newBtn.classList.add("preview-active");
-                document.getElementById("preview-status").textContent = "Preview playing — tap again to stop.";
-                oscillator.onended = stopPreview;
+                newBtn.addEventListener("click", (e) => {
+                    e.stopPropagation(); 
+                    
+                    const trackRow = newBtn.closest('article');
+                    const title = trackRow.querySelector('h3').textContent;
+                    const meta = trackRow.querySelector('p').textContent;
+                    const img = trackRow.querySelector('img').src;
+
+                    const trackData = {
+                        title: title,
+                        artist: meta || "One Circle",
+                        image: img,
+                        audioUrl: "" 
+                    };
+
+                    if (window.globalPlayer) {
+                        window.globalPlayer.playTrack(trackData, globalProjectsData.tracks, index);
+                    }
+
+                    if (activeButton === newBtn) { stopPreview(); return; }
+                    stopPreview();
+                    
+                    audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    oscillator.type = "sine";
+                    oscillator.frequency.value = Number(newBtn.dataset.tone);
+                    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.08, audioContext.currentTime + 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 2.8);
+                    oscillator.connect(gain).connect(audioContext.destination);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 2.85);
+                    activeOscillator = oscillator;
+                    activeButton = newBtn;
+                    newBtn.classList.add("preview-active");
+                    const previewStatus = document.getElementById("preview-status");
+                    if (previewStatus) previewStatus.textContent = "Preview playing — tap again to stop.";
+                    oscillator.onended = stopPreview;
+                });
             });
-        });
+        }
     }
+
+    window.initPage = initProjectsPage;
+    initProjectsPage();
   </script>
   <script src="player.js"></script>
 </body>
