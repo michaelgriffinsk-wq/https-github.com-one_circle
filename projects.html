@@ -29,23 +29,45 @@
     .release-card:hover, .video-card:hover, .moment-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,.38); }
     .image-zoom { transition: transform .7s ease; }
     .video-card:hover .image-zoom, .moment-card:hover .image-zoom { transform: scale(1.06); }
-    .track-row { border-bottom: 1px solid rgba(245,239,229,.15); transition: background .2s ease; }
+    .track-row { border-bottom: 1px solid rgba(245,239,229,.15); transition: background .2s ease; cursor: pointer;}
     .track-row:hover { background: rgba(245,239,229,.06); }
     .preview-active { background: var(--gold) !important; color: #17120a !important; border-color: var(--gold) !important; }
     .hero-copy { animation: rise .8s ease both; }
     .hero-actions { animation: rise .8s .14s ease both; }
     @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-    a:focus-visible, button:focus-visible { outline: 3px solid #f3c976; outline-offset: 3px; }
     @media (max-width: 640px) { .hero-image::after { background: linear-gradient(0deg, rgba(10,10,11,.96), rgba(10,10,11,.36)); } }
+
+    /* =========================================
+       ADMIN EDIT MODE STYLES
+       ========================================= */
+    .admin-toolbar { display: none; background: #111; padding: 15px 25px; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 9999; }
+    .admin-btn { background: var(--gold); color: #111; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .admin-btn:hover { background: #e6c27a; }
+    .projects-editable { position: relative; transition: all 0.2s; }
+    .active-edit { outline: 2px dashed var(--gold); outline-offset: 4px; cursor: pointer; border-radius: 8px; }
+    .active-edit:hover { background-color: rgba(216, 166, 77, 0.1); outline: 3px solid var(--gold); }
+    .active-edit::after { content: '✎ Click to Edit'; position: absolute; top: 10px; right: 10px; background: var(--gold); color: #111; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10; }
+    .active-edit:hover::after { opacity: 1; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; display: none; justify-content: center; align-items: center; }
+    .modal-content { background: #111; width: 100%; max-width: 600px; border-radius: 10px; border: 1px solid #333; display: flex; flex-direction: column; }
   </style>
 </head>
 <body class="w-full overflow-x-hidden">
   <div class="grain" aria-hidden="true"></div>
   
+  <!-- ADMIN TOOLBAR -->
+  <div class="admin-toolbar" id="adminToolbar">
+      <h1 style="margin: 0; font-size: 1.2em; color: white;">One Circle <span style="font-size: 0.8em; color: #888; font-weight: normal;">Music Editor</span></h1>
+      <div style="display: flex; gap: 20px; align-items: center;">
+          <div style="color: white; font-weight: bold; font-size: 0.9em; border-right: 1px solid #333; padding-right: 20px;">Edit Mode ON</div>
+          <button class="admin-btn" onclick="publishProjectsToGitHub()">Publish Music Page</button>
+      </div>
+  </div>
+
   <!-- UNIFIED NAVIGATION -->
   <header class="top-nav sticky top-0 z-50 border-b border-white/10">
    <nav class="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-4 md:px-8">
-     <a href="index.html" class="text-sm font-bold tracking-[0.24em] text-[#f5efe5] hover:text-[#d8a64d] transition uppercase">ONE CIRCLE</a>
+     <a href="index.html" id="backLink" class="text-sm font-bold tracking-[0.24em] text-[#f5efe5] hover:text-[#d8a64d] transition uppercase">ONE CIRCLE</a>
      
      <div class="flex items-center gap-4 md:gap-8">
         <div class="hidden items-center gap-6 text-xs font-semibold uppercase tracking-[0.16em] text-stone-300 md:flex">
@@ -74,7 +96,9 @@
     <div class="hero-image absolute inset-0">
         <img id="heroImg" loading="lazy" class="h-full w-full object-cover" src="" alt="Live Worship">
     </div>
-    <div class="relative z-10 mx-auto w-full max-w-7xl">
+    
+    <!-- EDITABLE HERO ZONE -->
+    <div class="relative z-10 mx-auto w-full max-w-7xl projects-editable p-4 rounded-xl" id="heroEditZone">
      <p class="eyebrow mb-5 text-[#d8a64d]">Originals · Covers · Live Sessions</p>
      <h1 id="heroTitle" class="serif hero-copy max-w-4xl text-5xl font-semibold leading-[.95] text-[#f5efe5] md:text-7xl lg:text-8xl">Loading...</h1>
      <p id="heroDesc" class="hero-copy mt-7 max-w-xl text-base leading-relaxed text-[#e7e0d6] md:text-lg"></p>
@@ -101,7 +125,9 @@
       <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
       <p id="featType" class="eyebrow absolute bottom-6 left-6 text-[#f5efe5]"></p>
      </div>
-     <div class="flex flex-col justify-between p-7 md:p-10">
+     
+     <!-- EDITABLE FEATURED ZONE -->
+     <div class="flex flex-col justify-between p-7 md:p-10 projects-editable" id="featEditZone">
       <div>
        <p class="eyebrow mb-4 text-[#d8a64d]">OUT NOW</p>
        <h3 id="featTitle" class="serif text-4xl font-semibold leading-tight text-[#f5efe5] md:text-5xl"></h3>
@@ -158,8 +184,40 @@
    <p class="text-sm text-[#8e887f]">© 2026 One Circle. Raising a sound that honors God.</p>
   </footer>
 
+  <!-- PROJECTS EDIT MODAL -->
+  <div class="modal-overlay" id="projectsModal">
+      <div class="modal-content">
+          <div style="padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between;">
+              <h2 style="margin: 0; color: var(--gold); font-family: 'DM Sans', sans-serif;">Edit Music Content</h2>
+              <button onclick="closeProjectsModal()" style="background: none; border: none; color: #888; font-size: 1.5em; cursor: pointer;">&times;</button>
+          </div>
+          <div style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+              <h3 style="color: #fff; font-size: 1.1em; margin-bottom: 10px; font-weight: bold;">Hero Section</h3>
+              <label style="color: #ccc; display: block; margin-bottom: 5px; font-size: 0.85em;">Main Title</label>
+              <input type="text" id="editHeroTitle" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; box-sizing: border-box; border-radius: 6px;">
+              <label style="color: #ccc; display: block; margin-bottom: 5px; font-size: 0.85em;">Hero Description</label>
+              <textarea id="editHeroDesc" rows="3" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 25px; box-sizing: border-box; border-radius: 6px;"></textarea>
+              
+              <h3 style="color: #fff; font-size: 1.1em; margin-bottom: 10px; font-weight: bold; border-top: 1px solid #333; padding-top: 20px;">Featured Release</h3>
+              <label style="color: #ccc; display: block; margin-bottom: 5px; font-size: 0.85em;">Release Title</label>
+              <input type="text" id="editFeatTitle" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; box-sizing: border-box; border-radius: 6px;">
+              <label style="color: #ccc; display: block; margin-bottom: 5px; font-size: 0.85em;">Release Type (e.g. New original EP)</label>
+              <input type="text" id="editFeatType" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; box-sizing: border-box; border-radius: 6px;">
+              <label style="color: #ccc; display: block; margin-bottom: 5px; font-size: 0.85em;">Description</label>
+              <textarea id="editFeatDesc" rows="3" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 10px; box-sizing: border-box; border-radius: 6px;"></textarea>
+          </div>
+          <div style="padding: 20px; border-top: 1px solid #333; display: flex; justify-content: flex-end; gap: 10px;">
+              <button onclick="closeProjectsModal()" style="background: #333; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Cancel</button>
+              <button onclick="saveProjectsModal()" class="admin-btn">Apply Changes</button>
+          </div>
+      </div>
+  </div>
+
   <script>
     lucide.createIcons();
+
+    let globalProjectsData = null;
+    let isAdmin = sessionStorage.getItem('oneCircleAdmin') === 'true';
 
     function formatImgPath(path) {
         if (!path) return '';
@@ -169,73 +227,163 @@
     fetch('projects.json')
         .then(res => res.json())
         .then(data => {
-            // Hero
-            document.getElementById('heroTitle').textContent = data.hero.title;
-            document.getElementById('heroDesc').textContent = data.hero.description;
-            document.getElementById('heroImg').src = formatImgPath(data.hero.image);
-            document.getElementById('heroSpotify').href = data.hero.spotify_url;
-            document.getElementById('heroApple').href = data.hero.apple_url;
-            document.getElementById('heroYoutube').href = data.hero.youtube_url;
-            document.getElementById('footerSpotify').href = data.hero.spotify_url;
+            globalProjectsData = data;
+            renderProjectsPage(data);
 
-            // Featured Release
-            document.getElementById('featTitle').textContent = data.featured_release.title;
-            document.getElementById('featDesc').textContent = data.featured_release.description;
-            document.getElementById('featType').textContent = data.featured_release.type;
-            document.getElementById('featImg').src = formatImgPath(data.featured_release.image);
-            document.getElementById('featSpotify').href = data.featured_release.spotify_url;
-            document.getElementById('featApple').href = data.featured_release.apple_url;
-
-            // Tracks
-            const tracksContainer = document.getElementById('tracksContainer');
-            tracksContainer.innerHTML = data.tracks.map(track => `
-                <article class="track-row grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl px-2 py-4 md:grid-cols-[auto_1fr_auto_auto] md:gap-6">
-                    <img loading="lazy" class="h-14 w-14 rounded-lg object-cover" src="${formatImgPath(track.image)}" alt="${track.title}">
-                    <div>
-                        <h3 class="font-bold text-[#f5efe5] text-[17px]">${track.title}</h3>
-                        <p class="mt-1 text-sm text-[#aaa398]">${track.meta}</p>
-                    </div>
-                    <span class="hidden text-sm text-[#aaa398] md:block">${track.duration}</span> 
-                    <button type="button" class="preview-button inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-500 text-stone-100 transition hover:border-amber-300 hover:text-amber-300" data-tone="${track.tone}">
-                        <i data-lucide="play" class="h-4 w-4"></i>
-                    </button>
-                </article>
-            `).join('');
-
-            // Videos
-            const videosContainer = document.getElementById('videosContainer');
-            videosContainer.innerHTML = data.videos.map(video => `
-                <article class="video-card overflow-hidden rounded-2xl bg-[#211c18]">
-                    <div class="relative aspect-video overflow-hidden">
-                        <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(video.image)}" alt="${video.title}">
-                        <span class="absolute bottom-4 left-4 grid h-11 w-11 place-items-center rounded-full bg-amber-300 text-black">
-                            <i data-lucide="play" class="h-4 w-4 fill-current"></i>
-                        </span>
-                    </div>
-                    <div class="p-5">
-                        <p class="eyebrow text-[#d8a64d]">${video.type}</p>
-                        <h3 class="mt-2 text-xl font-bold text-[#f5efe5]">${video.title}</h3>
-                        <a href="${video.url}" target="_blank" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#f5efe5] hover:text-[#d8a64d] transition">Watch on YouTube</a>
-                    </div>
-                </article>
-            `).join('');
-
-            // Moments
-            const momentsContainer = document.getElementById('momentsContainer');
-            momentsContainer.innerHTML = data.moments.map((img, index) => {
-                let spanClass = "";
-                if (index === 0) spanClass = "col-span-2 row-span-2";
-                if (index === 3) spanClass = "col-span-2";
-                return `
-                <figure class="moment-card ${spanClass} overflow-hidden rounded-2xl">
-                    <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(img)}" alt="One Circle Moment">
-                </figure>`;
-            }).join('');
-
-            lucide.createIcons();
-            bindAudioPlayers();
+            if (isAdmin) {
+                document.getElementById('adminToolbar').style.display = 'flex';
+                document.getElementById('backLink').href = 'admin/index.html';
+                document.getElementById('backLink').textContent = '← Back to Admin Panel';
+                
+                const editZones = document.querySelectorAll('.projects-editable');
+                editZones.forEach(zone => {
+                    zone.classList.add('active-edit');
+                    zone.addEventListener('click', openProjectsModal);
+                });
+            }
         })
         .catch(err => console.error("Error loading projects data:", err));
+
+    function renderProjectsPage(data) {
+        // Hero
+        document.getElementById('heroTitle').textContent = data.hero.title;
+        document.getElementById('heroDesc').textContent = data.hero.description;
+        document.getElementById('heroImg').src = formatImgPath(data.hero.image);
+        document.getElementById('heroSpotify').href = data.hero.spotify_url;
+        document.getElementById('heroApple').href = data.hero.apple_url;
+        document.getElementById('heroYoutube').href = data.hero.youtube_url;
+        document.getElementById('footerSpotify').href = data.hero.spotify_url;
+
+        // Featured Release
+        document.getElementById('featTitle').textContent = data.featured_release.title;
+        document.getElementById('featDesc').textContent = data.featured_release.description;
+        document.getElementById('featType').textContent = data.featured_release.type;
+        document.getElementById('featImg').src = formatImgPath(data.featured_release.image);
+        document.getElementById('featSpotify').href = data.featured_release.spotify_url;
+        document.getElementById('featApple').href = data.featured_release.apple_url;
+
+        // Tracks
+        const tracksContainer = document.getElementById('tracksContainer');
+        tracksContainer.innerHTML = data.tracks.map(track => `
+            <article class="track-row grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl px-2 py-4 md:grid-cols-[auto_1fr_auto_auto] md:gap-6">
+                <img loading="lazy" class="h-14 w-14 rounded-lg object-cover" src="${formatImgPath(track.image)}" alt="${track.title}">
+                <div>
+                    <h3 class="font-bold text-[#f5efe5] text-[17px]">${track.title}</h3>
+                    <p class="mt-1 text-sm text-[#aaa398]">${track.meta}</p>
+                </div>
+                <span class="hidden text-sm text-[#aaa398] md:block">${track.duration}</span> 
+                <button type="button" class="preview-button inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-500 text-stone-100 transition hover:border-amber-300 hover:text-amber-300" data-tone="${track.tone}">
+                    <i data-lucide="play" class="h-4 w-4"></i>
+                </button>
+            </article>
+        `).join('');
+
+        // Videos
+        const videosContainer = document.getElementById('videosContainer');
+        videosContainer.innerHTML = data.videos.map(video => `
+            <article class="video-card overflow-hidden rounded-2xl bg-[#211c18]">
+                <div class="relative aspect-video overflow-hidden">
+                    <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(video.image)}" alt="${video.title}">
+                    <a href="${video.url}" target="_blank" class="absolute bottom-4 left-4 grid h-11 w-11 place-items-center rounded-full bg-amber-300 text-black hover:scale-110 transition">
+                        <i data-lucide="play" class="h-4 w-4 fill-current"></i>
+                    </a>
+                </div>
+                <div class="p-5">
+                    <p class="eyebrow text-[#d8a64d]">${video.type}</p>
+                    <h3 class="mt-2 text-xl font-bold text-[#f5efe5]">${video.title}</h3>
+                    <a href="${video.url}" target="_blank" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#f5efe5] hover:text-[#d8a64d] transition">Watch on YouTube</a>
+                </div>
+            </article>
+        `).join('');
+
+        // Moments
+        const momentsContainer = document.getElementById('momentsContainer');
+        momentsContainer.innerHTML = data.moments.map((img, index) => {
+            let spanClass = "";
+            if (index === 0) spanClass = "col-span-2 row-span-2";
+            if (index === 3) spanClass = "col-span-2";
+            return `
+            <figure class="moment-card ${spanClass} overflow-hidden rounded-2xl">
+                <img loading="lazy" class="image-zoom h-full w-full object-cover" src="${formatImgPath(img)}" alt="One Circle Moment">
+            </figure>`;
+        }).join('');
+
+        lucide.createIcons();
+        bindAudioPlayers();
+    }
+
+    // ==========================================
+    // MODAL & GITHUB SAVING LOGIC
+    // ==========================================
+    function openProjectsModal(e) {
+        if (!isAdmin) return;
+        
+        // Prevent click from bubbling up if clicking inside the zone but not on the container itself
+        if (e && typeof e.stopPropagation === 'function') {
+            e.stopPropagation();
+        }
+
+        document.getElementById('editHeroTitle').value = globalProjectsData.hero.title;
+        document.getElementById('editHeroDesc').value = globalProjectsData.hero.description;
+        document.getElementById('editFeatTitle').value = globalProjectsData.featured_release.title;
+        document.getElementById('editFeatType').value = globalProjectsData.featured_release.type;
+        document.getElementById('editFeatDesc').value = globalProjectsData.featured_release.description;
+        
+        document.getElementById('projectsModal').style.display = 'flex';
+    }
+
+    function closeProjectsModal() {
+        document.getElementById('projectsModal').style.display = 'none';
+    }
+
+    function saveProjectsModal() {
+        globalProjectsData.hero.title = document.getElementById('editHeroTitle').value;
+        globalProjectsData.hero.description = document.getElementById('editHeroDesc').value;
+        globalProjectsData.featured_release.title = document.getElementById('editFeatTitle').value;
+        globalProjectsData.featured_release.type = document.getElementById('editFeatType').value;
+        globalProjectsData.featured_release.description = document.getElementById('editFeatDesc').value;
+        
+        renderProjectsPage(globalProjectsData);
+        closeProjectsModal();
+    }
+
+    async function publishProjectsToGitHub() {
+        const token = prompt("Enter your GitHub Personal Access Token to publish Music page updates:");
+        if (!token) return;
+
+        const repoOwner = "michaelgriffinsk-wq";
+        const repoName = "https-github.com-one_circle";
+        const branch = "About-json-branch"; // Keeping the same branch for consistency
+        const path = "projects.json"; 
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
+
+        try {
+            const getResponse = await fetch(`${apiUrl}?ref=${branch}`, {
+                headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
+            });
+            if (!getResponse.ok) throw new Error("Could not fetch current file SHA.");
+            const currentSha = (await getResponse.json()).sha;
+
+            const updatedContent = JSON.stringify(globalProjectsData, null, 2);
+            const base64Content = btoa(unescape(encodeURIComponent(updatedContent)));
+
+            const putResponse = await fetch(apiUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: "Update Music page content via custom Admin UI", content: base64Content, sha: currentSha, branch: branch
+                })
+            });
+
+            if (putResponse.ok) alert("Success! Music page changes have been published to GitHub.");
+            else alert("Failed to publish: " + (await putResponse.json()).message);
+        } catch (error) {
+            console.error("Error publishing:", error);
+            alert("An error occurred. Check the browser console.");
+        }
+    }
 
     // Audio Logic
     function bindAudioPlayers() {
@@ -251,14 +399,19 @@
         }
 
         document.querySelectorAll(".preview-button").forEach((button) => {
-            button.addEventListener("click", () => {
-                if (activeButton === button) { stopPreview(); return; }
+            // Remove old listeners to prevent duplicates if re-rendered
+            const newBtn = button.cloneNode(true);
+            button.parentNode.replaceChild(newBtn, button);
+            
+            newBtn.addEventListener("click", (e) => {
+                e.stopPropagation(); // Prevent row click if added later
+                if (activeButton === newBtn) { stopPreview(); return; }
                 stopPreview();
                 audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gain = audioContext.createGain();
                 oscillator.type = "sine";
-                oscillator.frequency.value = Number(button.dataset.tone);
+                oscillator.frequency.value = Number(newBtn.dataset.tone);
                 gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.08, audioContext.currentTime + 0.04);
                 gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 2.8);
@@ -266,8 +419,8 @@
                 oscillator.start();
                 oscillator.stop(audioContext.currentTime + 2.85);
                 activeOscillator = oscillator;
-                activeButton = button;
-                button.classList.add("preview-active");
+                activeButton = newBtn;
+                newBtn.classList.add("preview-active");
                 document.getElementById("preview-status").textContent = "Preview playing — tap again to stop.";
                 oscillator.onended = stopPreview;
             });
