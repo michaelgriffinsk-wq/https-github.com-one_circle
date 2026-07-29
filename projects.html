@@ -318,7 +318,6 @@
     function openProjectsModal(e) {
         if (!isAdmin) return;
         
-        // Prevent click from bubbling up if clicking inside the zone but not on the container itself
         if (e && typeof e.stopPropagation === 'function') {
             e.stopPropagation();
         }
@@ -353,7 +352,7 @@
 
         const repoOwner = "michaelgriffinsk-wq";
         const repoName = "https-github.com-one_circle";
-        const branch = "About-json-branch"; // Keeping the same branch for consistency
+        const branch = "About-json-branch";
         const path = "projects.json"; 
         const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
 
@@ -385,7 +384,7 @@
         }
     }
 
-    // Audio Logic
+    // Audio Logic integrated with Global Persistent Player
     function bindAudioPlayers() {
         let audioContext;
         let activeOscillator = null;
@@ -398,15 +397,32 @@
             document.getElementById("preview-status").textContent = "";
         }
 
-        document.querySelectorAll(".preview-button").forEach((button) => {
-            // Remove old listeners to prevent duplicates if re-rendered
+        document.querySelectorAll(".preview-button").forEach((button, index) => {
             const newBtn = button.cloneNode(true);
             button.parentNode.replaceChild(newBtn, button);
             
             newBtn.addEventListener("click", (e) => {
-                e.stopPropagation(); // Prevent row click if added later
+                e.stopPropagation(); 
+                
+                const trackRow = newBtn.closest('article');
+                const title = trackRow.querySelector('h3').textContent;
+                const meta = trackRow.querySelector('p').textContent;
+                const img = trackRow.querySelector('img').src;
+
+                const trackData = {
+                    title: title,
+                    artist: meta || "One Circle",
+                    image: img,
+                    audioUrl: "" 
+                };
+
+                if (window.globalPlayer) {
+                    window.globalPlayer.playTrack(trackData, globalProjectsData.tracks, index);
+                }
+
                 if (activeButton === newBtn) { stopPreview(); return; }
                 stopPreview();
+                
                 audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gain = audioContext.createGain();
@@ -427,9 +443,7 @@
         });
     }
   </script>
-  <script 
-        src="player.js">   
-  </script>
+  <script src="player.js"></script>
 </body>
 </html>
 
