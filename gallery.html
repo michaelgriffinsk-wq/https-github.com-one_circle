@@ -116,7 +116,7 @@
         
         <div class="lightbox-content" id="lightboxContent">
             <img id="lightboxImg" style="display: none;" alt="Gallery Image">
-            <video id="lightboxVideo" controls style="display: none;"></video>
+            <video id="lightboxVideo" controls playsinline preload="auto" style="display: none;"></video>
         </div>
         
         <button class="nav-btn next-btn" onclick="changeMedia(1)">&#10095;</button>
@@ -144,7 +144,6 @@
                         throw new Error("Season not found in database.");
                     }
 
-                    // Update Header to match About.html theme
                     document.title = `One Circle | Season ${seasonData.seasonNumber} Gallery`;
                     const dynamicHeader = document.getElementById('dynamicHeader');
                     if (dynamicHeader) {
@@ -165,18 +164,18 @@
                     const lightboxVideo = document.getElementById('lightboxVideo');
 
                     let mediaList = [];
-                    let currentIndex = 0;
 
                     for (let i = 1; i <= maxImagesToCheck; i++) {
-                        mediaList.push({ type: 'image', src: `${folderName}/${filePrefix} (${i}).jpg`, valid: true });
+                        mediaList.push({ type: 'image', src: `${folderName}/${filePrefix} (${i}).jpg` });
                     }
                     for (let i = 1; i <= maxVideosToCheck; i++) {
-                        mediaList.push({ type: 'video', src: `${folderName}/${filePrefix} (${i}).mp4`, valid: true });
+                        mediaList.push({ type: 'video', src: `${folderName}/${filePrefix} (${i}).mp4` });
                     }
 
                     if (galleryGrid) {
                         galleryGrid.innerHTML = '';
-                        mediaList.forEach((media, index) => {
+                        
+                        mediaList.forEach((media) => {
                             const wrapper = document.createElement('div');
                             wrapper.className = 'media-wrapper relative rounded-xl overflow-hidden bg-[#151d2e] cursor-pointer group shadow-lg';
 
@@ -185,22 +184,17 @@
                                 img.src = media.src;
                                 img.loading = "lazy";
                                 img.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105";
-                                
-                                img.onerror = () => {
-                                    wrapper.style.display = 'none';
-                                    media.valid = false;
-                                };
+                                img.onerror = () => wrapper.remove();
                                 wrapper.appendChild(img);
                                 
                             } else if (media.type === 'video') {
                                 const vid = document.createElement('video');
-                                vid.preload = "auto";
-                                vid.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105";
+                                vid.preload = "metadata";
+                                vid.muted = true;
+                                vid.playsInline = true;
+                                vid.className = "w-full h-auto block transition-transform duration-500 group-hover:scale-105 pointer-events-none";
                                 
-                                vid.onerror = () => {
-                                    wrapper.style.display = 'none';
-                                    media.valid = false;
-                                };
+                                vid.onerror = () => wrapper.remove();
                                 vid.src = media.src;
 
                                 const icon = document.createElement('div');
@@ -216,7 +210,9 @@
                             wrapper.appendChild(overlay);
 
                             wrapper.onclick = () => {
-                                if (media.valid) window.openLightbox(index);
+                                const validItems = Array.from(galleryGrid.querySelectorAll('.media-wrapper'));
+                                const activeIndex = validItems.indexOf(wrapper);
+                                if (activeIndex > -1) window.openLightbox(activeIndex);
                             };
 
                             galleryGrid.appendChild(wrapper);
@@ -224,8 +220,41 @@
                     }
 
                     window.openLightbox = function(index) {
-                        currentIndex = index;
-                        updateLightbox();
+                        const validWrappers = Array.from(galleryGrid.querySelectorAll('.media-wrapper'));
+                        const activeMediaList = validWrappers.map(wrap => {
+                            const img = wrap.querySelector('img');
+                            const vid = wrap.querySelector('video');
+                            return img ? { type: 'image', src: img.src } : { type: 'video', src: vid.src };
+                        });
+
+                        let currentIndex = index;
+                        
+                        function updateLightboxContent() {
+                            const current = activeMediaList[currentIndex];
+                            if (lightboxVideo) { lightboxVideo.pause(); lightboxVideo.currentTime = 0; }
+
+                            if (current.type === 'image') {
+                                if (lightboxImg) { lightboxImg.src = current.src; lightboxImg.style.display = 'block'; }
+                                if (lightboxVideo) lightboxVideo.style.display = 'none';
+                            } else {
+                                if (lightboxVideo) { 
+                                    lightboxVideo.src = current.src; 
+                                    lightboxVideo.style.display = 'block';
+                                    lightboxVideo.load();
+                                    lightboxVideo.play().catch(e => console.log("Auto-play prevented or stream loading:", e));
+                                }
+                                if (lightboxImg) lightboxImg.style.display = 'none';
+                            }
+                        }
+
+                        window.changeMedia = function(direction) {
+                            currentIndex += direction;
+                            if (currentIndex >= activeMediaList.length) currentIndex = 0;
+                            if (currentIndex < 0) currentIndex = activeMediaList.length - 1;
+                            updateLightboxContent();
+                        };
+
+                        updateLightboxContent();
                         if (lightbox) lightbox.style.display = 'block';
                         document.body.style.overflow = 'hidden'; 
                     };
@@ -233,44 +262,11 @@
                     window.closeLightbox = function() {
                         if (lightbox) lightbox.style.display = 'none';
                         document.body.style.overflow = 'auto';
-                        if (lightboxVideo) lightboxVideo.pause(); 
-                    };
-
-                    window.changeMedia = function(direction) {
-                        let foundValidMedia = false;
-                        let attempts = 0;
-
-                        while (!foundValidMedia && attempts < mediaList.length) {
-                            currentIndex += direction;
-                            if (currentIndex >= mediaList.length) currentIndex = 0;
-                            if (currentIndex < 0) currentIndex = mediaList.length - 1;
-                            if (mediaList[currentIndex].valid) foundValidMedia = true;
-                            attempts++;
-                        }
-                        if (foundValidMedia) updateLightbox();
-                    };
-
-                    function updateLightbox() {
-                        const media = mediaList[currentIndex];
                         if (lightboxVideo) {
                             lightboxVideo.pause();
                             lightboxVideo.currentTime = 0;
                         }
-
-                        if (media.type === 'image') {
-                            if (lightboxImg) {
-                                lightboxImg.src = media.src;
-                                lightboxImg.style.display = 'block';
-                            }
-                            if (lightboxVideo) lightboxVideo.style.display = 'none';
-                        } else if (media.type === 'video') {
-                            if (lightboxVideo) {
-                                lightboxVideo.src = media.src;
-                                lightboxVideo.style.display = 'block';
-                            }
-                            if (lightboxImg) lightboxImg.style.display = 'none';
-                        }
-                    }
+                    };
 
                     let touchstartX = 0;
                     let touchendX = 0;
@@ -280,8 +276,8 @@
                         lightbox.addEventListener('touchend', e => {
                             touchendX = e.changedTouches[0].screenX;
                             const swipeThreshold = 50; 
-                            if (touchendX < touchstartX - swipeThreshold) window.changeMedia(1); 
-                            if (touchendX > touchstartX + swipeThreshold) window.changeMedia(-1); 
+                            if (touchendX < touchstartX - swipeThreshold && typeof window.changeMedia === 'function') window.changeMedia(1); 
+                            if (touchendX > touchstartX + swipeThreshold && typeof window.changeMedia === 'function') window.changeMedia(-1); 
                         });
 
                         lightbox.addEventListener('click', e => {
@@ -302,4 +298,3 @@
     <script src="player.js"></script>
 </body>
 </html>
-
