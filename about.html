@@ -19,15 +19,19 @@
         .fade-up.delay-2 { transition-delay: 0.2s; } 
         .fade-up.delay-3 { transition-delay: 0.3s; } 
 
-        /* Admin Styles */
+        /* =========================================
+           ADMIN EDIT MODE STYLES
+           ========================================= */
         .admin-toolbar { display: none; background: #111; padding: 15px 25px; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4a853; position: sticky; top: 0; z-index: 9999; }
         .admin-btn { background: #d4a853; color: #111; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .admin-btn:hover { background: #e6c27a; }
+        
         .about-editable { position: relative; transition: all 0.2s; }
         .active-edit { outline: 2px dashed #d4a853; outline-offset: 4px; cursor: pointer; border-radius: 8px; }
         .active-edit:hover { background-color: rgba(212, 168, 83, 0.1); outline: 3px solid #d4a853; }
         .active-edit::after { content: '✎ Click to Edit'; position: absolute; top: 10px; right: 10px; background: #d4a853; color: #111; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10; }
         .active-edit:hover::after { opacity: 1; }
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; display: none; justify-content: center; align-items: center; }
         .modal-content { background: #111; width: 100%; max-width: 600px; border-radius: 10px; border: 1px solid #333; display: flex; flex-direction: column; }
     </style> 
@@ -43,9 +47,9 @@
         </div>
     </div>
 
-    <!-- UNIFIED NAVIGATION -->
+    <!-- NAVIGATION -->
     <nav class="absolute top-0 w-full z-50 p-6 flex justify-between items-center">
-        <a href="index.html" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-lg font-display drop-shadow-md">ONE CIRCLE</a>
+        <a href="index.html" id="backLink" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-lg font-display drop-shadow-md">ONE CIRCLE</a>
         <div class="relative group">
             <button class="flex items-center gap-2 text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-sm px-4 py-2 border border-white/20 rounded-md backdrop-blur-sm bg-black/20">
                 MENU <i data-lucide="menu" class="w-4 h-4"></i>
@@ -58,7 +62,7 @@
         </div>
     </nav>
 
-    <!-- HERO --> 
+    <!-- HERO (Editable Zone) --> 
     <header class="about-editable relative w-full overflow-hidden" id="headerEditZone" style="min-height: 70vh;">
         <img class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/7708458/pexels-photo-7708458.jpeg?auto=compress&cs=tinysrgb&w=1920" alt="Concert stage lights"> 
         <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#0c1220]"></div> 
@@ -70,7 +74,8 @@
     </header> 
 
     <main class="w-full bg-[#0c1220]">
-        <!-- Story Section --> 
+        
+        <!-- STORY SECTION (Editable Zone) --> 
         <section class="max-w-6xl mx-auto px-6 py-20 about-editable" id="storyEditZone"> 
             <div class="grid md:grid-cols-2 gap-12 items-center"> 
                 <div class="fade-up"> 
@@ -83,17 +88,18 @@
             </div> 
         </section>
 
-        <!-- Values --> 
+        <!-- VALUES --> 
         <section class="max-w-5xl mx-auto px-6 py-16"> 
             <h2 class="font-display text-center mb-14 text-white font-bold text-3xl">Our Values</h2> 
             <div id="valuesGrid" class="grid md:grid-cols-3 gap-8"></div> 
         </section>
 
-        <!-- Team --> 
+        <!-- TEAM --> 
         <section class="max-w-6xl mx-auto px-6 py-16"> 
             <h2 class="font-display text-center mb-14 text-white font-bold text-3xl">Meet the Team</h2> 
             <div id="teamGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"></div> 
         </section> 
+
     </main> 
 
     <footer class="w-full text-center py-10 px-6 bg-[#080d18]">
@@ -111,8 +117,10 @@
             <div style="padding: 20px;">
                 <label style="color: #ccc; display: block; margin-bottom: 5px;">Page Title</label>
                 <input type="text" id="editTitle" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; box-sizing: border-box; border-radius: 6px;">
+                
                 <label style="color: #ccc; display: block; margin-bottom: 5px;">Hero Subtitle</label>
                 <input type="text" id="editSubtitle" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; box-sizing: border-box; border-radius: 6px;">
+                
                 <label style="color: #ccc; display: block; margin-bottom: 5px;">Our Story</label>
                 <textarea id="editStory" rows="6" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; font-family: inherit; border-radius: 6px;"></textarea>
             </div>
@@ -123,7 +131,7 @@
         </div>
     </div>
 
-    <!-- LOGIC -->
+    <!-- SCRIPT LOGIC -->
     <script>
         lucide.createIcons();
         let globalAboutData = null;
@@ -141,6 +149,9 @@
                 
                 if (isAdmin) {
                     document.getElementById('adminToolbar').style.display = 'flex';
+                    document.getElementById('backLink').href = 'admin/index.html';
+                    document.getElementById('backLink').textContent = '← Back to Admin Panel';
+                    
                     const editZones = document.querySelectorAll('.about-editable');
                     editZones.forEach(zone => {
                         zone.classList.add('active-edit');
@@ -203,8 +214,9 @@
         }
 
         // Modal Logic
-        function openAboutModal() {
+        function openAboutModal(e) {
             if (!isAdmin) return;
+            if (e && typeof e.stopPropagation === 'function') { e.stopPropagation(); }
             document.getElementById('editTitle').value = globalAboutData.page_title;
             document.getElementById('editSubtitle').value = globalAboutData.hero_subtitle;
             document.getElementById('editStory').value = globalAboutData.story;
