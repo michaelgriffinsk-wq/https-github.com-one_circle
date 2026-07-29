@@ -4,216 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Circle | Official Website</title>
+    
+    <!-- Tailwind CSS, Fonts, and Icons to match the premium theme -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    
     <style>
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #0a0a0a; 
-            color: #fff; 
-            margin: 0; 
-            line-height: 1.6;
+            font-family: 'Alegreya Sans', sans-serif; 
+            background-color: #0c1220; 
+            color: #fff;
         }
+        .font-display { font-family: 'Playfair Display', serif; }
         
-        /* Navigation */
-        nav {
-            background-color: #111;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #cc0000;
-        }
-        nav h2 { margin: 0; color: #fff; letter-spacing: 1px; font-size: 1.2em; }
-        nav .nav-links a { color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em; margin-left: 20px; transition: color 0.2s;}
-        nav .nav-links a:hover { color: #cc0000; }
-        
-        /* Hero Section */
-        header { 
-            text-align: center; 
-            padding: 80px 20px; 
-            background: linear-gradient(180deg, #3a0000 0%, #0a0a0a 100%);
-        }
-        header h1 { margin: 0; font-size: 2.8em; text-transform: uppercase; letter-spacing: 3px; }
-        header p { color: #aaa; font-size: 1.1em; max-width: 600px; margin: 20px auto 0; }
-
-        /* Main Content Container */
-        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        .section-title { font-size: 1.8em; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 30px; }
-
-        /* Upcoming Event Banner */
-        .upcoming-card {
-            background: linear-gradient(45deg, #1a0000 0%, #111 100%);
-            border-left: 4px solid #cc0000;
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.15);
-        }
-        .upcoming-info h3 { margin: 0 0 5px 0; font-size: 1.6em; color: #fff; }
-        .upcoming-info .event-details { color: #cc0000; font-weight: bold; margin: 0 0 10px 0; font-size: 1.1em; }
-        .upcoming-info p { margin: 0; color: #aaa; font-size: 0.95em; max-width: 500px; }
-        
-        @media (max-width: 650px) {
-            .upcoming-card { flex-direction: column; text-align: center; gap: 20px; }
-            .upcoming-card .btn { width: 100%; box-sizing: border-box; text-align: center; }
-        }
-
-        /* Event Grid */
-        .event-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        /* Event Cards */
-        .card {
-            background-color: #151515;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        .card:hover { transform: translateY(-5px); }
-        .card-img { width: 100%; height: 200px; background-color: #222; object-fit: cover; }
-        .card-content { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
-        .card-title { margin: 0 0 10px 0; font-size: 1.3em; color: #cc0000; }
-        
-        /* Lists inside cards */
-        .card-list { padding-left: 20px; color: #ccc; font-size: 0.9em; margin-bottom: 20px; flex-grow: 1;}
-        
-        /* Buttons */
-        .btn {
-            display: inline-block;
-            background-color: #cc0000;
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 0.9em;
-            transition: background 0.2s;
-        }
-        .btn:hover { background-color: #ff1a1a; }
-        .btn.disabled { background-color: #444; color: #888; cursor: not-allowed; pointer-events: none; }
-
-        footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; border-top: 1px solid #222; margin-top: 50px; }
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
     </style>
 </head>
-<body>
+<body class="w-full min-h-screen flex flex-col">
 
-    <nav>
-        <h2>ONE CIRCLE</h2>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="about.html">About</a>
+    <!-- UNIFIED NAVIGATION -->
+    <nav class="absolute top-0 w-full z-50 p-6 flex justify-between items-center">
+        <a href="index.html" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-xl font-display drop-shadow-md">ONE CIRCLE</a>
+        
+        <div class="relative group">
+            <button class="flex items-center gap-2 text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-sm px-4 py-2 border border-white/20 rounded-md backdrop-blur-sm bg-black/20">
+                MENU <i data-lucide="menu" class="w-4 h-4"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-48 bg-[#0c1220]/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right overflow-hidden z-50">
+                <a href="index.html" class="block px-4 py-3 text-sm text-[#d4a853] bg-white/5 font-bold uppercase tracking-wider">Home</a>
+                <a href="about.html" class="block px-4 py-3 text-sm text-white hover:bg-[#d4a853] hover:text-black transition-colors font-bold uppercase tracking-wider border-t border-white/10">About</a>
+                <a href="projects.html" class="block px-4 py-3 text-sm text-white hover:bg-[#d4a853] hover:text-black transition-colors font-bold uppercase tracking-wider border-t border-white/10">Music</a>
+            </div>
         </div>
     </nav>
 
-    <header>
-        <h1>Welcome to One Circle</h1>
-        <p>A community of worship, music, and fellowship. Explore our past seasons and listen to our lists.</p>
+    <!-- HERO SECTION -->
+    <header class="relative w-full overflow-hidden min-h-[60vh] flex items-center justify-center text-center px-6">
+        <!-- Replace this URL with a wide shot of your team or live event -->
+        <img class="absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/12044265/pexels-photo-12044265.jpeg" alt="Live Worship">
+        <div class="absolute inset-0 bg-gradient-to-b from-[#0c1220]/80 via-[#0c1220]/60 to-[#0c1220]"></div>
+        
+        <div class="relative z-10 mt-16 max-w-3xl">
+            <p class="uppercase tracking-[0.3em] text-sm mb-4 text-[#d4a853] font-bold">A Worship Experience</p>
+            <h1 class="font-display font-black text-5xl md:text-7xl mb-6 drop-shadow-xl text-white">Welcome to One Circle</h1>
+            <p class="text-xl text-[#b8c4d6] leading-relaxed font-medium">A community of worship, music, and fellowship. Explore our past seasons and listen to our live lists.</p>
+        </div>
     </header>
 
-    <div class="container">
+    <!-- MAIN CONTENT -->
+    <main class="w-full flex-grow max-w-7xl mx-auto px-6 py-12">
         
         <!-- UPCOMING EVENT SECTION (Injected by JS) -->
-        <div id="upcomingContainer"></div>
+        <div id="upcomingContainer" class="mb-16"></div>
 
         <!-- PAST EVENTS SECTION -->
-        <h2 class="section-title">Past Events</h2>
-        <div class="event-grid" id="pastGrid">
+        <div class="flex items-center gap-4 mb-10">
+            <h2 class="font-display text-3xl md:text-4xl text-white font-bold">Past Seasons</h2>
+            <div class="flex-grow h-px bg-gradient-to-r from-[#d4a853]/50 to-transparent"></div>
+        </div>
+        
+        <!-- Event Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="pastGrid">
             <!-- Cards Injected by JS -->
         </div>
 
-    </div>
+    </main>
 
-    <footer>
-        <p>&copy; 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
+    <!-- FOOTER -->
+    <footer class="w-full text-center py-10 px-6 bg-[#080d18] mt-12 border-t border-white/5">
+        <p class="text-[#64748b] text-sm">© 2026 One Circle. Maintained by Kebaso Michael Griffins.</p>
     </footer>
 
     <script>
+        // Initialize static icons
+        lucide.createIcons();
+
         const upcomingContainer = document.getElementById('upcomingContainer');
         const pastGrid = document.getElementById('pastGrid');
 
-        // Fetch the data from the new JSON file instead of the static JS file
+        // Helper to fix Decap CMS leading slashes on GitHub Pages
+        function formatImgPath(path) {
+            if (!path) return '';
+            return path.startsWith('/') ? path.substring(1) : path;
+        }
+
         fetch('database.json')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
+                if (!response.ok) throw new Error('Network response was not ok ' + response.statusText);
                 return response.json();
             })
             .then(siteDatabase => {
-                // Loop through the siteDatabase array and build the HTML for each season
                 siteDatabase.seasons.forEach(season => {
                     
-                    // 1. If it is an upcoming event, build the banner
+                    // 1. UPCOMING BANNER
                     if (season.status === 'upcoming') {
                         upcomingContainer.innerHTML = `
-                            <h2 class="section-title">Next Event</h2>
-                            <div class="upcoming-card">
-                                <div class="upcoming-info">
-                                    <h3>${season.title}</h3>
-                                    <p class="event-details">套 ${season.date} &nbsp;|&nbsp; 桃 ${season.location}</p>
-                                    <p>${season.description}</p>
+                            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#151d2e] to-[#080d18] border border-[#d4a853]/30 p-8 md:p-12 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 group">
+                                <div class="absolute inset-0 bg-[#d4a853]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div class="relative z-10 w-full md:w-2/3 text-center md:text-left">
+                                    <p class="uppercase tracking-[0.2em] text-[#d4a853] text-sm font-bold mb-2">Next Event</p>
+                                    <h3 class="font-display text-3xl md:text-4xl text-white mb-4">${season.title || 'Title TBA'}</h3>
+                                    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8 text-[#b8c4d6] font-bold text-lg mb-4">
+                                        <span class="flex items-center gap-2"><i data-lucide="calendar" class="w-5 h-5 text-[#d4a853]"></i> ${season.date || 'TBD'}</span>
+                                        <span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-[#d4a853]"></i> ${season.location || 'TBD'}</span>
+                                    </div>
+                                    <p class="text-[#94a3b8] max-w-xl mx-auto md:mx-0">${season.description || ''}</p>
                                 </div>
-                                <div class="upcoming-action">
-                                    <a href="#" class="btn disabled">More Info Soon</a>
+                                <div class="relative z-10 flex-shrink-0">
+                                    <span class="inline-block bg-[#111] text-gray-500 border border-gray-700 px-8 py-4 rounded-full font-bold uppercase tracking-wider cursor-not-allowed shadow-inner">More Info Soon</span>
                                 </div>
                             </div>
                         `;
                     } 
                     
-                    // 2. If it is a past event, build the card
+                    // 2. PAST EVENT CARDS
                     else if (season.status === 'past') {
                         
-                        // Convert the highlights array into HTML list items
+                        // Safety check for highlights
                         let highlightsHTML = '';
-                        season.highlights.forEach(item => {
-                            highlightsHTML += `<li>${item}</li>`;
-                        });
+                        if (season.highlights && Array.isArray(season.highlights)) {
+                            season.highlights.forEach(item => {
+                                highlightsHTML += `<li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 mt-1 text-[#d4a853] flex-shrink-0"></i> <span>${item}</span></li>`;
+                            });
+                        }
 
-                        // Decide how to display the image (show poster or placeholder)
-                        const imageHTML = season.posterImg 
-                            ? `<img src="${season.posterImg}" alt="${season.title} Poster" class="card-img">`
-                            : `<div class="card-img" style="display: flex; align-items: center; justify-content: center; color: #555;">Image Placeholder</div>`;
+                        // Image formatting
+                        const imgPath = formatImgPath(season.posterImg);
+                        const imageHTML = imgPath 
+                            ? `<img src="${imgPath}" alt="${season.title} Poster" class="w-full h-full object-cover transition duration-700 group-hover:scale-105 group-hover:opacity-80">`
+                            : `<div class="w-full h-full flex items-center justify-center text-gray-600 font-bold uppercase tracking-widest bg-[#080d18]">No Image</div>`;
 
-                        // Logic for the buttons: Only show them if media actually exists in the database
+                        // Interactive Buttons Logic
                         let buttonsHTML = '';
                         const hasAudio = season.tracklist && season.tracklist.length > 0;
                         const hasGallery = season.gallery && (season.gallery.maxImages > 0 || season.gallery.maxVideos > 0);
                         const hasYouTube = season.youtubeLink && season.youtubeLink !== "";
 
                         if (hasAudio || hasGallery || hasYouTube) {
-                            buttonsHTML += `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">`;
-                            
-                            if (hasAudio) {
-                                buttonsHTML += `<a href="playlist.html?season=${season.seasonNumber}" class="btn">Listen 而</a>`;
-                            }
-                            if (hasYouTube) {
-                                buttonsHTML += `<a href="${season.youtubeLink}" target="_blank" class="btn" style="background-color: #cc0000;">Watch 銅</a>`;
-                            }
-                            if (hasGallery) {
-                                buttonsHTML += `<a href="gallery.html?season=${season.seasonNumber}" class="btn" style="background-color: #333;">Gallery 胴</a>`;
-                            }
-                            
+                            buttonsHTML += `<div class="flex flex-wrap gap-2 mt-auto pt-4 border-t border-white/10">`;
+                            if (hasAudio) buttonsHTML += `<a href="playlist.html?season=${season.seasonNumber}" class="flex-1 text-center bg-[#d4a853] text-[#0c1220] px-4 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition hover:bg-white flex items-center justify-center gap-1.5"><i data-lucide="headphones" class="w-4 h-4"></i> Listen</a>`;
+                            if (hasYouTube) buttonsHTML += `<a href="${season.youtubeLink}" target="_blank" class="flex-1 text-center bg-[#cc0000] text-white px-4 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition hover:bg-red-700 flex items-center justify-center gap-1.5"><i data-lucide="youtube" class="w-4 h-4"></i> Watch</a>`;
+                            if (hasGallery) buttonsHTML += `<a href="gallery.html?season=${season.seasonNumber}" class="flex-1 text-center bg-[#2a364f] text-white px-4 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition hover:bg-[#3b4b6b] flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> Gallery</a>`;
                             buttonsHTML += `</div>`;
                         } else {
-                            buttonsHTML = `<div style="margin-top: 10px;"><a href="#" class="btn disabled">Media Coming Soon</a></div>`;
+                            buttonsHTML = `<div class="mt-auto pt-4 border-t border-white/10"><span class="block text-center bg-black/40 text-gray-500 px-4 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider border border-white/5">Media Coming Soon</span></div>`;
                         }
                         
-                        // Inject the assembled card into the grid
+                        // Inject Card
                         pastGrid.innerHTML += `
-                            <div class="card">
-                                ${imageHTML}
-                                <div class="card-content">
-                                    <h3 class="card-title">${season.title}</h3>
-                                    <p style="font-size: 0.85em; color: #888; margin-top: 0;">${season.date}</p>
-                                    <ul class="card-list">
+                            <div class="bg-[#151d2e] rounded-2xl overflow-hidden shadow-xl group flex flex-col border border-white/5 transition duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#d4a853]/20 hover:border-[#d4a853]/30">
+                                <div class="relative aspect-[4/3] overflow-hidden bg-black/50">
+                                    ${imageHTML}
+                                    <div class="absolute top-4 right-4 bg-black/70 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-1.5">
+                                        <i data-lucide="history" class="w-3 h-3 text-[#d4a853]"></i> Season ${season.seasonNumber}
+                                    </div>
+                                </div>
+                                <div class="p-6 flex flex-col flex-grow">
+                                    <h3 class="font-display text-2xl text-white mb-1 group-hover:text-[#d4a853] transition-colors">${season.title}</h3>
+                                    <p class="text-[#8897ae] text-sm font-bold uppercase tracking-wider mb-5 flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4"></i> ${season.date || ''}</p>
+                                    <ul class="text-[#94a3b8] text-sm mb-6 flex-grow space-y-2">
                                         ${highlightsHTML}
                                     </ul>
                                     ${buttonsHTML}
@@ -222,11 +173,15 @@
                         `;
                     }
                 });
+                
+                // Render dynamically injected icons
+                lucide.createIcons();
             })
             .catch(error => {
                 console.error("Error loading the database:", error);
-                pastGrid.innerHTML = `<p style="color: red;">Failed to load events. Please ensure database.json exists and is formatted correctly.</p>`;
+                pastGrid.innerHTML = `<p class="col-span-full text-center text-red-500 font-bold bg-red-500/10 p-6 rounded-lg border border-red-500/20">Failed to load events. Please ensure database.json exists and is formatted correctly.</p>`;
             });
     </script>
 </body>
 </html>
+
