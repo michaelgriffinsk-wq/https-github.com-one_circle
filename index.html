@@ -19,10 +19,10 @@
         html { scroll-behavior: smooth; }
 
         /* =========================================
-           ADMIN EDIT MODE STYLES
+           ADMIN EDIT MODE STYLES (Matching Gold/Blue Theme)
            ========================================= */
         .admin-toolbar { display: none; background: #111; padding: 15px 25px; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4a853; position: sticky; top: 0; z-index: 9999; }
-        .admin-btn { background: #d4a853; color: #111; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .admin-btn { background: #d4a853; color: #111; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; text-decoration: none; }
         .admin-btn:hover { background: #e6c27a; }
         
         .index-editable { position: relative; transition: all 0.2s; }
@@ -34,16 +34,16 @@
 </head>
 <body class="w-full min-h-screen flex flex-col">
 
-    <!-- ADMIN TOOLBAR -->
+    <!-- ADMIN TOOLBAR (Matches About and Music Pages) -->
     <div class="admin-toolbar" id="adminToolbar">
         <h1 style="margin: 0; font-size: 1.2em; color: white;">One Circle <span style="font-size: 0.8em; color: #888; font-weight: normal;">Home & Events Editor</span></h1>
         <div style="display: flex; gap: 20px; align-items: center;">
             <div style="color: white; font-weight: bold; font-size: 0.9em; border-right: 1px solid #333; padding-right: 20px;">Edit Mode ON</div>
-            <a href="admin/index.html" class="admin-btn" style="text-decoration: none;">Open Decap CMS</a>
+            <a href="admin/index.html" class="admin-btn">Open Advanced CMS</a>
         </div>
     </div>
 
-    <!-- UNIFIED NAVIGATION -->
+    <!-- UNIFIED NAVIGATION (Always Visible in Live or Admin Mode) -->
     <nav class="absolute top-0 w-full z-50 p-6 flex justify-between items-center">
         <a href="index.html" id="backLink" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-xl font-display drop-shadow-md">ONE CIRCLE</a>
         
@@ -78,7 +78,7 @@
         <div id="upcomingContainer" class="mb-16 index-editable" title="Click to manage events in CMS"></div>
 
         <!-- PAST EVENTS SECTION -->
-        <div class="flex items-center gap-4 mb-10">
+        <div class="flex items-center justify-between gap-4 mb-10">
             <h2 class="font-display text-3xl md:text-4xl text-white font-bold">Past Seasons</h2>
             <div class="flex-grow h-px bg-gradient-to-r from-[#d4a853]/50 to-transparent"></div>
         </div>
@@ -101,8 +101,8 @@
         let isAdmin = sessionStorage.getItem('oneCircleAdmin') === 'true';
         if (isAdmin) {
             document.getElementById('adminToolbar').style.display = 'flex';
+            // Update back link to point correctly to the admin panel
             document.getElementById('backLink').href = 'admin/index.html';
-            document.getElementById('backLink').textContent = '← Back to Admin Panel';
 
             // Make sections interactive to direct user to Decap CMS for structured JSON lists
             document.querySelectorAll('.index-editable').forEach(zone => {
