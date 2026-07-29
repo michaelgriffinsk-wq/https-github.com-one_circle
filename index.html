@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Circle | Official Website</title>
     
-    <!-- Tailwind CSS, Fonts, and Icons to match the premium theme -->
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -17,23 +16,43 @@
             color: #fff;
         }
         .font-display { font-family: 'Playfair Display', serif; }
-        
-        /* Smooth scrolling */
         html { scroll-behavior: smooth; }
+
+        /* =========================================
+           ADMIN EDIT MODE STYLES
+           ========================================= */
+        .admin-toolbar { display: none; background: #111; padding: 15px 25px; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4a853; position: sticky; top: 0; z-index: 9999; }
+        .admin-btn { background: #d4a853; color: #111; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .admin-btn:hover { background: #e6c27a; }
+        
+        .index-editable { position: relative; transition: all 0.2s; }
+        .active-edit { outline: 2px dashed #d4a853; outline-offset: 4px; cursor: pointer; border-radius: 8px; }
+        .active-edit:hover { background-color: rgba(212, 168, 83, 0.1); outline: 3px solid #d4a853; }
+        .active-edit::after { content: '✎ Manage in CMS'; position: absolute; top: 10px; right: 10px; background: #d4a853; color: #111; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10; }
+        .active-edit:hover::after { opacity: 1; }
     </style>
 </head>
 <body class="w-full min-h-screen flex flex-col">
 
+    <!-- ADMIN TOOLBAR -->
+    <div class="admin-toolbar" id="adminToolbar">
+        <h1 style="margin: 0; font-size: 1.2em; color: white;">One Circle <span style="font-size: 0.8em; color: #888; font-weight: normal;">Home & Events Editor</span></h1>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="color: white; font-weight: bold; font-size: 0.9em; border-right: 1px solid #333; padding-right: 20px;">Edit Mode ON</div>
+            <a href="admin/index.html" class="admin-btn" style="text-decoration: none;">Open Decap CMS</a>
+        </div>
+    </div>
+
     <!-- UNIFIED NAVIGATION -->
     <nav class="absolute top-0 w-full z-50 p-6 flex justify-between items-center">
-        <a href="index.html" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-xl font-display drop-shadow-md">ONE CIRCLE</a>
+        <a href="index.html" id="backLink" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-xl font-display drop-shadow-md">ONE CIRCLE</a>
         
         <div class="relative group">
             <button class="flex items-center gap-2 text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-sm px-4 py-2 border border-white/20 rounded-md backdrop-blur-sm bg-black/20">
                 MENU <i data-lucide="menu" class="w-4 h-4"></i>
             </button>
             <div class="absolute right-0 mt-2 w-48 bg-[#0c1220]/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right overflow-hidden z-50">
-                <a href="index.html" class="block px-4 py-3 text-sm text-[#d4a853] bg-white/5 font-bold uppercase tracking-wider">Home</a>
+                <a href="index.html" class="block px-4 py-3 text-sm text-black bg-[#d4a853] font-bold uppercase tracking-wider">Home</a>
                 <a href="about.html" class="block px-4 py-3 text-sm text-white hover:bg-[#d4a853] hover:text-black transition-colors font-bold uppercase tracking-wider border-t border-white/10">About</a>
                 <a href="projects.html" class="block px-4 py-3 text-sm text-white hover:bg-[#d4a853] hover:text-black transition-colors font-bold uppercase tracking-wider border-t border-white/10">Music</a>
             </div>
@@ -42,7 +61,6 @@
 
     <!-- HERO SECTION -->
     <header class="relative w-full overflow-hidden min-h-[60vh] flex items-center justify-center text-center px-6">
-        <!-- Replace this URL with a wide shot of your team or live event -->
         <img class="absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/12044265/pexels-photo-12044265.jpeg" alt="Live Worship">
         <div class="absolute inset-0 bg-gradient-to-b from-[#0c1220]/80 via-[#0c1220]/60 to-[#0c1220]"></div>
         
@@ -56,8 +74,8 @@
     <!-- MAIN CONTENT -->
     <main class="w-full flex-grow max-w-7xl mx-auto px-6 py-12">
         
-        <!-- UPCOMING EVENT SECTION (Injected by JS) -->
-        <div id="upcomingContainer" class="mb-16"></div>
+        <!-- UPCOMING EVENT SECTION (Wrapped in Editable Zone) -->
+        <div id="upcomingContainer" class="mb-16 index-editable" title="Click to manage events in CMS"></div>
 
         <!-- PAST EVENTS SECTION -->
         <div class="flex items-center gap-4 mb-10">
@@ -65,8 +83,8 @@
             <div class="flex-grow h-px bg-gradient-to-r from-[#d4a853]/50 to-transparent"></div>
         </div>
         
-        <!-- Event Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="pastGrid">
+        <!-- Event Grid (Wrapped in Editable Zone) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 index-editable" id="pastGrid" title="Click to manage events in CMS">
             <!-- Cards Injected by JS -->
         </div>
 
@@ -78,13 +96,26 @@
     </footer>
 
     <script>
-        // Initialize static icons
         lucide.createIcons();
+
+        let isAdmin = sessionStorage.getItem('oneCircleAdmin') === 'true';
+        if (isAdmin) {
+            document.getElementById('adminToolbar').style.display = 'flex';
+            document.getElementById('backLink').href = 'admin/index.html';
+            document.getElementById('backLink').textContent = '← Back to Admin Panel';
+
+            // Make sections interactive to direct user to Decap CMS for structured JSON lists
+            document.querySelectorAll('.index-editable').forEach(zone => {
+                zone.classList.add('active-edit');
+                zone.addEventListener('click', () => {
+                    window.location.href = 'admin/index.html';
+                });
+            });
+        }
 
         const upcomingContainer = document.getElementById('upcomingContainer');
         const pastGrid = document.getElementById('pastGrid');
 
-        // Helper to fix Decap CMS leading slashes on GitHub Pages
         function formatImgPath(path) {
             if (!path) return '';
             return path.startsWith('/') ? path.substring(1) : path;
@@ -96,6 +127,9 @@
                 return response.json();
             })
             .then(siteDatabase => {
+                upcomingContainer.innerHTML = '';
+                pastGrid.innerHTML = '';
+
                 siteDatabase.seasons.forEach(season => {
                     
                     // 1. UPCOMING BANNER
@@ -104,7 +138,7 @@
                             <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#151d2e] to-[#080d18] border border-[#d4a853]/30 p-8 md:p-12 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 group">
                                 <div class="absolute inset-0 bg-[#d4a853]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 <div class="relative z-10 w-full md:w-2/3 text-center md:text-left">
-                                    <p class="uppercase tracking-[0.2em] text-[#d4a853] text-sm font-bold mb-2">Next Event</p>
+                                    <p class="uppercase tracking-[0.2em] text-[#d4a853] text-sm font-bold mb-2">Next Event ${isAdmin ? '(Click to Edit in CMS)' : ''}</p>
                                     <h3 class="font-display text-3xl md:text-4xl text-white mb-4">${season.title || 'Title TBA'}</h3>
                                     <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8 text-[#b8c4d6] font-bold text-lg mb-4">
                                         <span class="flex items-center gap-2"><i data-lucide="calendar" class="w-5 h-5 text-[#d4a853]"></i> ${season.date || 'TBD'}</span>
@@ -121,8 +155,6 @@
                     
                     // 2. PAST EVENT CARDS
                     else if (season.status === 'past') {
-                        
-                        // Safety check for highlights
                         let highlightsHTML = '';
                         if (season.highlights && Array.isArray(season.highlights)) {
                             season.highlights.forEach(item => {
@@ -130,13 +162,11 @@
                             });
                         }
 
-                        // Image formatting
                         const imgPath = formatImgPath(season.posterImg);
                         const imageHTML = imgPath 
                             ? `<img src="${imgPath}" alt="${season.title} Poster" class="w-full h-full object-cover transition duration-700 group-hover:scale-105 group-hover:opacity-80">`
                             : `<div class="w-full h-full flex items-center justify-center text-gray-600 font-bold uppercase tracking-widest bg-[#080d18]">No Image</div>`;
 
-                        // Interactive Buttons Logic
                         let buttonsHTML = '';
                         const hasAudio = season.tracklist && season.tracklist.length > 0;
                         const hasGallery = season.gallery && (season.gallery.maxImages > 0 || season.gallery.maxVideos > 0);
@@ -152,7 +182,6 @@
                             buttonsHTML = `<div class="mt-auto pt-4 border-t border-white/10"><span class="block text-center bg-black/40 text-gray-500 px-4 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider border border-white/5">Media Coming Soon</span></div>`;
                         }
                         
-                        // Inject Card
                         pastGrid.innerHTML += `
                             <div class="bg-[#151d2e] rounded-2xl overflow-hidden shadow-xl group flex flex-col border border-white/5 transition duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#d4a853]/20 hover:border-[#d4a853]/30">
                                 <div class="relative aspect-[4/3] overflow-hidden bg-black/50">
@@ -174,7 +203,6 @@
                     }
                 });
                 
-                // Render dynamically injected icons
                 lucide.createIcons();
             })
             .catch(error => {
