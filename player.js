@@ -1,4 +1,4 @@
-// player.js - Global Persistent Player & Seamless Page Transition Engine
+// player.js - Global Persistent Spotify-Style Player Engine
 
 (function() {
     // 1. Inject Player HTML and CSS into the current page automatically
@@ -281,8 +281,14 @@
                         this.audio.currentTime = state.currentTime || 0;
                         
                         document.getElementById('persistentPlayer').style.display = 'block';
-                        this.isPlaying = false;
-                        this.updateUIState();
+                        // Auto resume playback on page navigation load
+                        this.audio.play().then(() => {
+                            this.isPlaying = true;
+                            this.updateUIState();
+                        }).catch(e => {
+                            this.isPlaying = false;
+                            this.updateUIState();
+                        });
                     }
                 } catch(e) { console.error("Could not restore player state", e); }
             }
@@ -290,73 +296,5 @@
     }
 
     window.globalPlayer = new GlobalPersistentPlayer();
-
-    // 3. Seamless SPA Page Transition Engine (Prevents audio interruption on navigation)
-    function initRouter() {
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('a');
-            if (!link) return;
-
-            const href = link.getAttribute('href');
-            // Check if it's an internal link (ignores external links, mailto, anchors, or target="_blank")
-            if (!href || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('#') || link.getAttribute('target') === '_blank') {
-                return;
-            }
-
-            e.preventDefault();
-            loadPage(href, true);
-        });
-
-        window.addEventListener('popstate', () => {
-            loadPage(window.location.pathname, false);
-        });
-    }
-
-    async function loadPage(url, pushState = true) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Page load failed');
-            const htmlText = await response.text();
-
-            const parser = new DOMParser();
-            const newDoc = parser.parseFromString(htmlText, 'text/html');
-
-            // Swap out body content while keeping the audio engine container intact
-            document.title = newDoc.title;
-            document.body.innerHTML = newDoc.body.innerHTML;
-
-            // Re-append the player root so it doesn't get wiped out by the swap
-            document.body.appendChild(playerContainer);
-
-            if (pushState) {
-                history.pushState({}, '', url);
-            }
-
-            // Scroll back to top smoothly
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            // Re-execute any scripts found in the newly loaded body content
-            const scripts = document.body.querySelectorAll('script');
-            scripts.forEach(script => {
-                // Skip player.js itself to avoid double-binding
-                if (script.src && script.src.includes('player.js')) return;
-
-                const newScript = document.createElement('script');
-                if (script.src) {
-                    newScript.src = script.src;
-                } else {
-                    newScript.textContent = script.textContent;
-                }
-                document.body.appendChild(newScript);
-            });
-
-        } catch (err) {
-            console.error("Navigation error, falling back to standard link load:", err);
-            window.location.href = url;
-        }
-    }
-
-    // Initialize the router on load
-    initRouter();
 })();
 
