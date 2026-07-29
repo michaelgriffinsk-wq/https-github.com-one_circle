@@ -75,8 +75,9 @@
       "image": "uploads/1000599434.jpg"
     },
     {
-      "name": "Ammi",
-      "role": "Bassist"
+      "name": "Tanya",
+      "role": "Vocalist",
+      "image": "uploads/1000599477.jpg"
     },
     {
       "name": "Heavy Beat",
@@ -107,6 +108,14 @@
     {
       "name": "Ammi",
       "role": "Bassist"
+    },
+    {
+      "name": "Andy",
+      "role": "Keys"
+    },
+    {
+      "name": "Dan",
+      "role": "Guitarist"
     }
   ],
   "footer_links": [
