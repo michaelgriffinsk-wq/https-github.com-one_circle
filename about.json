@@ -25,13 +25,13 @@
       "name": "Shakeela Mutuku",
       "role": "Vocalist",
       "image_placeholder": "Photo",
-      "image": "uploads/1000595621.jpg"
+      "image": "uploads/1000599440.jpg"
     },
     {
       "name": "Alex Mutuma",
       "role": "Keys",
       "image_placeholder": "Photo",
-      "image": ""
+      "image": "uploads/1000599435.jpg"
     },
     {
       "name": "Kebaso Michael Griffins",
@@ -48,6 +48,65 @@
       "name": "Chebet",
       "role": "Vocalist ",
       "image": "uploads/1000592008.jpg"
+    },
+    {
+      "name": "Cece",
+      "role": "Vocalist ",
+      "image": "uploads/1000599442.jpg"
+    },
+    {
+      "name": "Jeremy ",
+      "role": "Vocalist",
+      "image": "uploads/1000599433.jpg"
+    },
+    {
+      "name": "Ivy",
+      "role": "Dancer",
+      "image": "uploads/1000599439.jpg"
+    },
+    {
+      "name": "Duke",
+      "role": "Vocalist ",
+      "image": "uploads/1000599437.jpg"
+    },
+    {
+      "name": "Sharlene ",
+      "role": "Vocalist ",
+      "image": "uploads/1000599434.jpg"
+    },
+    {
+      "name": "Ammi",
+      "role": "Bassist"
+    },
+    {
+      "name": "Heavy Beat",
+      "role": "Keys"
+    },
+    {
+      "name": "Samara",
+      "role": "Vocalist ",
+      "image": "uploads/1000599441.jpg"
+    },
+    {
+      "name": "Robert",
+      "role": "Drums"
+    },
+    {
+      "name": "Edna",
+      "role": "Vocalist ",
+      "image": "uploads/1000599438.jpg"
+    },
+    {
+      "name": "Bahaty",
+      "role": "Bass"
+    },
+    {
+      "name": "Zach",
+      "role": "Drums"
+    },
+    {
+      "name": "Ammi",
+      "role": "Bassist"
     }
   ],
   "footer_links": [
