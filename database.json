@@ -279,7 +279,79 @@
           "trackId": 1,
           "title": "Shalom",
           "file": "uploads/david-dam-shalom-daviddamvevo.mp3"
-        }
+        },
+        {
+          "trackId": 2,
+          "title": "Abba",
+          "artist": "Dante Bowe",
+          "file": "audio/Track2.mp3"
+        },
+        {
+          "trackId": 3,
+          "title": "I Belong",
+          "artist": "William McDowell",
+          "file": "audio/Track3.mp3"
+        },
+        {
+          "trackId": 4,
+          "title": "How Deep The Father's Love",
+          "artist": "SELAH",
+          "file": "audio/Track4.mp3"
+        },
+        {
+          "trackId": 5,
+          "title": "Good Good Father",
+          "artist": "Housefires",
+          "file": "audio/Track5.mp3"
+        },
+        {
+          "trackId": 6,
+          "title": "I'm A Friend Of God",
+          "artist": "Israel Houghton",
+          "file": "audio/Track6.mp3"
+        },
+        {
+          "trackId": 7,
+          "title": "Who You Say I Am",
+          "artist": "Hillsong",
+          "file": "audio/Track7.mp3"
+        },
+        {
+          "trackId": 8,
+          "title": "Hallelujah",
+          "artist": "Sue Wachira",
+          "file": "audio/Track8.mp3"
+        },
+        {
+          "trackId": 9,
+          "title": "Kama Si We Baba",
+          "artist": "Kanji Mbugua",
+          "file": "audio/Track9.mp3"
+        },
+        {
+          "trackId": 10,
+          "title": "Amapiano Medley",
+          "artist": "One Circle",
+          "file": "audio/Track10.mp3"
+        },
+        {
+          "trackId": 11,
+          "title": "Moyo Wangu",
+          "artist": "Icons ft Mike Manao And Janice",
+          "file": "audio/Track11.mp3"
+        },
+        {
+          "trackId": 12,
+          "title": "Sifa Zote",
+          "artist": "Icons ft Mike Manao And Janice",
+          "file": "audio/Track12.mp3"
+        },
+        {
+          "trackId": 13,
+          "title": "Nakungoja",
+          "artist": "Icons ft Mike Manao And Janice",
+          "file": "audio/Track13.mp3"
+        },
       ],
       "seasonNumber": 3,
       "date": "20/6/2025",
