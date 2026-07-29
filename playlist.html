@@ -4,325 +4,218 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Circle | Playlist</title>
+    
+    <!-- Tailwind CSS & Fonts matching projects.html -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+    
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #0a0a0a; 
-            color: #fff; 
-            margin: 0; 
-            padding: 0 0 120px 0; 
+        :root {
+            --ink: #0a0a0b;
+            --paper: #f5efe5;
+            --gold: #d8a64d;
+            --muted: #aaa398;
         }
-        header { 
-            text-align: center; 
-            padding: 40px 20px; 
-            background: linear-gradient(180deg, #3a0000 0%, #0a0a0a 100%);
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "DM Sans", sans-serif; background: var(--ink); color: var(--paper); padding-bottom: 100px; }
+        .serif { font-family: "Fraunces", serif; }
+        .grain {
+            pointer-events: none; position: fixed; inset: 0; z-index: 60; opacity: .05;
+            background-image: url("https://grainy-gradients.vercel.app/noise.svg");
         }
-        .poster-img {
-            width: 200px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(204, 0, 0, 0.3);
-            margin-bottom: 20px;
-        }
-        h1 { margin: 0; font-size: 2em; text-transform: uppercase; letter-spacing: 2px; }
-        p.subtitle { color: #aaa; font-size: 0.9em; letter-spacing: 1px;}
+        .top-nav { background: rgba(10,10,11,.82); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         
-        .container { max-width: 600px; margin: 0 auto; padding: 0 20px; }
+        .hero-image::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(0deg, var(--ink) 0%, rgba(10,10,11,.7) 50%, rgba(10,10,11,.4) 100%);
+        }
         
+        .eyebrow { letter-spacing: .18em; text-transform: uppercase; font-size: .7rem; font-weight: 700; color: var(--gold); }
+        
+        /* Tracklist Styles */
+        .track-row { border-bottom: 1px solid rgba(245,239,229,.1); transition: background .2s ease; cursor: pointer; }
+        .track-row:hover { background: rgba(245,239,229,.05); }
+        .track-row.active { background: rgba(216, 166, 77, 0.1); border-left: 3px solid var(--gold); }
+        .track-row.active .track-title { color: var(--gold); }
+
         /* Master Play Button */
-        .master-controls { display: flex; align-items: center; margin: 20px 0 30px; }
-        .play-all-btn {
-            background-color: #cc0000;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.4);
-            transition: transform 0.2s;
+        .master-play {
+            background: var(--gold); color: var(--ink); width: 60px; height: 60px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s, background 0.2s; box-shadow: 0 10px 30px rgba(216, 166, 77, 0.3);
         }
-        .play-all-btn:active { transform: scale(0.95); }
+        .master-play:hover { transform: scale(1.05); filter: brightness(1.1); }
 
-        /* Tracklist */
-        .track-list { list-style: none; padding: 0; margin: 0; }
-        .track-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-bottom: 5px;
-        }
-        .track-item:hover { background-color: #1a1a1a; }
-        .track-item.active { background-color: #2a0a0a; border-left: 4px solid #cc0000; }
+        /* Progress Bars */
+        .progress-container { width: 100%; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; cursor: pointer; }
+        .progress-bar { height: 100%; background: var(--gold); width: 0%; border-radius: 2px; }
         
-        .track-info { flex-grow: 1; margin-left: 15px; }
-        .track-title { margin: 0; font-size: 1.1em; font-weight: bold; color: #fff; }
-        .track-artist { margin: 5px 0 0 0; font-size: 0.85em; color: #888; }
-        .track-item.active .track-title { color: #cc0000; }
-
-        /* Bottom Sticky Player (Mini Player) */
+        /* Bottom Mini Player */
         .bottom-player {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #111;
-            border-top: 1px solid #333;
-            padding: 15px 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            cursor: pointer; 
+            position: fixed; bottom: 0; left: 0; w: 100%; width: 100%;
+            background: rgba(10,10,11,0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; cursor: pointer;
         }
-        .player-info-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        .now-playing-text { display: flex; flex-direction: column; }
-        .now-title { font-weight: bold; font-size: 1em; margin: 0; }
-        .now-artist { color: #aaa; font-size: 0.8em; margin: 0; }
         
-        .player-controls button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            margin-left: 15px;
-        }
-        .progress-container {
-            max-width: 600px;
-            margin: 10px auto 0;
-            width: 100%;
-            background: #333;
-            height: 4px;
-            border-radius: 2px;
-            cursor: pointer;
-        }
-        .progress-bar { height: 100%; background: #cc0000; width: 0%; border-radius: 2px; }
-
-        /* =========================================
-           FULL SCREEN PLAYER STYLES 
-           ========================================= */
+        /* Full Screen Player */
         .full-player {
-            position: fixed;
-            top: 100vh; 
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(180deg, #2a0000 0%, #0a0a0a 100%);
-            z-index: 2000;
-            transition: top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            display: flex;
-            flex-direction: column;
-            padding: 30px 25px;
-            box-sizing: border-box;
+            position: fixed; top: 100vh; left: 0; width: 100%; height: 100vh;
+            background: var(--ink); z-index: 2000;
+            transition: top 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
+            display: flex; flex-direction: column;
         }
-        .full-player.active {
-            top: 0; 
-        }
+        .full-player.active { top: 0; }
         
-        .fp-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        .fp-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; }
-        .fp-playlist-info { text-align: center; font-size: 0.75em; letter-spacing: 1px; color: #ccc; }
-        .fp-playlist-info span { font-weight: bold; font-size: 1.1em; color: white; display: block; margin-top: 3px; }
-        
-        .fp-art-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; margin-bottom: 30px; }
-        .fp-art { width: 100%; max-width: 320px; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        
-        .fp-info { margin-bottom: 20px; }
-        .fp-title { font-size: 1.5em; font-weight: bold; margin: 0 0 5px 0; }
-        .fp-artist { font-size: 1em; color: #aaa; margin: 0; }
-        
-        .fp-progress-wrapper { margin-bottom: 30px; }
-        .fp-progress-container { background: #444; height: 5px; border-radius: 3px; cursor: pointer; width: 100%; margin-bottom: 10px; }
-        .fp-time-row { display: flex; justify-content: space-between; font-size: 0.75em; color: #aaa; }
-        
-        .fp-controls { display: flex; justify-content: space-between; align-items: center; }
-        .fp-controls button { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .fp-play-btn {
-            background-color: white !important;
-            color: black !important;
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            font-size: 28px !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        /* Highlighted/Encircled state for Shuffle & Repeat */
-        .toggle-btn { 
-            color: #888 !important; 
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-        .toggle-btn.active { 
-            color: #cc0000 !important; 
-            background-color: rgba(204, 0, 0, 0.15); 
-        }
-
-        footer { text-align: center; padding: 40px 20px; font-size: 0.85em; color: #555; margin-top: 20px; }
+        .toggle-btn { color: var(--muted); transition: color 0.2s; }
+        .toggle-btn.active { color: var(--gold); }
     </style>
 </head>
 <body>
+    <div class="grain" aria-hidden="true"></div>
 
-    <nav>
-        <a href="index.html" style="color: #fff; text-decoration: none; font-weight: bold; font-size: 1.2em; letter-spacing: 1px;">ONE CIRCLE</a>
-        <div style="display: flex; gap: 20px;">
-            <a href="index.html" style="color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em;">Home</a>
-            <a href="about.html" style="color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9em;">About</a>
-        </div>
-    </nav>
-
-    <header id="dynamicHeader">
-        <!-- Injected by JS -->
+    <header class="top-nav sticky top-0 z-50">
+        <nav class="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-4 md:px-8">
+            <a href="index.html" class="text-sm font-bold tracking-[0.24em] text-[#f5efe5] hover:text-[#d8a64d] transition uppercase">← BACK</a>
+            <div class="hidden items-center gap-7 text-xs font-semibold uppercase tracking-[0.16em] text-[#aaa398] md:flex">
+                <a href="projects.html" class="transition hover:text-[#d8a64d]">Music</a> 
+                <a href="about.html" class="transition hover:text-[#d8a64d]">About</a> 
+            </div>
+        </nav>
     </header>
 
-    <div class="container">
-        <div class="master-controls">
-            <button class="play-all-btn" id="masterPlayBtn">▶</button>
+    <main id="top" class="relative z-10 mx-auto w-full max-w-4xl px-5 pt-10 md:px-8">
+        
+        <!-- Dynamic Header (Injected by JS) -->
+        <div id="dynamicHeader" class="flex flex-col items-center text-center mb-12">
+            <!-- Content Injected -->
         </div>
-        <ul class="track-list" id="trackList">
+
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="serif text-3xl font-semibold text-[#f5efe5]">Tracklist</h2>
+            <button class="master-play" id="masterPlayBtn"><i data-lucide="play" class="w-6 h-6 fill-current"></i></button>
+        </div>
+
+        <div id="trackList" class="mb-20">
             <!-- Tracks injected by JS -->
-        </ul>
-    </div>
+        </div>
+    </main>
 
     <audio id="audioPlayer"></audio>
 
-    <!-- Bottom Sticky Player (Mini Player) -->
-    <div class="bottom-player" id="miniPlayer">
-        <div class="player-info-row">
-            <div class="now-playing-text">
-                <p class="now-title" id="nowTitle">Select a track</p>
-                <p class="now-artist" id="nowArtist">One Circle</p>
-            </div>
-            <div class="player-controls" onclick="event.stopPropagation()">
-                <button id="prevBtn">⏮</button>
-                <button id="playPauseBtn">▶</button>
-                <button id="nextBtn">⏭</button>
-            </div>
-        </div>
-        <div class="progress-container" id="progressContainer" onclick="event.stopPropagation(); seekAudio(event, this)">
+    <!-- Mini Player -->
+    <div class="bottom-player pb-safe" id="miniPlayer">
+        <div class="progress-container !h-1 rounded-none" id="progressContainer" onclick="event.stopPropagation(); seekAudio(event, this)">
             <div class="progress-bar" id="progressBar"></div>
         </div>
+        <div class="mx-auto max-w-4xl px-5 py-4 flex items-center justify-between">
+            <div class="flex flex-col">
+                <p class="font-bold text-[#f5efe5] text-sm" id="nowTitle">Select a track</p>
+                <p class="text-xs text-[#aaa398] mt-1" id="nowArtist">One Circle</p>
+            </div>
+            <div class="flex items-center gap-4 text-[#f5efe5]" onclick="event.stopPropagation()">
+                <button id="prevBtn" class="hover:text-[#d8a64d] transition"><i data-lucide="skip-back" class="w-5 h-5 fill-current"></i></button>
+                <button id="playPauseBtn" class="hover:text-[#d8a64d] transition"><i data-lucide="play" class="w-6 h-6 fill-current"></i></button>
+                <button id="nextBtn" class="hover:text-[#d8a64d] transition"><i data-lucide="skip-forward" class="w-5 h-5 fill-current"></i></button>
+            </div>
+        </div>
     </div>
 
-    <!-- FULL SCREEN PLAYER -->
+    <!-- Full Screen Player -->
     <div class="full-player" id="fullPlayer">
-        <div class="fp-header">
-            <button class="fp-close" id="closeFullPlayer">⯆</button>
-            <div class="fp-playlist-info">
-                PLAYING FROM PLAYLIST
-                <span id="fpPlaylistTitle">Loading...</span>
+        <!-- Background Grain for Full Player -->
+        <div class="grain" aria-hidden="true"></div>
+        
+        <div class="relative z-10 flex flex-col h-full px-6 py-8 md:max-w-md md:mx-auto w-full">
+            
+            <div class="flex justify-between items-center mb-8">
+                <button id="closeFullPlayer" class="text-[#f5efe5] hover:text-[#d8a64d]"><i data-lucide="chevron-down" class="w-8 h-8"></i></button>
+                <div class="text-center">
+                    <p class="eyebrow !text-[10px] mb-1">Playing from Playlist</p>
+                    <p class="text-[#f5efe5] font-bold text-sm" id="fpPlaylistTitle">Loading...</p>
+                </div>
+                <div class="w-8"></div> <!-- Spacer -->
             </div>
-            <div style="width:24px;"></div>
-        </div>
-        
-        <div class="fp-art-container">
-            <img src="" alt="Album Art" class="fp-art" id="fpArt">
-        </div>
-        
-        <div class="fp-info">
-            <h2 class="fp-title" id="fpTitle">Select a track</h2>
-            <p class="fp-artist" id="fpArtist">One Circle</p>
-        </div>
-        
-        <div class="fp-progress-wrapper">
-            <div class="fp-progress-container" id="fpProgressContainer" onclick="seekAudio(event, this)">
-                <div class="progress-bar" id="fpProgressBar"></div>
+            
+            <div class="flex-grow flex items-center justify-center mb-8">
+                <img src="" alt="Album Art" id="fpArt" class="w-full aspect-square object-cover rounded-2xl shadow-2xl shadow-black/50">
             </div>
-            <div class="fp-time-row">
-                <span id="currentTimeDisplay">0:00</span>
-                <span id="durationDisplay">0:00</span>
+            
+            <div class="mb-6">
+                <h2 class="serif text-3xl font-semibold text-[#f5efe5] mb-1" id="fpTitle">Select a track</h2>
+                <p class="text-lg text-[#aaa398]" id="fpArtist">One Circle</p>
             </div>
-        </div>
-        
-        <div class="fp-controls">
-            <button id="shuffleBtn" class="toggle-btn">🔀</button>
-            <button id="fpPrevBtn">⏮</button>
-            <button id="fpPlayPauseBtn" class="fp-play-btn">▶</button>
-            <button id="fpNextBtn">⏭</button>
-            <button id="repeatBtn" class="toggle-btn">🔁</button>
+            
+            <div class="mb-8">
+                <div class="progress-container" id="fpProgressContainer" onclick="seekAudio(event, this)">
+                    <div class="progress-bar" id="fpProgressBar"></div>
+                </div>
+                <div class="flex justify-between text-xs text-[#aaa398] mt-2 font-medium">
+                    <span id="currentTimeDisplay">0:00</span>
+                    <span id="durationDisplay">0:00</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center px-2">
+                <button id="shuffleBtn" class="toggle-btn"><i data-lucide="shuffle" class="w-6 h-6"></i></button>
+                <button id="fpPrevBtn" class="text-[#f5efe5] hover:text-[#d8a64d] transition"><i data-lucide="skip-back" class="w-8 h-8 fill-current"></i></button>
+                <button id="fpPlayPauseBtn" class="w-16 h-16 bg-[#d8a64d] text-[#17120a] rounded-full flex items-center justify-center transition hover:scale-105"><i data-lucide="play" class="w-8 h-8 fill-current ml-1"></i></button>
+                <button id="fpNextBtn" class="text-[#f5efe5] hover:text-[#d8a64d] transition"><i data-lucide="skip-forward" class="w-8 h-8 fill-current"></i></button>
+                <button id="repeatBtn" class="toggle-btn"><i data-lucide="repeat" class="w-6 h-6"></i></button>
+            </div>
+            
         </div>
     </div>
-
-    <footer>
-        <p>&copy; 2026 One Circle.</p>
-    </footer>
 
     <script>
-        // Fetch the JSON database
+        // Initialize Icons
+        lucide.createIcons();
+
+        function formatImgPath(path) {
+            if (!path) return '';
+            return path.startsWith('/') ? path.substring(1) : path;
+        }
+
         fetch('database.json')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
             })
             .then(siteDatabase => {
-                // --- 1. DYNAMIC PLAYLIST DATA FETCHING ---
                 const urlParams = new URLSearchParams(window.location.search);
                 const seasonNumber = parseInt(urlParams.get('season'));
-
                 const seasonData = siteDatabase.seasons.find(s => s.seasonNumber === seasonNumber);
 
                 if (!seasonData) {
-                    document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Playlist not found.</h2>';
+                    document.getElementById('trackList').innerHTML = '<h2 class="text-center text-[#d8a64d] mt-10">Playlist not found.</h2>';
                     throw new Error("Season not found in database.");
                 }
 
-                // --- 2. UPDATE METADATA & HEADER ---
+                // Header Injection
                 document.title = `One Circle | ${seasonData.title}`;
+                const posterUrl = formatImgPath(seasonData.posterImg);
                 
-                const dynamicHeader = document.getElementById('dynamicHeader');
-                dynamicHeader.innerHTML = `
-                    ${seasonData.posterImg ? `<img src="${seasonData.posterImg}" alt="${seasonData.title} Poster" class="poster-img">` : ''}
-                    <h1>${seasonData.title}</h1>
-                    <p class="subtitle">One Circle • ${seasonData.date}</p>
+                document.getElementById('dynamicHeader').innerHTML = `
+                    ${posterUrl ? `<img src="${posterUrl}" alt="${seasonData.title}" class="w-48 h-48 md:w-64 md:h-64 object-cover rounded-2xl shadow-xl shadow-black/50 mb-6">` : ''}
+                    <h1 class="serif text-4xl md:text-6xl font-semibold text-[#f5efe5] mb-3">${seasonData.title}</h1>
+                    <p class="eyebrow">${seasonData.date}</p>
                 `;
 
                 document.getElementById('fpPlaylistTitle').innerText = seasonData.title;
                 const fpArt = document.getElementById('fpArt');
-                if (seasonData.posterImg) {
-                    fpArt.src = seasonData.posterImg;
-                } else {
-                    fpArt.style.display = 'none';
-                }
+                if (posterUrl) { fpArt.src = posterUrl; } else { fpArt.style.display = 'none'; }
 
-                // --- 3. FORMAT TRACKLIST ---
+                // Format Tracklist
                 const playlist = seasonData.tracklist.map((track, index) => {
                     return {
                         id: index,
                         title: track.title,
                         artist: track.artist || "One Circle", 
-                        file: track.file
+                        file: formatImgPath(track.file)
                     };
                 });
 
-                // --- 4. PLAYER LOGIC ---
+                // PLAYER LOGIC
                 let currentTrackIndex = 0;
                 let isPlaying = false;
                 let isShuffle = false;
@@ -351,17 +244,22 @@
                 function renderTracklist() {
                     trackListEl.innerHTML = '';
                     playlist.forEach((track, index) => {
-                        const li = document.createElement('li');
-                        li.className = 'track-item';
-                        li.innerHTML = `
-                            <div class="track-info">
-                                <p class="track-title">${index + 1}. ${track.title}</p>
-                                <p class="track-artist">${track.artist}</p>
+                        const div = document.createElement('div');
+                        div.className = 'track-row track-item flex items-center justify-between px-4 py-4 rounded-xl';
+                        div.innerHTML = `
+                            <div class="flex items-center gap-4">
+                                <span class="text-[#aaa398] font-bold text-sm w-4">${index + 1}</span>
+                                <div>
+                                    <h3 class="track-title font-bold text-[#f5efe5] text-[16px]">${track.title}</h3>
+                                    <p class="text-sm text-[#aaa398] mt-1">${track.artist}</p>
+                                </div>
                             </div>
+                            <i data-lucide="play-circle" class="w-5 h-5 text-[#aaa398]"></i>
                         `;
-                        li.onclick = () => loadAndPlayTrack(index);
-                        trackListEl.appendChild(li);
+                        div.onclick = () => loadAndPlayTrack(index);
+                        trackListEl.appendChild(div);
                     });
+                    lucide.createIcons();
                 }
 
                 function loadAndPlayTrack(index) {
@@ -386,7 +284,6 @@
                             updatePlayButtons();
                         }).catch(error => {
                             console.error("Playback failed:", error);
-                            alert("Error playing " + track.title + "!\n\nSystem Error: " + error.name);
                             isPlaying = false;
                             updatePlayButtons();
                         });
@@ -395,21 +292,19 @@
 
                 function togglePlay() {
                     if (!audio.src) { loadAndPlayTrack(0); return; }
-                    if (isPlaying) { 
-                        audio.pause();
-                        isPlaying = false;
-                    } else { 
-                        audio.play();
-                        isPlaying = true;
-                    }
+                    if (isPlaying) { audio.pause(); isPlaying = false; } 
+                    else { audio.play(); isPlaying = true; }
                     updatePlayButtons();
                 }
 
                 function updatePlayButtons() {
-                    const icon = isPlaying ? "⏸" : "▶";
-                    playPauseBtn.innerText = icon;
-                    masterPlayBtn.innerText = icon;
-                    fpPlayPauseBtn.innerText = icon;
+                    const iconHTML = isPlaying ? '<i data-lucide="pause" class="w-6 h-6 fill-current"></i>' : '<i data-lucide="play" class="w-6 h-6 fill-current"></i>';
+                    const fpIconHTML = isPlaying ? '<i data-lucide="pause" class="w-8 h-8 fill-current"></i>' : '<i data-lucide="play" class="w-8 h-8 fill-current ml-1"></i>';
+                    
+                    playPauseBtn.innerHTML = iconHTML;
+                    masterPlayBtn.innerHTML = isPlaying ? '<i data-lucide="pause" class="w-6 h-6 fill-current"></i>' : '<i data-lucide="play" class="w-6 h-6 fill-current ml-1"></i>';
+                    fpPlayPauseBtn.innerHTML = fpIconHTML;
+                    lucide.createIcons();
                 }
 
                 function playNext() {
@@ -438,7 +333,6 @@
                 
                 document.getElementById('nextBtn').onclick = playNext;
                 document.getElementById('fpNextBtn').onclick = playNext;
-                
                 document.getElementById('prevBtn').onclick = playPrev;
                 document.getElementById('fpPrevBtn').onclick = playPrev;
 
@@ -465,41 +359,29 @@
                         const percent = (audio.currentTime / audio.duration) * 100;
                         progressBar.style.width = percent + '%';
                         fpProgressBar.style.width = percent + '%';
-                        
                         currentTimeDisplay.innerText = formatTime(audio.currentTime);
                         durationDisplay.innerText = formatTime(audio.duration);
                     }
                 });
 
-                // Attach seekAudio to the window object so it can be called by inline onclick handlers
                 window.seekAudio = function(e, container) {
                     const width = container.clientWidth;
                     const clickX = e.offsetX;
                     const duration = audio.duration;
-                    if (duration) {
-                        audio.currentTime = (clickX / width) * duration;
-                    }
+                    if (duration) { audio.currentTime = (clickX / width) * duration; }
                 };
 
-                audio.addEventListener('ended', () => {
-                    if (!isRepeat) { playNext(); }
-                });
+                audio.addEventListener('ended', () => { if (!isRepeat) { playNext(); } });
 
-                miniPlayer.addEventListener('click', () => {
-                    fullPlayer.classList.add('active');
-                });
-                
-                document.getElementById('closeFullPlayer').addEventListener('click', () => {
-                    fullPlayer.classList.remove('active');
-                });
+                miniPlayer.addEventListener('click', () => fullPlayer.classList.add('active'));
+                document.getElementById('closeFullPlayer').addEventListener('click', () => fullPlayer.classList.remove('active'));
 
                 renderTracklist();
-
             })
             .catch(error => {
                 console.error("Error fetching database:", error);
-                document.querySelector('.container').innerHTML = '<h2 style="text-align:center; color:#cc0000; margin-top: 50px;">Failed to load playlist data.</h2>';
             });
     </script>
 </body>
 </html>
+
