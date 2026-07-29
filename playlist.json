@@ -1,0 +1,75 @@
+{
+  "hero": {
+    "title": "A sound for the gathering.",
+    "description": "One Circle creates songs that carry faith, rhythm, and the raw joy of a room singing together.",
+    "image": "uploads/12044265.jpeg",
+    "spotify_url": "https://open.spotify.com/",
+    "apple_url": "https://music.apple.com/",
+    "youtube_url": "https://www.youtube.com/"
+  },
+  "featured_release": {
+    "title": "The Father’s Love",
+    "type": "New original EP",
+    "description": "A live-recorded collection of songs shaped by prayer, community, and a deep confidence in grace.",
+    "image": "uploads/15578335.png",
+    "spotify_url": "https://open.spotify.com/",
+    "apple_url": "https://music.apple.com/"
+  },
+  "tracks": [
+    {
+      "title": "The Father’s Love",
+      "meta": "One Circle · Live EP",
+      "duration": "4:18",
+      "image": "uploads/15578335.png",
+      "tone": 220
+    },
+    {
+      "title": "Worthy",
+      "meta": "One Circle · Original single",
+      "duration": "3:44",
+      "image": "uploads/6132995.jpeg",
+      "tone": 262
+    },
+    {
+      "title": "Abba",
+      "meta": "One Circle · Acoustic session",
+      "duration": "5:02",
+      "image": "uploads/7279567.jpeg",
+      "tone": 294
+    },
+    {
+      "title": "Ni Zako Ewe Bwana",
+      "meta": "One Circle · Live cover",
+      "duration": "6:11",
+      "image": "uploads/9401734.jpeg",
+      "tone": 330
+    }
+  ],
+  "videos": [
+    {
+      "title": "The Father’s Love — Live",
+      "type": "Live session",
+      "url": "https://www.youtube.com/",
+      "image": "uploads/12044265.jpeg"
+    },
+    {
+      "title": "Behind Worthy",
+      "type": "Studio diary",
+      "url": "https://www.youtube.com/",
+      "image": "uploads/28003176.jpeg"
+    },
+    {
+      "title": "Amapiano Medley",
+      "type": "Live cover",
+      "url": "https://www.youtube.com/",
+      "image": "uploads/213207.jpeg"
+    }
+  ],
+  "moments": [
+    "uploads/7091308.jpeg",
+    "uploads/8197224.jpeg",
+    "uploads/35555152.jpeg",
+    "uploads/4988138.jpeg"
+  ]
+}
+
