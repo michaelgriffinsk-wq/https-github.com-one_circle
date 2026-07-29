@@ -5,67 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>One Circle | Our Story</title> 
     
-    <!-- Tailwind CSS for the new layout -->
     <script src="https://cdn.tailwindcss.com/3.4.17"></script> 
-    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&amp;family=Playfair+Display:wght@700;900&amp;display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"> 
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     
     <style> 
         body { font-family: 'Alegreya Sans', sans-serif; background: #0c1220; color: #fff;} 
         .font-display { font-family: 'Playfair Display', serif; } 
         
-        .fade-up { 
-            opacity: 0; 
-            transform: translateY(30px); 
-            transition: opacity 0.8s ease, transform 0.8s ease; 
-        } 
+        .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; } 
         .fade-up.visible { opacity: 1; transform: translateY(0); } 
         .fade-up.delay-1 { transition-delay: 0.1s; } 
         .fade-up.delay-2 { transition-delay: 0.2s; } 
         .fade-up.delay-3 { transition-delay: 0.3s; } 
 
-        /* =========================================
-           ADMIN EDIT MODE STYLES
-           ========================================= */
-        .admin-toolbar {
-            display: none; background: #111; padding: 15px 25px; 
-            justify-content: space-between; align-items: center; 
-            border-bottom: 2px solid #d4a853; position: sticky; 
-            top: 0; z-index: 9999;
-        }
-        .admin-btn {
-            background: #d4a853; color: #111; border: none; padding: 8px 16px; 
-            border-radius: 4px; cursor: pointer; font-weight: bold;
-        }
+        /* Admin Styles */
+        .admin-toolbar { display: none; background: #111; padding: 15px 25px; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4a853; position: sticky; top: 0; z-index: 9999; }
+        .admin-btn { background: #d4a853; color: #111; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .admin-btn:hover { background: #e6c27a; }
-        
         .about-editable { position: relative; transition: all 0.2s; }
-        .active-edit {
-            outline: 2px dashed #d4a853; outline-offset: 4px; cursor: pointer; border-radius: 8px;
-        }
+        .active-edit { outline: 2px dashed #d4a853; outline-offset: 4px; cursor: pointer; border-radius: 8px; }
         .active-edit:hover { background-color: rgba(212, 168, 83, 0.1); outline: 3px solid #d4a853; }
-        .active-edit::after {
-            content: '✎ Click to Edit'; position: absolute; top: 10px; right: 10px;
-            background: #d4a853; color: #111; padding: 5px 12px; font-size: 12px;
-            font-weight: bold; border-radius: 4px; opacity: 0; transition: opacity 0.2s;
-            pointer-events: none; z-index: 10;
-        }
+        .active-edit::after { content: '✎ Click to Edit'; position: absolute; top: 10px; right: 10px; background: #d4a853; color: #111; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10; }
         .active-edit:hover::after { opacity: 1; }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); z-index: 10000;
-            display: none; justify-content: center; align-items: center;
-        }
-        .modal-content {
-            background: #111; width: 100%; max-width: 600px;
-            border-radius: 10px; border: 1px solid #333; display: flex; flex-direction: column;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; display: none; justify-content: center; align-items: center; }
+        .modal-content { background: #111; width: 100%; max-width: 600px; border-radius: 10px; border: 1px solid #333; display: flex; flex-direction: column; }
     </style> 
 </head> 
 <body class="w-full min-h-screen">
 
-    <!-- ADMIN TOOLBAR (Hidden by Default) -->
+    <!-- ADMIN TOOLBAR -->
     <div class="admin-toolbar" id="adminToolbar">
         <h1 style="margin: 0; font-size: 1.2em; color: white;">One Circle <span style="font-size: 0.8em; color: #888; font-weight: normal;">About Editor</span></h1>
         <div style="display: flex; gap: 20px; align-items: center;">
@@ -74,35 +43,40 @@
         </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- UNIFIED NAVIGATION -->
     <nav class="absolute top-0 w-full z-50 p-6 flex justify-between items-center">
-        <a href="index.html" id="backLink" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-sm">← Back to Home</a>
+        <a href="index.html" class="text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-lg font-display drop-shadow-md">ONE CIRCLE</a>
+        <div class="relative group">
+            <button class="flex items-center gap-2 text-white font-bold tracking-widest uppercase hover:text-[#d4a853] transition-colors text-sm px-4 py-2 border border-white/20 rounded-md backdrop-blur-sm bg-black/20">
+                MENU <i data-lucide="menu" class="w-4 h-4"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-48 bg-[#0c1220]/95 backdrop-blur-md border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right overflow-hidden z-50">
+                <a href="index.html" class="block px-4 py-3 text-sm text-white hover:bg-[#d4a853] hover:text-black transition-colors font-bold uppercase tracking-wider">Home</a>
+                <a href="about.html" class="block px-4 py-3 text-sm text-black bg-[#d4a853] transition-colors font-bold uppercase tracking-wider border-t border-white/10">About</a>
+                <a href="projects.html" class="block px-4 py-3 text-sm text-white hover:bg-[#d4a853] hover:text-black transition-colors font-bold uppercase tracking-wider border-t border-white/10">Music</a>
+            </div>
+        </div>
     </nav>
 
-    <!-- Hero --> 
+    <!-- HERO --> 
     <header class="about-editable relative w-full overflow-hidden" id="headerEditZone" style="min-height: 70vh;">
-        <img class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/7708458/pexels-photo-7708458.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1920" alt="Concert stage lights"> 
+        <img class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/7708458/pexels-photo-7708458.jpeg?auto=compress&cs=tinysrgb&w=1920" alt="Concert stage lights"> 
         <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#0c1220]"></div> 
         <div class="relative z-10 flex flex-col items-center justify-center text-center px-6 py-24" style="min-height: 70vh;"> 
-            <p class="uppercase tracking-[0.3em] text-sm mb-4" style="color: rgb(212, 168, 83); font-weight: 700;">One Circle</p> 
-            <h1 id="pageTitle" class="font-display" style="color: rgb(255, 255, 255); font-weight: 900; font-size: 56px;">Loading...</h1> 
-            <p id="pageSubtitle" class="mt-6 max-w-2xl leading-relaxed" style="color: rgb(200, 208, 220); font-size: 20px;"></p> 
+            <p class="uppercase tracking-[0.3em] text-sm mb-4 text-[#d4a853] font-bold">One Circle</p> 
+            <h1 id="pageTitle" class="font-display text-white font-black text-6xl">Loading...</h1> 
+            <p id="pageSubtitle" class="mt-6 max-w-2xl leading-relaxed text-[#c8d0dc] text-xl"></p> 
         </div> 
     </header> 
 
     <main class="w-full bg-[#0c1220]">
-        
         <!-- Story Section --> 
         <section class="max-w-6xl mx-auto px-6 py-20 about-editable" id="storyEditZone"> 
             <div class="grid md:grid-cols-2 gap-12 items-center"> 
                 <div class="fade-up"> 
-                    <h2 class="font-display mb-6" style="color: rgb(212, 168, 83); font-weight: 700; font-size: 32px;">What is One Circle?</h2> 
-                    
-                    <!-- Dynamic Text Injected Here -->
-                    <div id="aboutTextContainer" style="color: rgb(184, 196, 214); font-size: 16px; line-height: 1.8;"></div>
+                    <h2 class="font-display mb-6 text-[#d4a853] font-bold text-3xl">What is One Circle?</h2> 
+                    <div id="aboutTextContainer" class="text-[#b8c4d6] text-base leading-loose"></div>
                 </div> 
-                
-                <!-- Dynamic Group Photo Injected Here -->
                 <div class="fade-up delay-1" id="groupPhotoContainer">
                     <div class="w-full rounded-2xl shadow-2xl aspect-[4/3] bg-gray-800 flex items-center justify-center text-gray-500">Photo Placeholder</div>
                 </div> 
@@ -111,25 +85,20 @@
 
         <!-- Values --> 
         <section class="max-w-5xl mx-auto px-6 py-16"> 
-            <h2 class="font-display text-center mb-14" style="color: rgb(255, 255, 255); font-weight: 700; font-size: 32px;">Our Values</h2> 
-            
-            <!-- Dynamic Values Grid Injected Here -->
+            <h2 class="font-display text-center mb-14 text-white font-bold text-3xl">Our Values</h2> 
             <div id="valuesGrid" class="grid md:grid-cols-3 gap-8"></div> 
         </section>
 
         <!-- Team --> 
         <section class="max-w-6xl mx-auto px-6 py-16"> 
-            <h2 class="font-display text-center mb-14" style="color: rgb(255, 255, 255); font-weight: 700; font-size: 32px;">Meet the Team</h2> 
-            
-            <!-- Dynamic Team Grid Injected Here -->
+            <h2 class="font-display text-center mb-14 text-white font-bold text-3xl">Meet the Team</h2> 
             <div id="teamGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"></div> 
         </section> 
-
     </main> 
 
     <footer class="w-full text-center py-10 px-6 bg-[#080d18]">
         <div id="footerLinksContainer" class="flex justify-center gap-6 mb-6"></div>
-        <p style="color: rgb(75, 85, 99); font-size: 16px;">© 2026 One Circle. Maintained by Kebaso Michael Griffins.</p> 
+        <p class="text-gray-500 text-sm">© 2026 One Circle. Maintained by Kebaso Michael Griffins.</p> 
     </footer>
 
     <!-- ABOUT EDIT MODAL -->
@@ -142,10 +111,8 @@
             <div style="padding: 20px;">
                 <label style="color: #ccc; display: block; margin-bottom: 5px;">Page Title</label>
                 <input type="text" id="editTitle" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; box-sizing: border-box; border-radius: 6px;">
-                
                 <label style="color: #ccc; display: block; margin-bottom: 5px;">Hero Subtitle</label>
                 <input type="text" id="editSubtitle" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; box-sizing: border-box; border-radius: 6px;">
-                
                 <label style="color: #ccc; display: block; margin-bottom: 5px;">Our Story</label>
                 <textarea id="editStory" rows="6" style="width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; font-family: inherit; border-radius: 6px;"></textarea>
             </div>
@@ -156,19 +123,14 @@
         </div>
     </div>
 
-    <!-- DYNAMIC DATA FETCHING LOGIC -->
+    <!-- LOGIC -->
     <script>
+        lucide.createIcons();
         let globalAboutData = null;
         let isAdmin = sessionStorage.getItem('oneCircleAdmin') === 'true';
 
-        // Initialize Intersection Observer for Scroll Animations
         const observer = new IntersectionObserver((entries) => { 
-            entries.forEach(e => { 
-                if (e.isIntersecting) { 
-                    e.target.classList.add('visible'); 
-                    observer.unobserve(e.target); 
-                } 
-            }); 
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }); 
         }, { threshold: 0.15 }); 
 
         fetch('about.json')
@@ -179,39 +141,25 @@
                 
                 if (isAdmin) {
                     document.getElementById('adminToolbar').style.display = 'flex';
-                    document.getElementById('backLink').href = 'admin/index.html';
-                    document.getElementById('backLink').textContent = '← Back to Admin Panel';
-                    
                     const editZones = document.querySelectorAll('.about-editable');
                     editZones.forEach(zone => {
                         zone.classList.add('active-edit');
                         zone.addEventListener('click', openAboutModal);
                     });
                 }
-
-                // Trigger animations after elements are rendered
-                setTimeout(() => {
-                    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-                }, 100);
+                setTimeout(() => { document.querySelectorAll('.fade-up').forEach(el => observer.observe(el)); }, 100);
             })
-            .catch(error => {
-                console.error("Error fetching about data:", error);
-                document.getElementById('pageTitle').textContent = 'Error loading data';
-            });
+            .catch(error => console.error("Error fetching about data:", error));
 
         function renderAboutPage(data) {
             document.getElementById('pageTitle').textContent = data.page_title;
             document.getElementById('pageSubtitle').textContent = data.hero_subtitle;
 
-            // Story Text
             const storyParagraphs = data.story.split('\n\n');
             let storyHTML = '';
-            storyParagraphs.forEach(p => {
-                storyHTML += `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`;
-            });
+            storyParagraphs.forEach(p => { storyHTML += `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`; });
             document.getElementById('aboutTextContainer').innerHTML = storyHTML;
 
-            // Group Photo
             const groupPhotoContainer = document.getElementById('groupPhotoContainer');
             if (data.group_photo) {
                 let groupImgPath = data.group_photo;
@@ -219,52 +167,42 @@
                 groupPhotoContainer.innerHTML = `<img class="w-full rounded-2xl shadow-2xl object-cover aspect-[4/3]" loading="lazy" src="${groupImgPath}" alt="One Circle Community">`;
             }
 
-            // Core Values
             const valuesGrid = document.getElementById('valuesGrid');
             valuesGrid.innerHTML = '';
             data.core_values.forEach((value, index) => {
                 const delayClass = index === 0 ? '' : `delay-${index}`;
                 valuesGrid.innerHTML += `
-                    <div class="fade-up ${delayClass} rounded-xl p-8 text-center" style="background: rgb(21, 29, 46);">
+                    <div class="fade-up ${delayClass} rounded-xl p-8 text-center bg-[#151d2e]">
                         <div class="text-4xl mb-4">${value.icon}</div>
-                        <h3 class="font-display mb-2" style="color: rgb(255, 255, 255); font-weight: 700; font-size: 22px;">${value.title}</h3>
-                        <p class="leading-relaxed" style="color: rgb(148, 163, 184); font-size: 16px;">${value.description}</p>
+                        <h3 class="font-display mb-2 text-white font-bold text-2xl">${value.title}</h3>
+                        <p class="leading-relaxed text-[#94a3b8] text-base">${value.description}</p>
                     </div>
                 `;
             });
 
-            // Team Grid
             const teamGrid = document.getElementById('teamGrid');
             teamGrid.innerHTML = ''; 
             data.team.forEach((member, index) => {
                 let imgPath = member.image;
                 if (imgPath && imgPath.startsWith('/')) imgPath = imgPath.substring(1); 
-
                 const delayClass = index === 0 ? '' : index > 3 ? '' : `delay-${index}`;
-                
-                const imageHTML = imgPath 
-                    ? `<img class="w-full aspect-[3/4] object-cover rounded-xl mb-3" loading="lazy" src="${imgPath}" alt="${member.name}">`
-                    : `<div class="w-full aspect-[3/4] bg-[#151d2e] rounded-xl mb-3 flex items-center justify-center text-gray-500">Photo</div>`;
-
+                const imageHTML = imgPath ? `<img class="w-full aspect-[3/4] object-cover rounded-xl mb-3" loading="lazy" src="${imgPath}" alt="${member.name}">` : `<div class="w-full aspect-[3/4] bg-[#151d2e] rounded-xl mb-3 flex items-center justify-center text-gray-500">Photo</div>`;
                 teamGrid.innerHTML += `
                     <div class="fade-up ${delayClass} text-center">
                         ${imageHTML}
                         <h3 class="font-bold text-white text-lg">${member.name}</h3>
-                        <p class="text-sm uppercase tracking-wider mt-1" style="color: rgb(212, 168, 83);">${member.role}</p>
+                        <p class="text-sm uppercase tracking-wider mt-1 text-[#d4a853]">${member.role}</p>
                     </div>
                 `;
             });
 
-            // Footer Links
             const footerLinksContainer = document.getElementById('footerLinksContainer');
             footerLinksContainer.innerHTML = data.footer_links.map(link => 
                 `<a href="${link.url}" class="text-[#d4a853] hover:text-white transition-colors font-bold tracking-wider uppercase text-sm">${link.label}</a>`
             ).join('');
         }
 
-        // ==========================================
-        // MODAL & GITHUB SAVING LOGIC
-        // ==========================================
+        // Modal Logic
         function openAboutModal() {
             if (!isAdmin) return;
             document.getElementById('editTitle').value = globalAboutData.page_title;
@@ -272,11 +210,7 @@
             document.getElementById('editStory').value = globalAboutData.story;
             document.getElementById('aboutModal').style.display = 'flex';
         }
-
-        function closeAboutModal() {
-            document.getElementById('aboutModal').style.display = 'none';
-        }
-
+        function closeAboutModal() { document.getElementById('aboutModal').style.display = 'none'; }
         function saveAboutModal() {
             globalAboutData.page_title = document.getElementById('editTitle').value;
             globalAboutData.hero_subtitle = document.getElementById('editSubtitle').value;
@@ -288,7 +222,6 @@
         async function publishAboutToGitHub() {
             const token = prompt("Enter your GitHub Personal Access Token to publish About page updates:");
             if (!token) return;
-
             const repoOwner = "michaelgriffinsk-wq";
             const repoName = "https-github.com-one_circle";
             const branch = "About-json-branch";
@@ -296,9 +229,7 @@
             const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
 
             try {
-                const getResponse = await fetch(`${apiUrl}?ref=${branch}`, {
-                    headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
-                });
+                const getResponse = await fetch(`${apiUrl}?ref=${branch}`, { headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" } });
                 if (!getResponse.ok) throw new Error("Could not fetch current file SHA.");
                 const currentSha = (await getResponse.json()).sha;
 
@@ -307,20 +238,13 @@
 
                 const putResponse = await fetch(apiUrl, {
                     method: "PUT",
-                    headers: {
-                        "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: "Update About page content via custom Admin UI", content: base64Content, sha: currentSha, branch: branch
-                    })
+                    headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: "Update About page content via custom Admin UI", content: base64Content, sha: currentSha, branch: branch })
                 });
 
                 if (putResponse.ok) alert("Success! About page changes have been published to GitHub.");
                 else alert("Failed to publish: " + (await putResponse.json()).message);
-            } catch (error) {
-                console.error("Error publishing:", error);
-                alert("An error occurred. Check the browser console.");
-            }
+            } catch (error) { console.error("Error publishing:", error); alert("An error occurred."); }
         }
     </script>
 </body>
