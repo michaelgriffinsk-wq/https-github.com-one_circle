@@ -30,7 +30,8 @@
     {
       "name": "Alex Mutuma",
       "role": "Keys",
-      "image_placeholder": "Photo"
+      "image_placeholder": "Photo",
+      "image": ""
     },
     {
       "name": "Kebaso Michael Griffins",
@@ -42,6 +43,11 @@
       "name": "Duang",
       "role": "Audio & Media",
       "image_placeholder": "Photo"
+    },
+    {
+      "name": "Chebet",
+      "role": "Vocalist ",
+      "image": "uploads/1000592008.jpg"
     }
   ],
   "footer_links": [
