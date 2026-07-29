@@ -11,7 +11,7 @@
     
     <style> 
         body { font-family: 'Alegreya Sans', sans-serif; background: #0c1220; color: #fff;} 
-        .font-display { font-family: 'Playfair Display', serif; } 
+        .font-display { font-display: swap; font-family: 'Playfair Display', serif; } 
         
         .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; } 
         .fade-up.visible { opacity: 1; transform: translateY(0); } 
@@ -94,10 +94,10 @@
             <div id="valuesGrid" class="grid md:grid-cols-3 gap-8"></div> 
         </section>
 
-        <!-- TEAM --> 
-        <section class="max-w-6xl mx-auto px-6 py-16"> 
+        <!-- TEAM (Masonry Layout & Editable) --> 
+        <section class="max-w-6xl mx-auto px-6 py-16 about-editable" id="teamEditZone"> 
             <h2 class="font-display text-center mb-14 text-white font-bold text-3xl">Meet the Team</h2> 
-            <div id="teamGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"></div> 
+            <div id="teamGrid" class="columns-2 md:columns-3 lg:columns-5 gap-6"></div> 
         </section> 
 
     </main> 
@@ -197,12 +197,16 @@
                 let imgPath = member.image;
                 if (imgPath && imgPath.startsWith('/')) imgPath = imgPath.substring(1); 
                 const delayClass = index === 0 ? '' : index > 3 ? '' : `delay-${index}`;
-                const imageHTML = imgPath ? `<img class="w-full aspect-[3/4] object-cover rounded-xl mb-3" loading="lazy" src="${imgPath}" alt="${member.name}">` : `<div class="w-full aspect-[3/4] bg-[#151d2e] rounded-xl mb-3 flex items-center justify-center text-gray-500">Photo</div>`;
+                
+                const aspectClasses = ['aspect-[3/4]', 'aspect-[1/1]', 'aspect-[4/5]'];
+                const randomAspect = aspectClasses[index % aspectClasses.length];
+
+                const imageHTML = imgPath ? `<img class="w-full ${randomAspect} object-cover rounded-xl mb-3 transition-transform duration-500 group-hover:scale-105" loading="lazy" src="${imgPath}" alt="${member.name}">` : `<div class="w-full ${randomAspect} bg-[#151d2e] rounded-xl mb-3 flex items-center justify-center text-gray-500 font-bold">Photo</div>`;
                 teamGrid.innerHTML += `
-                    <div class="fade-up ${delayClass} text-center">
+                    <div class="fade-up ${delayClass} mb-6 break-inside-avoid bg-[#151d2e]/40 p-4 rounded-2xl border border-white/5 group shadow-lg">
                         ${imageHTML}
-                        <h3 class="font-bold text-white text-lg">${member.name}</h3>
-                        <p class="text-sm uppercase tracking-wider mt-1 text-[#d4a853]">${member.role}</p>
+                        <h3 class="font-bold text-white text-lg text-center mt-2">${member.name}</h3>
+                        <p class="text-xs uppercase tracking-widest text-center mt-1 text-[#d4a853] font-semibold">${member.role}</p>
                     </div>
                 `;
             });
