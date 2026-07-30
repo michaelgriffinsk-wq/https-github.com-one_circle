@@ -1,1 +1,24 @@
+{
+  "name": "One Circle Worship",
+  "short_name": "One Circle",
+  "description": "A community of worship, music, and fellowship.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0b",
+  "theme_color": "#d8a64d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
 
