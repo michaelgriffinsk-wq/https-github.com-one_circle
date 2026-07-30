@@ -1,6 +1,6 @@
 /**
  * player.js - Global Persistent Audio Engine & Client-Side SPA Router for One Circle
- * Upgraded with Spotify-style UI, Shuffle, Loop, Device Picker, and robust State Persistence.
+ * Upgraded with Spotify-style UI, Shuffle, Loop, History Stack, and Mobile Swipe Gestures.
  */
 (function() {
     // Prevent duplicate injection
@@ -35,23 +35,30 @@
           .spotify-btn.active { color: #d8a64d !important; }
           .spotify-btn.active svg { fill: currentColor; }
 
-          .device-select-popup {
-            display: none; position: absolute; bottom: 70px; right: 20px; background: #181818;
-            border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 12px; z-index: 100002;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); width: 260px; font-size: 13px; color: #f5efe5;
+          /* History Stack Popup Styles */
+          .history-popup {
+            display: none; position: absolute; bottom: 70px; left: 0; background: #181818;
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 16px; z-index: 100002;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8); width: 280px; max-height: 350px; overflow-y: auto;
           }
-          .device-select-popup.open { display: block; }
-          .device-select-popup select {
-            width: 100%; background: #282828; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 6px; margin-top: 8px; outline: none; font-family: inherit;
+          .history-popup.open { display: block; }
+          .history-item { 
+            display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-bottom: 12px; 
+            border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: background 0.2s; 
           }
+          .history-item:hover { background: rgba(255,255,255,0.05); border-radius: 6px; }
+          .history-item:last-child { border-bottom: none; padding-bottom: 0; }
+          .history-item img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
+          .history-item .hist-text { display: flex; flex-direction: column; min-width: 0; }
+          .history-item .hist-title { font-size: 13px; font-weight: 700; color: #f5efe5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .history-item .hist-artist { font-size: 11px; color: #aaa398; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         </style>
 
-        <!-- Initially set to display: none so it only appears when a track is clicked -->
         <div id="persistentPlayer" style="display: none;">
            <!-- MINIMIZED BAR -->
            <div class="player-minimized" id="expandTrigger">
               <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
-                 <img id="miniImg" src="" alt="Art" style="width: 48px; height: 48px; border-radius: 6px; object-fit: cover; background: #222; flex-shrink: 0;">
+                 <img id="miniImg" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" style="width: 48px; height: 48px; border-radius: 6px; object-fit: cover; background: #222; flex-shrink: 0;">
                  <div style="min-width: 0;">
                     <h4 id="miniTitle" style="margin: 0; font-size: 14px; font-weight: 700; color: #f5efe5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></h4>
                     <p id="miniArtist" style="margin: 2px 0 0 0; font-size: 12px; color: #aaa398; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
@@ -75,7 +82,7 @@
               </div>
 
               <div id="swipeArea" style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px; margin: auto; text-align: center;">
-                 <img id="maxImg" src="" alt="Album Art" style="width: 100%; aspect-ratio: 1/1; max-width: 340px; border-radius: 12px; object-fit: cover; box-shadow: 0 20px 50px rgba(0,0,0,0.6); margin-bottom: 28px;">
+                 <img id="maxImg" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" style="width: 100%; aspect-ratio: 1/1; max-width: 340px; border-radius: 12px; object-fit: cover; box-shadow: 0 20px 50px rgba(0,0,0,0.6); margin-bottom: 28px;">
                  <div style="width: 100%; text-align: left; margin-bottom: 20px;">
                     <h2 id="maxTitle" style="margin: 0; font-size: 24px; font-weight: 700; color: #f5efe5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></h2>
                     <p id="maxArtist" style="margin: 6px 0 0 0; font-size: 15px; color: #aaa398; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
@@ -110,21 +117,26 @@
                  </div>
               </div>
 
-              <!-- BOTTOM ANCHOR CONTROLS (Audio Device Picker) -->
+              <!-- BOTTOM ANCHOR CONTROLS (History Stack) -->
               <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 600px; margin: 0 auto; position: relative;">
-                 <button id="devicePickerBtn" class="spotify-btn" title="Connect to a Device">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                 
+                 <!-- History / Stack Button -->
+                 <button id="historyBtn" class="spotify-btn" title="Recently Played">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
                  </button>
                  
-                 <!-- Audio Output Device Select Popup Menu -->
-                 <div id="devicePopup" class="device-select-popup">
-                    <span style="font-weight: 700; color: #d8a64d;">Select Audio Output</span>
-                    <select id="audioOutputSelect">
-                       <option value="">Default System Speaker</option>
-                    </select>
+                 <!-- History Stack Popup Menu -->
+                 <div id="historyPopup" class="history-popup">
+                    <span style="font-weight: 700; color: #d8a64d; display: block; margin-bottom: 8px;">Recently Played</span>
+                    <div id="historyList">
+                        <div style="font-size: 12px; color: #aaa398;">No history yet.</div>
+                    </div>
                  </div>
 
-                 <span style="font-size: 12px; color: #aaa398;">One Circle Audio Engine</span>
+                 <span style="font-size: 12px; color: #aaa398; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;">One Circle Audio Engine</span>
               </div>
            </div>
         </div>
@@ -143,13 +155,15 @@
             this.isShuffle = false;
             this.loopMode = 0; // 0: Off, 1: Loop All, 2: Loop One
             this.shuffledIndices = [];
+            
+            // History State (Max 10)
+            this.playHistory = [];
 
             this.audio = document.createElement('audio');
             document.body.appendChild(this.audio);
 
             this.initListeners();
             this.restoreState();
-            this.loadAudioDevices();
         }
 
         initListeners() {
@@ -169,30 +183,44 @@
             document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
             document.getElementById('loopBtn').addEventListener('click', () => this.toggleLoop());
 
-            // Audio Device Picker toggle
-            const deviceBtn = document.getElementById('devicePickerBtn');
-            const devicePopup = document.getElementById('devicePopup');
-            deviceBtn.addEventListener('click', (e) => {
+            // History Stack Popup toggle
+            const histBtn = document.getElementById('historyBtn');
+            const histPopup = document.getElementById('historyPopup');
+            histBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                devicePopup.classList.toggle('open');
+                histPopup.classList.toggle('open');
             });
-            document.addEventListener('click', () => devicePopup.classList.remove('open'));
-            devicePopup.addEventListener('click', (e) => e.stopPropagation());
+            document.addEventListener('click', () => histPopup.classList.remove('open'));
+            histPopup.addEventListener('click', (e) => e.stopPropagation());
 
-            // Audio Output Device Selection handler
-            const outputSelect = document.getElementById('audioOutputSelect');
-            outputSelect.addEventListener('change', async (e) => {
-                const deviceId = e.target.value;
-                if (typeof this.audio.setSinkId === 'function') {
-                    try {
-                        await this.audio.setSinkId(deviceId);
-                    } catch (err) {
-                        console.error("Error setting audio output device:", err);
+            // MOBILE TOUCH SWIPE GESTURES
+            let touchStartY = 0, touchStartX = 0;
+            const swipeArea = document.getElementById('swipeArea');
+            
+            if (swipeArea) {
+                swipeArea.addEventListener('touchstart', (e) => {
+                    touchStartY = e.touches[0].clientY;
+                    touchStartX = e.touches[0].clientX;
+                }, {passive: true});
+
+                swipeArea.addEventListener('touchend', (e) => {
+                    const diffY = e.changedTouches[0].clientY - touchStartY;
+                    const diffX = e.changedTouches[0].clientX - touchStartX;
+
+                    // Swipe Down to Minimize
+                    if (diffY > 60 && Math.abs(diffX) < 50) {
+                        this.setExpanded(false);
+                    } 
+                    // Swipe Left (drag finger left) to go to Next Track
+                    else if (diffX < -60 && Math.abs(diffY) < 50) {
+                        this.nextTrack();
+                    } 
+                    // Swipe Right (drag finger right) to go to Previous Track
+                    else if (diffX > 60 && Math.abs(diffY) < 50) {
+                        this.prevTrack();
                     }
-                } else {
-                    alert("Your browser does not support audio output device switching.");
-                }
-            });
+                }, {passive: true});
+            }
 
             // Audio element native events
             this.audio.addEventListener('timeupdate', () => {
@@ -208,24 +236,6 @@
                     this.audio.currentTime = (e.target.value / 100) * this.audio.duration;
                 }
             });
-        }
-
-        async loadAudioDevices() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const audioOutputs = devices.filter(device => device.kind === 'audiooutput');
-                const select = document.getElementById('audioOutputSelect');
-                select.innerHTML = '<option value="">Default System Speaker</option>';
-                audioOutputs.forEach(device => {
-                    const opt = document.createElement('option');
-                    opt.value = device.deviceId;
-                    opt.textContent = device.label || `Speaker (${device.deviceId.slice(0, 4)}...)`;
-                    select.appendChild(opt);
-                });
-            } catch (err) {
-                console.error("Could not load audio output devices:", err);
-            }
         }
 
         setExpanded(expand) {
@@ -245,7 +255,18 @@
             this.playlist = playlist.length ? playlist : [track];
             this.currentIndex = index;
 
+            // Update UI BEFORE showing the player to prevent FOUC (Flash of Unstyled Content)
+            this.updateUIState();
             document.getElementById('persistentPlayer').style.display = 'block';
+
+            // Add to Play History (Only if it's not the exact same track consecutively)
+            if (this.playHistory.length === 0 || this.playHistory[0].title !== track.title) {
+                this.playHistory.unshift(track); // Add to beginning
+                if (this.playHistory.length > 10) {
+                    this.playHistory.pop(); // Keep only the last 10
+                }
+                this.renderHistory();
+            }
 
             if (this.currentTrack.file || this.currentTrack.audioUrl) {
                 this.audio.src = this.currentTrack.file || this.currentTrack.audioUrl;
@@ -390,6 +411,33 @@
                 this.nextTrack();
             }
         }
+        
+        renderHistory() {
+            const list = document.getElementById('historyList');
+            if (this.playHistory.length === 0) {
+                list.innerHTML = '<div style="font-size: 12px; color: #aaa398;">No history yet.</div>';
+                return;
+            }
+            list.innerHTML = this.playHistory.map((track, i) => `
+                <div class="history-item" data-index="${i}">
+                    <img src="${track.image || 'https://images.pexels.com/photos/7708458/pexels-photo-7708458.jpeg'}" alt="">
+                    <div class="hist-text">
+                        <span class="hist-title">${track.title || 'Unknown Track'}</span>
+                        <span class="hist-artist">${track.artist || 'One Circle'}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Make history items clickable to replay
+            list.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const idx = e.currentTarget.getAttribute('data-index');
+                    const trackToPlay = this.playHistory[idx];
+                    this.playTrack(trackToPlay, [trackToPlay], 0); // Play immediately as single track context
+                    document.getElementById('historyPopup').classList.remove('open'); // Close popup
+                });
+            });
+        }
 
         saveState() {
             localStorage.setItem('oneCirclePlayerState', JSON.stringify({
@@ -397,7 +445,8 @@
                 isPlaying: this.isPlaying,
                 currentTime: this.audio.currentTime, 
                 playlist: this.playlist, 
-                currentIndex: this.currentIndex
+                currentIndex: this.currentIndex,
+                playHistory: this.playHistory
             }));
         }
 
@@ -410,14 +459,16 @@
                         this.currentTrack = state.track;
                         this.playlist = state.playlist || [];
                         this.currentIndex = state.currentIndex || 0;
+                        this.playHistory = state.playHistory || [];
                         this.isPlaying = false; // Always load paused to satisfy browser policies
                         
                         this.audio.src = state.track.file || state.track.audioUrl || '';
                         this.audio.currentTime = state.currentTime || 0;
                         
-                        document.getElementById('persistentPlayer').style.display = 'block';
-                        this.updateUIState();
+                        this.updateUIState(); // Update UI instantly
+                        document.getElementById('persistentPlayer').style.display = 'block'; // Then show player
                         this.updateProgress();
+                        this.renderHistory();
                     }
                 } catch(e) {
                     console.error("Error restoring player state:", e);
