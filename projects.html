@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>One Circle | Music</title>
   
+  <!-- PWA Manifest & Offline App Support -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a0b">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
@@ -285,13 +290,19 @@
             const tracksContainer = document.getElementById('tracksContainer');
             if (tracksContainer) {
                 tracksContainer.innerHTML = data.tracks.map(track => `
-                    <article class="track-row grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl px-2 py-4 md:grid-cols-[auto_1fr_auto_auto] md:gap-6">
+                    <article class="track-row grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-xl px-2 py-4 md:grid-cols-[auto_1fr_auto_auto_auto] md:gap-6">
                         <img loading="lazy" class="h-14 w-14 rounded-lg object-cover" src="${formatImgPath(track.image)}" alt="${track.title}">
                         <div>
                             <h3 class="font-bold text-[#f5efe5] text-[17px]">${track.title}</h3>
                             <p class="mt-1 text-sm text-[#aaa398]">${track.meta}</p>
                         </div>
                         <span class="hidden text-sm text-[#aaa398] md:block">${track.duration}</span> 
+                        
+                        <!-- Download Button for Offline PWA -->
+                        <button type="button" class="offline-download-btn text-[#aaa398] hover:text-[#d8a64d] transition" data-url="${track.file || ''}" title="Download for Offline">
+                            <i data-lucide="download-cloud" class="w-5 h-5"></i>
+                        </button>
+
                         <button type="button" class="preview-button inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-500 text-stone-100 transition hover:border-amber-300 hover:text-amber-300" data-tone="${track.tone}">
                             <i data-lucide="play" class="h-4 w-4"></i>
                         </button>
