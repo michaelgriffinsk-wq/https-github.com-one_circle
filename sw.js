@@ -3,18 +3,17 @@ const MEDIA_CACHE = 'user-downloads-v1'; // We will use this later for selective
 
 // The "App Shell" - These files download automatically in the background
 const CORE_ASSETS = [
-    './',
-    './index.html',
-    './about.html',
-    './projects.html',
-    './playlist.html',
-    './gallery.html',
-    './player.js',
-    './database.json',
-    './manifest.json',
-    './icon-192.png',
-    './icon-512.png'
+    '/https-github.com-one_circle/',
+    '/https-github.com-one_circle/index.html',
+    '/https-github.com-one_circle/about.html',
+    '/https-github.com-one_circle/projects.html',
+    '/https-github.com-one_circle/playlist.html',
+    '/https-github.com-one_circle/gallery.html',
+    '/https-github.com-one_circle/player.js',
+    '/https-github.com-one_circle/database.json',
+    '/https-github.com-one_circle/manifest.json'
 ];
+
 
 // 1. INSTALL EVENT: Automatically cache the core visual assets
 self.addEventListener('install', (event) => {
