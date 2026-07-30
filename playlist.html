@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Circle | Playlist</title>
     
+    <!-- PWA Manifest & Offline App Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0b">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
     <!-- Tailwind CSS & Fonts matching projects.html -->
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -138,7 +143,13 @@
                                         <p class="text-sm text-[#aaa398] mt-1">${track.artist}</p>
                                     </div>
                                 </div>
-                                <i data-lucide="play-circle" class="w-5 h-5 text-[#aaa398]"></i>
+                                <div class="flex items-center gap-4">
+                                    <!-- Download Button for Offline PWA -->
+                                    <button class="offline-download-btn text-[#aaa398] hover:text-[#d8a64d] transition" data-url="${track.file}" title="Download for Offline">
+                                        <i data-lucide="download-cloud" class="w-5 h-5"></i>
+                                    </button>
+                                    <i data-lucide="play-circle" class="w-5 h-5 text-[#aaa398] pointer-events-none"></i>
+                                </div>
                             `;
                             div.onclick = () => {
                                 if (window.globalPlayer) {
