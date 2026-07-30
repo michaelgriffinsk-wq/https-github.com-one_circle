@@ -1,6 +1,6 @@
 /**
  * player.js - Global Persistent Audio Engine & Client-Side SPA Router for One Circle
- * Upgraded with Spotify-style UI, Shuffle, Loop, History Stack, and Mobile Swipe Gestures.
+ * Upgraded with Spotify-style UI, Shuffle, Loop, History Stack, Mobile Swipes, and Offline PWA Downloading.
  */
 (function() {
     // Prevent duplicate injection
@@ -52,6 +52,9 @@
           .history-item .hist-text { display: flex; flex-direction: column; min-width: 0; }
           .history-item .hist-title { font-size: 13px; font-weight: 700; color: #f5efe5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
           .history-item .hist-artist { font-size: 11px; color: #aaa398; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+          /* Custom styling for the green downloaded checkmark */
+          .downloaded-check { color: #1ed760 !important; }
         </style>
 
         <div id="persistentPlayer" style="display: none;">
@@ -238,6 +241,67 @@
             });
         }
 
+        // --- NEW: OFFLINE DOWNLOAD HANDLER ---
+        bindDownloadButtons() {
+            document.querySelectorAll('.offline-download-btn').forEach(button => {
+                const url = button.getAttribute('data-url');
+                if (!url) return;
+
+                // Check if already downloaded when page loads
+                if ('caches' in window) {
+                    caches.open('user-downloads-v1').then(cache => {
+                        cache.match(url).then(response => {
+                            if (response) {
+                                button.classList.add('downloaded-check');
+                                button.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i>`;
+                                button.title = "Downloaded";
+                                if (typeof lucide !== 'undefined') lucide.createIcons();
+                            }
+                        });
+                    });
+                }
+
+                // Handle click to download
+                button.addEventListener('click', async (e) => {
+                    e.stopPropagation(); // Prevent track from playing when hitting download
+                    if (!('caches' in window)) {
+                        alert("Your browser doesn't support offline downloads.");
+                        return;
+                    }
+
+                    try {
+                        button.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>`;
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                        const cache = await caches.open('user-downloads-v1');
+                        
+                        // Check if already downloaded to avoid double-downloading
+                        const exists = await cache.match(url);
+                        if (exists) {
+                            alert("This track is already saved offline.");
+                        } else {
+                            // Fetch and save the audio file
+                            const response = await fetch(url);
+                            if (!response.ok) throw new Error("Network error during download");
+                            await cache.put(url, response.clone());
+                        }
+
+                        // Success styling
+                        button.classList.add('downloaded-check');
+                        button.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i>`;
+                        button.title = "Downloaded";
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                    } catch (error) {
+                        console.error("Download failed:", error);
+                        alert("Failed to download track. Check your connection.");
+                        button.innerHTML = `<i data-lucide="download-cloud" class="w-5 h-5"></i>`;
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }
+                });
+            });
+        }
+
         setExpanded(expand) {
             this.isExpanded = expand;
             const maxEl = document.getElementById('maximizedPlayer');
@@ -255,15 +319,15 @@
             this.playlist = playlist.length ? playlist : [track];
             this.currentIndex = index;
 
-            // Update UI BEFORE showing the player to prevent FOUC (Flash of Unstyled Content)
+            // Update UI BEFORE showing the player to prevent FOUC
             this.updateUIState();
             document.getElementById('persistentPlayer').style.display = 'block';
 
-            // Add to Play History (Only if it's not the exact same track consecutively)
+            // Add to Play History
             if (this.playHistory.length === 0 || this.playHistory[0].title !== track.title) {
-                this.playHistory.unshift(track); // Add to beginning
+                this.playHistory.unshift(track); 
                 if (this.playHistory.length > 10) {
-                    this.playHistory.pop(); // Keep only the last 10
+                    this.playHistory.pop(); 
                 }
                 this.renderHistory();
             }
@@ -428,13 +492,12 @@
                 </div>
             `).join('');
 
-            // Make history items clickable to replay
             list.querySelectorAll('.history-item').forEach(item => {
                 item.addEventListener('click', (e) => {
                     const idx = e.currentTarget.getAttribute('data-index');
                     const trackToPlay = this.playHistory[idx];
-                    this.playTrack(trackToPlay, [trackToPlay], 0); // Play immediately as single track context
-                    document.getElementById('historyPopup').classList.remove('open'); // Close popup
+                    this.playTrack(trackToPlay, [trackToPlay], 0); 
+                    document.getElementById('historyPopup').classList.remove('open'); 
                 });
             });
         }
@@ -460,13 +523,13 @@
                         this.playlist = state.playlist || [];
                         this.currentIndex = state.currentIndex || 0;
                         this.playHistory = state.playHistory || [];
-                        this.isPlaying = false; // Always load paused to satisfy browser policies
+                        this.isPlaying = false; 
                         
                         this.audio.src = state.track.file || state.track.audioUrl || '';
                         this.audio.currentTime = state.currentTime || 0;
                         
-                        this.updateUIState(); // Update UI instantly
-                        document.getElementById('persistentPlayer').style.display = 'block'; // Then show player
+                        this.updateUIState();
+                        document.getElementById('persistentPlayer').style.display = 'block';
                         this.updateProgress();
                         this.renderHistory();
                     }
@@ -521,11 +584,36 @@
             if (typeof window.initPage === 'function') {
                 window.initPage();
             }
+
+            // RE-BIND DOWNLOAD BUTTONS ON NEW PAGE LOAD
+            if (window.globalPlayer && typeof window.globalPlayer.bindDownloadButtons === 'function') {
+                setTimeout(() => window.globalPlayer.bindDownloadButtons(), 300);
+            }
+
         } catch (err) {
             window.location.href = url;
         }
     }
 
     initRouter();
+
+    // BIND DOWNLOAD BUTTONS ON INITIAL LOAD
+    setTimeout(() => {
+        if (window.globalPlayer) window.globalPlayer.bindDownloadButtons();
+    }, 500);
+
+    // --- PWA SERVICE WORKER REGISTRATION ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful:', registration.scope);
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed:', err);
+                });
+        });
+    }
+
 })();
 
