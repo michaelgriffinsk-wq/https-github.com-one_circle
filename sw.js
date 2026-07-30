@@ -1,5 +1,5 @@
-const CORE_CACHE = 'one-circle-core-v1';
-const MEDIA_CACHE = 'user-downloads-v1'; // We will use this later for selective downloads
+const CORE_CACHE = 'one-circle-core-v2';
+const MEDIA_CACHE = 'user-downloads-v2'; // We will use this later for selective downloads
 
 // The "App Shell" - These files download automatically in the background
 const CORE_ASSETS = [
