@@ -1,6 +1,6 @@
 /**
  * player.js - Global Persistent Audio Engine & Client-Side SPA Router for One Circle
- * Upgraded with Spotify-style UI, Shuffle, Loop, History Stack, Mobile Swipes, and Offline PWA Downloading.
+ * Upgraded with Offline Blob Streaming to bypass mobile browser Range Request bugs.
  */
 (function() {
     // Prevent duplicate injection
@@ -156,7 +156,7 @@
             
             // Spotify specific states
             this.isShuffle = false;
-            this.loopMode = 0; // 0: Off, 1: Loop All, 2: Loop One
+            this.loopMode = 0; 
             this.shuffledIndices = [];
             
             // History State (Max 10)
@@ -170,23 +170,18 @@
         }
 
         initListeners() {
-            // Expansion toggles
             document.getElementById('expandTrigger').addEventListener('click', () => this.setExpanded(true));
             document.getElementById('collapseBtn').addEventListener('click', () => this.setExpanded(false));
 
-            // Play / Pause toggles
             document.getElementById('miniPlayBtn').addEventListener('click', (e) => { e.stopPropagation(); this.togglePlay(); });
             document.getElementById('maxPlayBtn').addEventListener('click', () => this.togglePlay());
 
-            // Skip controls
             document.getElementById('nextBtn').addEventListener('click', () => this.nextTrack());
             document.getElementById('prevBtn').addEventListener('click', () => this.prevTrack());
 
-            // Shuffle & Loop toggles
             document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
             document.getElementById('loopBtn').addEventListener('click', () => this.toggleLoop());
 
-            // History Stack Popup toggle
             const histBtn = document.getElementById('historyBtn');
             const histPopup = document.getElementById('historyPopup');
             histBtn.addEventListener('click', (e) => {
@@ -210,29 +205,22 @@
                     const diffY = e.changedTouches[0].clientY - touchStartY;
                     const diffX = e.changedTouches[0].clientX - touchStartX;
 
-                    // Swipe Down to Minimize
                     if (diffY > 60 && Math.abs(diffX) < 50) {
                         this.setExpanded(false);
-                    } 
-                    // Swipe Left (drag finger left) to go to Next Track
-                    else if (diffX < -60 && Math.abs(diffY) < 50) {
+                    } else if (diffX < -60 && Math.abs(diffY) < 50) {
                         this.nextTrack();
-                    } 
-                    // Swipe Right (drag finger right) to go to Previous Track
-                    else if (diffX > 60 && Math.abs(diffY) < 50) {
+                    } else if (diffX > 60 && Math.abs(diffY) < 50) {
                         this.prevTrack();
                     }
                 }, {passive: true});
             }
 
-            // Audio element native events
             this.audio.addEventListener('timeupdate', () => {
                 this.updateProgress();
-                this.saveState(); // Saves currentTime persistently
+                this.saveState(); 
             });
             this.audio.addEventListener('ended', () => this.handleTrackEnded());
 
-            // Scrub bar progress control
             const progressBar = document.getElementById('progressBar');
             progressBar.addEventListener('input', (e) => {
                 if (this.audio.duration) {
@@ -241,16 +229,39 @@
             });
         }
 
-        // --- NEW: OFFLINE DOWNLOAD HANDLER ---
+        // --- THE FIX: Cache-to-Blob Converter ---
+        async loadAudioSource(url) {
+            // If the browser doesn't support caches, just return the standard URL
+            if (!('caches' in window)) return url;
+            
+            try {
+                const cache = await caches.open('user-downloads-v1');
+                // ignoreSearch ensures it finds the file even if there are weird URL parameters
+                const cachedResponse = await cache.match(url, { ignoreSearch: true });
+                
+                if (cachedResponse) {
+                    // Convert the saved audio file into a raw local Blob to bypass Safari Range errors
+                    const blob = await cachedResponse.blob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    console.log("Playing track directly from local offline Blob:", url);
+                    return blobUrl;
+                }
+            } catch (err) {
+                console.error("Error loading Blob from cache:", err);
+            }
+            
+            // If it's not in the cache, return the normal network URL
+            return url;
+        }
+
         bindDownloadButtons() {
             document.querySelectorAll('.offline-download-btn').forEach(button => {
                 const url = button.getAttribute('data-url');
                 if (!url) return;
 
-                // Check if already downloaded when page loads
                 if ('caches' in window) {
                     caches.open('user-downloads-v1').then(cache => {
-                        cache.match(url).then(response => {
+                        cache.match(url, { ignoreSearch: true }).then(response => {
                             if (response) {
                                 button.classList.add('downloaded-check');
                                 button.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i>`;
@@ -261,9 +272,8 @@
                     });
                 }
 
-                // Handle click to download
                 button.addEventListener('click', async (e) => {
-                    e.stopPropagation(); // Prevent track from playing when hitting download
+                    e.stopPropagation(); 
                     if (!('caches' in window)) {
                         alert("Your browser doesn't support offline downloads.");
                         return;
@@ -275,18 +285,15 @@
 
                         const cache = await caches.open('user-downloads-v1');
                         
-                        // Check if already downloaded to avoid double-downloading
-                        const exists = await cache.match(url);
+                        const exists = await cache.match(url, { ignoreSearch: true });
                         if (exists) {
                             alert("This track is already saved offline.");
                         } else {
-                            // Fetch and save the audio file
                             const response = await fetch(url);
                             if (!response.ok) throw new Error("Network error during download");
                             await cache.put(url, response.clone());
                         }
 
-                        // Success styling
                         button.classList.add('downloaded-check');
                         button.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i>`;
                         button.title = "Downloaded";
@@ -314,16 +321,14 @@
             }
         }
 
-        playTrack(track, playlist = [], index = 0) {
+        async playTrack(track, playlist = [], index = 0) {
             this.currentTrack = track;
             this.playlist = playlist.length ? playlist : [track];
             this.currentIndex = index;
 
-            // Update UI BEFORE showing the player to prevent FOUC
             this.updateUIState();
             document.getElementById('persistentPlayer').style.display = 'block';
 
-            // Add to Play History
             if (this.playHistory.length === 0 || this.playHistory[0].title !== track.title) {
                 this.playHistory.unshift(track); 
                 if (this.playHistory.length > 10) {
@@ -332,13 +337,24 @@
                 this.renderHistory();
             }
 
-            if (this.currentTrack.file || this.currentTrack.audioUrl) {
-                this.audio.src = this.currentTrack.file || this.currentTrack.audioUrl;
-                this.audio.play().then(() => {
+            const targetUrl = this.currentTrack.file || this.currentTrack.audioUrl;
+            
+            if (targetUrl) {
+                try {
+                    // Inject the offline Blob URL if downloaded, otherwise stream normally
+                    const playableSrc = await this.loadAudioSource(targetUrl);
+                    this.audio.src = playableSrc;
+                    
+                    await this.audio.play();
                     this.isPlaying = true;
                     this.updateUIState();
                     this.saveState();
-                }).catch(err => console.error("Playback error:", err));
+                } catch (err) {
+                    console.error("Playback error:", err);
+                    this.audio.pause();
+                    this.isPlaying = false;
+                    this.updateUIState();
+                }
             } else {
                 this.audio.pause();
                 this.isPlaying = false;
@@ -366,7 +382,6 @@
             const title = this.currentTrack.title || 'Unknown Track';
             const artist = this.currentTrack.artist || 'One Circle';
 
-            // Update Text and Images
             document.getElementById('miniTitle').textContent = title;
             document.getElementById('miniArtist').textContent = artist;
             document.getElementById('miniImg').src = img;
@@ -375,7 +390,6 @@
             document.getElementById('maxArtist').textContent = artist;
             document.getElementById('maxImg').src = img;
 
-            // Update SVGs centrally
             const playSVG = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
             const pauseSVG = `<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>`;
 
@@ -513,7 +527,7 @@
             }));
         }
 
-        restoreState() {
+        async restoreState() {
             const saved = localStorage.getItem('oneCirclePlayerState');
             if (saved) {
                 try {
@@ -525,8 +539,14 @@
                         this.playHistory = state.playHistory || [];
                         this.isPlaying = false; 
                         
-                        this.audio.src = state.track.file || state.track.audioUrl || '';
-                        this.audio.currentTime = state.currentTime || 0;
+                        const targetUrl = state.track.file || state.track.audioUrl || '';
+                        if (targetUrl) {
+                            // Inject offline Blob URL on restore as well
+                            this.audio.src = await this.loadAudioSource(targetUrl);
+                        }
+                        
+                        // Small delay to ensure metadata loads before setting time
+                        setTimeout(() => { this.audio.currentTime = state.currentTime || 0; }, 100);
                         
                         this.updateUIState();
                         document.getElementById('persistentPlayer').style.display = 'block';
